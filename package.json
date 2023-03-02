@@ -1,0 +1,25 @@
+{
+  "name": "solana-pay-for-woocommerce",
+  "version": "0.1.0",
+  "description": "Solana Pay payment gateway for WooCommerce",
+  "author": "t4top",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t4top/solana-pay-for-woocommerce.git"
+  },
+  "keywords": [
+    "Solana",
+    "Solana Pay",
+    "WooCommerce",
+    "WordPress"
+  ],
+  "bugs": {
+    "url": "https://github.com/t4top/solana-pay-for-woocommerce/issues"
+  },
+  "homepage": "https://github.com/t4top/solana-pay-for-woocommerce#readme"
+}
