@@ -47,3 +47,44 @@ function register_gateway_class( $gateways = [] ) {
 function init_gateway_class() {
   require PLUGIN_DIR . '/includes/class-solana-pay-for-woocommerce.php';
 }
+
+/**
+ * Enqueue a css style or js script to the front end html.
+ *
+ * @param  relpath string Relative path to file to enqueue.
+ * @param  deps    array  An array of registered script handles this file depends on.
+ * @return         string A unique handle name of the file
+ */
+function enqueue_file( $relpath, $deps = [] ) {
+  $handle = str_replace( array( '/', '.' ), '_', $relpath );
+  $url = PLUGIN_URL . $relpath;
+  $path = PLUGIN_DIR . $relpath;
+
+  if ( 0 === substr_compare( $relpath, '.css', -4, 4, true ) ) {
+    wp_enqueue_style( $handle, $url, $deps, filemtime( $path ), 'all' );
+  } else {
+    wp_enqueue_script( $handle, $url, $deps, filemtime( $path ), true );
+  }
+
+  return $handle;
+}
+
+/**
+ * Load enqueued scripts as modules.
+ *
+ * @param  enqueued_scripts array  List of handles of enqueued scripts to load as modules.
+ * @return                  string The <script> tag for the enqueued script.
+ */
+function load_enqueued_scripts_as_modules( $enqueued_scripts = [] ) {
+  add_filter(
+    'script_loader_tag',
+    function ( $tag, $handle ) use( $enqueued_scripts )  {
+      if ( in_array( $handle, $enqueued_scripts ) ) {
+        $tag = str_replace( '></script>', ' type="module" defer></script>', $tag );
+      }
+      return $tag;
+    },
+    10,
+    2
+  );
+}
