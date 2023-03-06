@@ -5,6 +5,9 @@
   "author": "t4top",
   "license": "GPL-3.0-or-later",
   "type": "module",
+  "workspaces": [
+    "assets/svelte"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
