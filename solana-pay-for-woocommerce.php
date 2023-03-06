@@ -12,4 +12,27 @@
  * License URI:       https://github.com/t4top/solana-pay-for-woocommerce/blob/main/LICENSE
  * Text Domain:       solana-pay-for-wc
  * Domain Path:       /languages
+ *
+ * @package T4top\Solana_Pay_for_WC
  */
+
+namespace T4top\Solana_Pay_for_WC;
+
+// die if accessed directly
+if ( ! defined( 'WPINC' ) ) { die; }
+
+// define named constants
+define( 'PLUGIN_DIR', rtrim( plugin_dir_path( __FILE__ ), '/\\' ) );
+define( 'PLUGIN_URL', rtrim( plugin_dir_url( __FILE__ ), '/\\' ) );
+define( 'PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+
+require_once PLUGIN_DIR . '/includes/functions.php';
+
+// return if WooCommerce is not active
+if ( ! is_woocommerce_activated() ) {
+  show_error_notice( __( '<b>Solana Pay for WooCommerce</b> requires <b>WooCommerce</b> to be installed and active.', 'solana-pay-for-wc' ) );
+  return;
+}
+
+add_filter( 'woocommerce_payment_gateways', __NAMESPACE__ . '\register_gateway_class' );
+add_action( 'plugins_loaded', __NAMESPACE__ . '\init_gateway_class' );
