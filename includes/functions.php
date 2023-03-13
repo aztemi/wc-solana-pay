@@ -7,6 +7,17 @@
 
 namespace T4top\Solana_Pay_for_WC;
 
+use StephenHill\Base58;
+
+/**
+ * start session
+ */
+function start_session() {
+  if ( !session_id() ) {
+    session_start();
+  }
+}
+
 /**
  * Check if WooCommerce plugin is activated or not.
  *
@@ -58,12 +69,12 @@ function init_gateway_class() {
 function enqueue_file( $relpath, $deps = [] ) {
   $handle = str_replace( array( '/', '.' ), '_', $relpath );
   $url = PLUGIN_URL . $relpath;
-  $path = PLUGIN_DIR . $relpath;
-
+  
   if ( 0 === substr_compare( $relpath, '.css', -4, 4, true ) ) {
+    $path = PLUGIN_DIR . $relpath;
     wp_enqueue_style( $handle, $url, $deps, filemtime( $path ), 'all' );
   } else {
-    wp_enqueue_script( $handle, $url, $deps, filemtime( $path ), true );
+    wp_enqueue_script( $handle, $url, $deps, null, true );
   }
 
   return $handle;
@@ -87,4 +98,22 @@ function load_enqueued_scripts_as_modules( $enqueued_scripts = [] ) {
     10,
     2
   );
+}
+
+/**
+ * Todo
+ */
+function get_template_html( $relpath, $args = [] ) {
+  ob_start();
+
+  extract( $args );
+  include PLUGIN_DIR . $relpath;
+
+  return ob_get_clean();
+}
+
+function write_log( $txt ) {
+  $myfile = fopen(PLUGIN_DIR . '/assets/log.txt', "a") or die("Unable to open file!");
+  fwrite($myfile, $txt . "\n\n");
+  fclose($myfile);
 }
