@@ -111,9 +111,3 @@ function get_template_html( $relpath, $args = [] ) {
 
   return ob_get_clean();
 }
-
-function write_log( $txt ) {
-  $myfile = fopen(PLUGIN_DIR . '/assets/log.txt', "a") or die("Unable to open file!");
-  fwrite($myfile, $txt . "\n\n");
-  fclose($myfile);
-}
