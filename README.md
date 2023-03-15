@@ -2,9 +2,7 @@
 
 Solana Pay payment gateway for WordPress and WooCommerce
 
-![Solana Pay Demo Screenshot on a smartphone](./assets/img/screenshot.jpg)
-
-<img src="/t4top/solana-pay-for-woocommerce/raw/main/assets/img/screenshot.jpg" alt="Solana Pay Demo Screenshot on a smartphone" style="max-width: 40%;">
+<img src="/assets/img/screenshot.jpg" alt="Solana Pay Demo Screenshot on a smartphone" width="320">
 
 This is a payment gateway built for WordPress as a WooCommerce plugin for online stores to accept payments in USDC and SOL through Solana Pay. It was created as an entry to the [Solana Grizzlython Hackathon](https://solana.com/grizzlython).
 
