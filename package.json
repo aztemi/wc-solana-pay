@@ -9,7 +9,8 @@
     "assets/svelte"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "cd .. && zip -r $npm_package_name-$npm_package_version.zip $npm_package_name -x .gitignore package-lock.json package.json **.git/\\* **node_modules/\\*  **svelte/\\* && cd $npm_package_name"
   },
   "repository": {
     "type": "git",

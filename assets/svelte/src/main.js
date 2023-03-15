@@ -1,5 +1,4 @@
-import App from "./App.svelte";
+import App from "./app.svelte";
 
-const app = new App({
-  target: document.getElementById("app")
-});
+const target = document.getElementById("solana_pay_for_wc_svelte_target");
+if (target) new App({ target });

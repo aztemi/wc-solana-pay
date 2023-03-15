@@ -1,0 +1,12 @@
+{
+  "useTabs": false,
+  "tabWidth": 2,
+  "semi": true,
+  "trailingComma": "none",
+  "bracketSpacing": true,
+  "printWidth": 120,
+  "arrowParens": "avoid",
+  "svelteSortOrder": "scripts-markup-styles-options",
+  "svelteBracketNewLine": true,
+  "overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
+}
