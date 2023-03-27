@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "makepot": "wp-pot --dest-file languages/$npm_package_name.pot --domain solana-pay-for-wc --no-file-paths",
     "package": "cd .. && zip -r $npm_package_name-$npm_package_version.zip $npm_package_name -x .gitignore package-lock.json package.json **.git/\\* **node_modules/\\*  **svelte/\\* && cd $npm_package_name"
   },
   "repository": {
@@ -25,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/t4top/solana-pay-for-woocommerce/issues"
   },
-  "homepage": "https://github.com/t4top/solana-pay-for-woocommerce#readme"
+  "homepage": "https://github.com/t4top/solana-pay-for-woocommerce#readme",
+  "devDependencies": {
+    "wp-pot-cli": "^1.5.0"
+  }
 }

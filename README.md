@@ -40,6 +40,7 @@ npm install
 
 ```bash
 npm run build --workspaces
+npm run makepot
 npm run package
 ```
 

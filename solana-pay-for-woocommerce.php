@@ -26,6 +26,10 @@ define( 'PLUGIN_DIR', rtrim( plugin_dir_path( __FILE__ ), '/\\' ) );
 define( 'PLUGIN_URL', rtrim( plugin_dir_url( __FILE__ ), '/\\' ) );
 define( 'PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
+// Load plugin textdomain.
+load_plugin_textdomain( 'solana-pay-for-wc', false, PLUGIN_DIR . '/languages/' );
+
+// load plugin helper functions
 require_once PLUGIN_DIR . '/includes/functions.php';
 
 // return if WooCommerce is not active

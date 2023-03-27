@@ -1,0 +1,85 @@
+# Copyright (C) 2023 solana-pay-for-wc
+# This file is distributed under the same license as the solana-pay-for-wc package.
+msgid ""
+msgstr ""
+"Project-Id-Version: solana-pay-for-wc\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2023-03-27 14:47+0000\n"
+"Project-Id-Version: undefined\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Solana Pay"
+msgstr ""
+
+msgid "Add Solana Pay to your WooCommerce store."
+msgstr ""
+
+msgid "Enable/Disable"
+msgstr ""
+
+msgid "Enable Solana Pay for your store."
+msgstr ""
+
+msgid "In order to use Solana Pay processing, this Gateway must be enabled."
+msgstr ""
+
+msgid "Test Mode"
+msgstr ""
+
+msgid "Enable Test Mode. Must be unchecked for Production."
+msgstr ""
+
+msgid "Solana Devnet is used for Test Mode. Mainnet Beta is used for Production."
+msgstr ""
+
+msgid "Solana Wallet Address"
+msgstr ""
+
+msgid "Your Solana wallet address where all payments will be sent."
+msgstr ""
+
+msgid "USDC"
+msgstr ""
+
+msgid "SOL"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Complete your payment with Solana Pay."
+msgstr ""
+
+msgid "Payment method description that the customer will see in the checkout."
+msgstr ""
+
+msgid "Instructions"
+msgstr ""
+
+msgid "Thank you for using Solana Pay"
+msgstr ""
+
+msgid "Delivery or other useful instructions that will be added to the thank you page and order emails."
+msgstr ""
+
+msgid "SOL (Solana)"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Payment error:"
+msgstr ""
+
+msgid "Pay with"
+msgstr ""
+
+msgid "<b>Solana Pay for WooCommerce</b> requires <b>WooCommerce</b> to be installed and active."
+msgstr ""
