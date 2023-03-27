@@ -21,11 +21,6 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
   protected const DEVNET_ENDPOINT = 'https://api.devnet.solana.com';
 
-  /**
-   * Array of enqueued scripts
-   */
-  protected $enqueued_scripts = [];
-
   public function __construct() {    
     $this->init_session();
     $this->id                 = strtolower( str_replace( __NAMESPACE__ . '\\', '', __CLASS__ ) );
@@ -52,7 +47,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     add_action( 'woocommerce_after_checkout_form', array( $this, 'add_custom_payment_modal' ), 10 );
     add_action( "woocommerce_api_$this->id" , array( $this, 'handle_webhook_request' ) );
 
-    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_files' ) );
+    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
     add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_order_button_html' ) );
     add_filter( 'woocommerce_currency', array( $this, 'change_woocommerce_currency' ) );
@@ -250,34 +245,34 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   }
 
   /**
-   * Enqueue our custom css styles and js scripts
+   * Enqueue main js script
+   * No need to enqueue CSS since main js import all css and other js files as they are needed.
    */
-  public function enqueue_files() {
-    // enqueue styles
-    // foreach( glob( PLUGIN_DIR . '/assets/build/*.css' ) as $file ) {
-    //   $file = str_replace( PLUGIN_DIR, '', $file );
-    //   enqueue_file( $file );
-    // }
-    
-    // enqueue scripts
-    foreach( glob( PLUGIN_DIR . '/assets/build/main*.js' ) as $file ) {
-      $file = str_replace( PLUGIN_DIR, '', $file );
-      $this->enqueued_scripts[] = enqueue_file( $file, ['jquery'] );
-    }
-    if ( count( $this->enqueued_scripts ) ) {
-      load_enqueued_scripts_as_modules( $this->enqueued_scripts );
+  public function enqueue_scripts() {
+    $scripts = glob( PLUGIN_DIR . '/assets/build/main*.js' );
+    if ( count( $scripts ) ) {
+      $handle = $this->id . '_mainjs';
+      $mainjs = str_replace( PLUGIN_DIR, PLUGIN_URL, $scripts[0] );
 
+      wp_enqueue_script( $handle, $mainjs, ['jquery'], null, true );
+      load_enqueued_scripts_as_modules( [ $handle ] );
       wp_localize_script(
-        $this->enqueued_scripts[0],
+        $handle,
         'solana_pay_for_wc',
         array(
-          'id'       => $this->id,
-          'enabled'  => $this->enabled,
-          'order'    => $this->get_session_data(),
-          'currency' => $this->cryptocurrency,
+          'id'        => $this->id,
+          'baseurl'   => PLUGIN_URL,
+          'btn_class' => $this->get_button_classname(),
         )
       );
     }
+  }
+
+  /**
+   * Get WordPress default class name for button element
+   */
+  public function get_button_classname() {
+    return esc_attr(function_exists('wp_theme_get_element_class_name') ? wp_theme_get_element_class_name('button') : '');
   }
 
 	/**

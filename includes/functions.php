@@ -49,27 +49,6 @@ function init_gateway_class() {
 }
 
 /**
- * Enqueue a css style or js script to the front end html.
- *
- * @param  relpath string Relative path to file to enqueue.
- * @param  deps    array  An array of registered script handles this file depends on.
- * @return         string A unique handle name of the file
- */
-function enqueue_file( $relpath, $deps = [] ) {
-  $handle = str_replace( array( '/', '.' ), '_', $relpath );
-  $url = PLUGIN_URL . $relpath;
-  
-  if ( 0 === substr_compare( $relpath, '.css', -4, 4, true ) ) {
-    $path = PLUGIN_DIR . $relpath;
-    wp_enqueue_style( $handle, $url, $deps, filemtime( $path ), 'all' );
-  } else {
-    wp_enqueue_script( $handle, $url, $deps, null, true );
-  }
-
-  return $handle;
-}
-
-/**
  * Load enqueued scripts as modules.
  *
  * @param  enqueued_scripts array  List of handles of enqueued scripts to load as modules.
