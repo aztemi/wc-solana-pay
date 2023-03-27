@@ -20,7 +20,6 @@ if ( class_exists( __NAMESPACE__ . '\Solana_Pay_for_WooCommerce' ) ) {
 class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
   protected const DEVNET_ENDPOINT = 'https://api.devnet.solana.com';
-  protected const CHECKOUT_SESSION_DATA = 'solana_pay_for_wc_session_data';
 
   /**
    * Array of enqueued scripts
@@ -28,6 +27,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   protected $enqueued_scripts = [];
 
   public function __construct() {    
+    $this->init_session();
     $this->id                 = strtolower( str_replace( __NAMESPACE__ . '\\', '', __CLASS__ ) );
     $this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
     $this->has_fields         = false;
@@ -62,6 +62,42 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     add_filter( 'woocommerce_checkout_fields', array( $this, 'remove_unused_fields' ) );
 
     add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_action_links' ) );
+  }
+
+  /**
+   * Add initialized plugin session entry to WC session
+   */
+  public function init_session() {
+    if ( isset( WC()->session ) && ! WC()->session->{ $this->id } ) {
+      WC()->session->{ $this->id } = array();
+    }
+  }
+
+  /**
+   * Remove plugin session entry from WC session
+   */
+  public function clear_session() {
+    unset( WC()->session->{ $this->id } );
+  }
+
+  /**
+   * Read plugin session data
+   */
+  public function get_session_data() {
+    if ( isset( WC()->session ) && isset( WC()->session->{ $this->id } ) ) {
+      return WC()->session->{ $this->id };
+    }
+
+    return array();
+  }
+
+  /**
+   * Update plugin session data
+   */
+  public function update_session_data( $data ) {
+    if ( isset( WC()->session ) ) {
+      WC()->session->{ $this->id } = $data;
+    }
   }
 
   /**
@@ -264,6 +300,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     }
 
     $order->payment_complete();
+    $this->clear_session();
 
     // Remove cart.
     WC()->cart->empty_cart();
@@ -278,8 +315,8 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   public function confirm_solana_payment( $order_id ) {
     $url = self::DEVNET_ENDPOINT;
     $data = $this->get_session_data();
-    $reference = $data->reference;
-    $nonce = $data->nonce;
+    $reference = $data['reference'];
+    $nonce = $data['nonce'];
 
     $body = wp_json_encode(
       array(
@@ -328,20 +365,6 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     }
 
     return false;
-  }
-
-  public function update_session_data( $data ) {
-    $_SESSION[ self::CHECKOUT_SESSION_DATA ] = json_encode( $data );
-  }
-
-  public function get_session_data() {
-    start_session();
-
-    if ( isset( $_SESSION[ self::CHECKOUT_SESSION_DATA ] ) ) {
-      return json_decode( $_SESSION[ self::CHECKOUT_SESSION_DATA ] );
-    }
-    
-    return array();
   }
 
   public function handle_webhook_request() {

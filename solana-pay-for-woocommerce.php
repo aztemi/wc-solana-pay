@@ -38,6 +38,5 @@ if ( ! is_woocommerce_activated() ) {
   return;
 }
 
-add_action( 'init', __NAMESPACE__ . '\start_session', 1 );
 add_filter( 'woocommerce_payment_gateways', __NAMESPACE__ . '\register_gateway_class' );
 add_action( 'plugins_loaded', __NAMESPACE__ . '\init_gateway_class' );

@@ -7,17 +7,6 @@
 
 namespace T4top\Solana_Pay_for_WC;
 
-use StephenHill\Base58;
-
-/**
- * start session
- */
-function start_session() {
-  if ( !session_id() ) {
-    session_start();
-  }
-}
-
 /**
  * Check if WooCommerce plugin is activated or not.
  *
