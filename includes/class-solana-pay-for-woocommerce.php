@@ -7,6 +7,9 @@
 
 namespace T4top\Solana_Pay_for_WC;
 
+// die if accessed directly
+if ( ! defined( 'WPINC' ) ) { die; }
+
 // return if WooCommerce payment gateway class is missing
 if ( ! class_exists( '\WC_Payment_Gateway' ) ) {
   return;
@@ -20,52 +23,29 @@ if ( class_exists( __NAMESPACE__ . '\Solana_Pay_for_WooCommerce' ) ) {
 class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
   protected const DEVNET_ENDPOINT = 'https://api.devnet.solana.com';
-  protected const MAINNET_BETA_ENDPOINT = 'https://api.mainnet-beta.solana.com';
 
   public function __construct() {
+    // Init session for this plugin
     $this->init_session();
-    $this->id                 = strtolower( str_replace( __NAMESPACE__ . '\\', '', __CLASS__ ) );
-    $this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
-    $this->has_fields         = false;
-    $this->title              = __( 'Solana Pay', 'solana-pay-for-wc' );
-    $this->method_title       = $this->title;
-    $this->method_description = __( 'Add Solana Pay to your WooCommerce store.', 'solana-pay-for-wc' );
 
-    $this->enabled            = $this->get_option('enabled');
-    $this->is_testmode        = $this->get_option('is_testmode');
-    $this->brand_name         = $this->get_option('brand_name');
-    $this->merchant_wallet    = $this->get_option('merchant_wallet');
-    $this->rpc_endpoint       = $this->get_option('rpc_endpoint');
-    $this->cryptocurrency     = $this->get_option('cryptocurrency');
-    $this->description        = $this->get_option('description');
-    $this->instructions       = $this->get_option('instructions');
+    // Setup general properties
+    $this->setup_properties();
 
-    // add settings form fields and initialize them
+    // Load settings
     $this->init_form_fields();
     $this->init_settings();
 
-    
-    add_action( "woocommerce_update_options_payment_gateways_$this->id", array( $this, 'process_admin_options' ) );
-    add_action( "woocommerce_thank_you_$this->id", array( $this, 'thank_you_page' ) );
-    add_action( 'woocommerce_after_checkout_form', array( $this, 'add_custom_payment_modal' ), 10 );
-    add_action( "woocommerce_api_$this->id" , array( $this, 'handle_webhook_request' ) );
+    // Get settings into local variables
+    $this->get_settings();
 
-    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
-    add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_order_button_html' ) );
-    add_filter( 'woocommerce_currency', array( $this, 'change_woocommerce_currency' ) );
-    add_filter( 'woocommerce_currencies', array( $this, 'add_woocommerce_currencies' ) );
-    add_filter( 'woocommerce_currency_symbol', array( $this, 'add_woocommerce_currency_symbol' ), 10, 2 );
-    
-    add_filter( 'woocommerce_checkout_fields', array( $this, 'remove_unused_fields' ) );
-
-    add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_action_links' ) );
+    // Actions & filters
+    $this->add_actions_and_filters();
   }
 
   /**
    * Add initialized plugin session entry to WC session
    */
-  public function init_session() {
+  private function init_session() {
     if ( isset( WC()->session ) && ! WC()->session->{ $this->id } ) {
       WC()->session->{ $this->id } = array();
     }
@@ -74,14 +54,14 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   /**
    * Remove plugin session entry from WC session
    */
-  public function clear_session() {
+  private function clear_session() {
     unset( WC()->session->{ $this->id } );
   }
 
   /**
    * Read plugin session data
    */
-  public function get_session_data() {
+  private function get_session_data() {
     if ( isset( WC()->session ) && isset( WC()->session->{ $this->id } ) ) {
       return WC()->session->{ $this->id };
     }
@@ -92,37 +72,20 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   /**
    * Update plugin session data
    */
-  public function update_session_data( $data ) {
+  private function update_session_data( $data ) {
     if ( isset( WC()->session ) ) {
       WC()->session->{ $this->id } = $data;
     }
   }
 
-  /**
-   *
-   */
-  public function remove_unused_fields( $fields ) {
-    $fields['billing']['billing_first_name']['required'] = false;
-    $fields['billing']['billing_last_name']['required'] = false;
-    $fields['billing']['billing_email']['required'] = false;
-
-    $fields['billing']['billing_company']['required'] = false;
-    $fields['billing']['billing_address_1']['required'] = false;
-    $fields['billing']['billing_address_2']['required'] = false;
-    $fields['billing']['billing_postcode']['required'] = false;
-    $fields['billing']['billing_city']['required'] = false;
-    $fields['billing']['billing_state']['required'] = false;
-    $fields['billing']['billing_phone']['required'] = false;
-
-    // unset( $fields['billing']['billing_company'] );
-    // unset( $fields['billing']['billing_address_1'] );
-    // unset( $fields['billing']['billing_address_2'] );
-    // unset( $fields['billing']['billing_postcode'] );
-    // unset( $fields['billing']['billing_city'] );
-    // unset( $fields['billing']['billing_state'] );
-    // unset( $fields['billing']['billing_phone'] );
-
-    return $fields;
+  private function setup_properties() {
+    $this->id                 = 'spfwc';
+    $this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
+    $this->has_fields         = false;
+    $this->title              = __( 'Solana Pay', 'solana-pay-for-wc' );
+    $this->method_title       = $this->title;
+    $this->method_description = __( 'Add Solana Pay to your WooCommerce store.', 'solana-pay-for-wc' );
+    $this->supports           = array( 'products' );
   }
 
   /**
@@ -139,34 +102,12 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
           'desc_tip'    => true,
           'description' => __( 'In order to use Solana Pay processing, this Gateway must be enabled.', 'solana-pay-for-wc' ),
         ),
-        'is_testmode'   => array(
-          'title'       => __('Test Mode', 'solana-pay-for-wc'),
-          'type'        => 'checkbox',
-          'label'       => __('Enable Test Mode. Must be unchecked for Production.', 'solana-pay-for-wc'),
-          'default'     => 'yes',
-          'desc_tip'    => true,
-          'description' => __('Solana Devnet is used for Test Mode. Mainnet Beta is used for Production.', 'solana-pay-for-wc'),
-        ),
-        'brand_name'    => array(
-          'title'       => __('Brand Name', 'solana-pay-for-wc'),
-          'type'        => 'text',
-          'default'     => get_bloginfo( 'name' ) ?? '',
-          'desc_tip'    => true,
-          'description' => __('Merchant name displayed in payment instructions.', 'solana-pay-for-wc'),
-        ),
         'merchant_wallet' => array(
           'title'       => __('Solana Wallet Address', 'solana-pay-for-wc'),
           'type'        => 'text',
           'default'     => '',
           'desc_tip'    => true,
           'description' => __('Merchant Solana wallet address where all payments will be sent.', 'solana-pay-for-wc'),
-        ),
-        'rpc_endpoint'  => array(
-          'title'       => __('Solana RPC Endpoint', 'solana-pay-for-wc'),
-          'type'        => 'url',
-          'default'     => MAINNET_BETA_ENDPOINT,
-          'desc_tip'    => true,
-          'description' => __('RPC endpoint for connection to Solana Blockchain.', 'solana-pay-for-wc'),
         ),
         'cryptocurrency' => array(
           'title'       => __('Cryptocurrency', 'solanapay_wc'),
@@ -178,6 +119,33 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
                             'USDC' => __( 'USDC', 'solana-pay-for-wc' ),
                             'SOL'  => __( 'SOL', 'solana-pay-for-wc' ),
                            ),
+        ),
+        'rpc_endpoint'  => array(
+          'title'       => __('Solana RPC Endpoint', 'solana-pay-for-wc'),
+          'type'        => 'url',
+          'default'     => self::DEVNET_ENDPOINT,
+          'desc_tip'    => true,
+          'description' => __('RPC endpoint for connection to Solana Blockchain.', 'solana-pay-for-wc'),
+        ),
+        'testmode'      => array(
+          'title'       => __('Test Mode', 'solana-pay-for-wc'),
+          'type'        => 'checkbox',
+          'label'       => __('Enable Test Mode. Must be unchecked for Production.', 'solana-pay-for-wc'),
+          'default'     => 'yes',
+          'desc_tip'    => true,
+          'description' => __('Solana Devnet is used for Test Mode. Mainnet-Beta is used for Production.', 'solana-pay-for-wc'),
+        ),
+        array(
+          'title'       => esc_html__( 'Optional Settings', 'solana-pay-for-wc' ),
+          'type'        => 'title',
+          'description' => __( 'Options below are not mandatory.', 'solana-pay-for-wc' ),
+        ),
+        'brand_name'    => array(
+          'title'       => __('Brand Name', 'solana-pay-for-wc'),
+          'type'        => 'text',
+          'default'     => get_bloginfo( 'name' ) ?? '',
+          'desc_tip'    => true,
+          'description' => __('Merchant name displayed in payment instructions.', 'solana-pay-for-wc'),
         ),
         'description' => array(
           'title'       => __('Description', 'solana-pay-for-wc'),
@@ -195,6 +163,39 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
         ),
       )
     );
+  }
+
+  private function get_settings() {
+    $this->enabled         = $this->get_option( 'enabled' );
+    $this->merchant_wallet = $this->get_option( 'merchant_wallet' );
+    $this->cryptocurrency  = $this->get_option( 'cryptocurrency' );
+    $this->rpc_endpoint    = $this->get_option( 'rpc_endpoint' );
+    $this->testmode        = 'yes' === $this->get_option( 'testmode', 'yes' );
+    $this->brand_name      = $this->get_option( 'brand_name' );
+    $this->description     = $this->get_option( 'description' );
+    $this->instructions    = $this->get_option( 'instructions' );
+
+    if ( $this->testmode ) {
+      $testmode_msg = ' (' . esc_html__( 'Test mode enabled. Devnet in use', 'solana-pay-for-wc' ) . ')';
+      $this->method_description .= $testmode_msg;
+      $this->description .= $testmode_msg;
+    }
+  }
+
+  private function add_actions_and_filters() {
+    add_action( "woocommerce_update_options_payment_gateways_$this->id", array( $this, 'process_admin_options' ) );
+    add_action( "woocommerce_thank_you_$this->id", array( $this, 'thank_you_page' ) );
+    add_action( 'woocommerce_after_checkout_form', array( $this, 'add_custom_payment_modal' ), 10 );
+    add_action( "woocommerce_api_$this->id" , array( $this, 'handle_webhook_request' ) );
+
+    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+    add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_order_button_html' ) );
+    add_filter( 'woocommerce_currency', array( $this, 'change_woocommerce_currency' ) );
+    add_filter( 'woocommerce_currencies', array( $this, 'add_woocommerce_currencies' ) );
+    add_filter( 'woocommerce_currency_symbol', array( $this, 'add_woocommerce_currency_symbol' ), 10, 2 );
+
+    add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_action_links' ) );
   }
 
   public function change_woocommerce_currency( $currency ) {
@@ -241,8 +242,8 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
    */
   public function thank_you_page() {
     if ( $this->instructions ) {
-			echo wp_kses_post( wpautop( wptexturize( $this->instructions ) ) );
-		}
+      echo wp_kses_post( wpautop( wptexturize( $this->instructions ) ) );
+    }
   }
 
   /**
@@ -292,21 +293,20 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     return esc_attr(function_exists('wp_theme_get_element_class_name') ? wp_theme_get_element_class_name('button') : '');
   }
 
-	/**
-	 * Process the payment and return the result.
-	 *
-	 * @param int $order_id Order ID.
-	 * @return array
-	 */
-	public function process_payment( $order_id ) {
+  /**
+   * Process the payment and return the result.
+   *
+   * @param int $order_id Order ID.
+   * @return array
+   */
+  public function process_payment( $order_id ) {
     $order = wc_get_order( $order_id );
     $amount = $order->get_total();
-    
-		if ( $amount > 0 ) {
-			// Mark as processing or on-hold.
-			// $order->update_status( apply_filters( 'woocommerce_cod_process_payment_order_status', $order->has_downloadable_item() ? 'on-hold' : 'processing', $order ), __( 'Payment pending.', 'solana-pay-for-wc' ) );
 
-      if ( true != $this->confirm_solana_payment( $order_id ) ) {
+    if ( $amount > 0 ) {
+      // confirm payment transaction on chain
+      $payment_confirmed = $this->confirm_solana_payment( $order_id );
+      if ( ! $payment_confirmed ) {
         return;
       }
     }
@@ -322,7 +322,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
       'result'   => 'success',
       'redirect' => $this->get_return_url( $order ),
     );
-	}
+  }
 
   public function confirm_solana_payment( $order_id ) {
     $url = self::DEVNET_ENDPOINT;
@@ -353,7 +353,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
       wc_add_notice( __('Payment error:', 'solana-pay-for-wc') . '<p>' . esc_html( $error_message ) . '</p>', 'error' );
     } else {
       $response_code = wp_remote_retrieve_response_code( $response );
-  
+
       if ( 200 === $response_code ) {
         $response_body = wp_remote_retrieve_body( $response );
         $response = json_decode( $response_body, true );
@@ -364,15 +364,15 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
           if ( str_contains( $memo, $nonce ) ) {
             $signature = $result[0]['signature'];
-    
+
             // update order info
             wc_add_order_item_meta( $order_id, 'solana_pay_reference', $reference );
             wc_add_order_item_meta( $order_id, 'solana_pay_signature', $signature );
             wc_add_order_item_meta( $order_id, 'solana_pay_nonce', $nonce );
-    
+
             return true;
           }
-        }        
+        }
       }
     }
 

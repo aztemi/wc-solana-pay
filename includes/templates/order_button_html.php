@@ -8,6 +8,9 @@
 
 namespace T4top\Solana_Pay_for_WC;
 
+// die if accessed directly
+if ( ! defined( 'WPINC' ) ) { die; }
+
 $button_text = __( 'Pay with', 'solana-pay-for-wc' );
 $img_src = PLUGIN_URL . '/assets/img/solana_pay_white_gradient.svg';
 $img_alt = __( 'Solana Pay', 'solana-pay-for-wc' );

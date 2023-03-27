@@ -84,7 +84,7 @@
         border 0
         max-height 1.2em
         margin-left 0.5em
-    
+
     .solana_pay_for_wc_overlay
       position fixed
       z-index 1000

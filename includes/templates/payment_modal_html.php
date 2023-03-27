@@ -7,6 +7,9 @@
 
 namespace T4top\Solana_Pay_for_WC;
 
+// die if accessed directly
+if ( ! defined( 'WPINC' ) ) { die; }
+
 $wp_button_class = esc_attr(function_exists('wp_theme_get_element_class_name') ? wp_theme_get_element_class_name('button') : '');
 ?>
 

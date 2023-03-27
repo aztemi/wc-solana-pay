@@ -7,6 +7,9 @@
 
 namespace T4top\Solana_Pay_for_WC;
 
+// die if accessed directly
+if ( ! defined( 'WPINC' ) ) { die; }
+
 /**
  * Check if WooCommerce plugin is activated or not.
  *
@@ -69,7 +72,11 @@ function load_enqueued_scripts_as_modules( $enqueued_scripts = [] ) {
 }
 
 /**
- * Todo
+ * Load a template file as HTML
+ *
+ * @param  relpath string Relative path to the php file to load.
+ * @param  args    array  List of variables to import into symbol table of the file.
+ * @return         string HTML string of loaded php file.
  */
 function get_template_html( $relpath, $args = [] ) {
   ob_start();
