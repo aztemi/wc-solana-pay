@@ -1,0 +1,29 @@
+{
+  "name": "solana-pay-for-woocommerce-svelte",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "stylus": "^0.59.0",
+    "svelte": "^3.55.1",
+    "svelte-preprocess": "^5.0.1",
+    "vite": "^4.1.0"
+  },
+  "dependencies": {
+    "@solana/pay": "^0.2.4",
+    "@solana/wallet-adapter-base": "^0.9.22",
+    "@solana/wallet-adapter-wallets": "^0.19.15",
+    "@solana/web3.js": "^1.73.3",
+    "@svelte-on-solana/wallet-adapter-core": "^1.0.11-alpha.0",
+    "@svelte-on-solana/wallet-adapter-ui": "^1.0.21-alpha.0",
+    "alpinejs": "^3.11.1",
+    "bignumber.js": "^9.1.1",
+    "buffer": "^6.0.3"
+  }
+}
