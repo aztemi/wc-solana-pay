@@ -34,7 +34,7 @@ function show_error_notice( $notice ) {
 }
 
 /**
- * Declare gateway class
+ * Register gateway class
  *
  * @param  gateways array List of gateways currently registered
  * @return          array Extended gateways list
@@ -45,10 +45,11 @@ function register_gateway_class( $gateways = [] ) {
 }
 
 /**
- * Initialize gateway class
+ * Activate gateway class and features
  */
-function init_gateway_class() {
+function activate_gateway() {
   require PLUGIN_DIR . '/includes/class-solana-pay-for-woocommerce.php';
+  require PLUGIN_DIR . '/includes/solana_tokens.php';
 }
 
 /**

@@ -110,15 +110,11 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
           'description' => __('Merchant Solana wallet address where all payments will be sent.', 'solana-pay-for-wc'),
         ),
         'cryptocurrency' => array(
-          'title'       => __('Cryptocurrency', 'solanapay_wc'),
+          'title'       => __('Store Currency', 'solanapay_wc'),
           'type'        => 'select',
-          'default'     => 'USDC',
           'desc_tip'    => true,
           'description' => __('Select the default cryptocurrency of your products.', 'solanapay_wc'),
-          'options'     => array(
-                            'USDC' => __( 'USDC', 'solana-pay-for-wc' ),
-                            'SOL'  => __( 'SOL', 'solana-pay-for-wc' ),
-                           ),
+          'options'     => $this->get_solana_tokens(),
         ),
         'rpc_endpoint'  => array(
           'title'       => __('Solana RPC Endpoint', 'solana-pay-for-wc'),
@@ -191,34 +187,34 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
     add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_order_button_html' ) );
-    add_filter( 'woocommerce_currency', array( $this, 'change_woocommerce_currency' ) );
-    add_filter( 'woocommerce_currencies', array( $this, 'add_woocommerce_currencies' ) );
-    add_filter( 'woocommerce_currency_symbol', array( $this, 'add_woocommerce_currency_symbol' ), 10, 2 );
 
     add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_action_links' ) );
   }
 
-  public function change_woocommerce_currency( $currency ) {
-    $currency = 'USDC';
-    if ( 'SOL' == $this->cryptocurrency ) {
-      $currency = 'SOL';
+  private function get_solana_tokens() {
+    $tokens = get_supported_solana_tokens();
+    $arr = array();
+    foreach( $tokens as $k => $v ) {
+      $arr[ $k ] = sprintf( '%s (%s)', $v['name'], $v['symbol'] );
     }
-    return $currency;
+
+    return $arr;
   }
 
-  // Add crypto tokens supported by Solana Pay to woocommerce currency list
-  public function add_woocommerce_currencies( $currencies ) {
-    $currencies['USDC'] = __( 'USDC', 'solana-pay-for-wc' );
-    $currencies['SOL']  = __( 'SOL (Solana)', 'solana-pay-for-wc' );
-    return $currencies;
-  }
+  /**
+   * Update WC currency after Admin Panel options are saved.
+   */
+  public function process_admin_options() {
+    // save regular settings
+    $saved = parent::process_admin_options();
 
-  public function add_woocommerce_currency_symbol( $currency_symbol, $currency ) {
-    switch( $currency ) {
-      case 'USDC': $currency_symbol = 'USDC'; break;
-      case 'SOL' : $currency_symbol = 'SOL'; break;
+    $post_data = $this->get_post_data();
+    if ( isset( $post_data[ "woocommerce_{$this->id}_cryptocurrency" ] ) ) {
+      $this->cryptocurrency  = $this->get_option( 'cryptocurrency' );
+      update_option( 'woocommerce_currency', $this->cryptocurrency );
     }
-    return $currency_symbol;
+
+    return $saved;
   }
 
   /**

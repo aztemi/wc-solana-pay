@@ -39,4 +39,4 @@ if ( ! is_woocommerce_activated() ) {
 }
 
 add_filter( 'woocommerce_payment_gateways', __NAMESPACE__ . '\register_gateway_class' );
-add_action( 'plugins_loaded', __NAMESPACE__ . '\init_gateway_class' );
+add_action( 'plugins_loaded', __NAMESPACE__ . '\activate_gateway' );
