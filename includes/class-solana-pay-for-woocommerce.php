@@ -263,7 +263,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
    * No need to enqueue CSS since main js import all css and other js files as they are needed.
    */
   public function enqueue_scripts() {
-    $scripts = glob( PLUGIN_DIR . '/assets/build/main*.js' );
+    $scripts = glob( PLUGIN_DIR . '/frontend/build/main*.js' );
     if ( count( $scripts ) ) {
       $handle = $this->id . '_mainjs';
       $mainjs = str_replace( PLUGIN_DIR, PLUGIN_URL, $scripts[0] );

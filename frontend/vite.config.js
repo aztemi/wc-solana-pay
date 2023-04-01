@@ -5,9 +5,7 @@ export default defineConfig({
   plugins: [svelte()],
   base: "",
   build: {
-    // minify: false,
-    outDir: "../build",
-    emptyOutDir: true,
+    outDir: "build",
     assetsDir: "",
     rollupOptions: {
       input: "src/main.js"
