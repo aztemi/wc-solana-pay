@@ -84,7 +84,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     $this->has_fields         = false;
     $this->title              = __( 'Solana Pay', 'solana-pay-for-wc' );
     $this->method_title       = $this->title;
-    $this->method_description = __( 'Add Solana Pay to your WooCommerce store.', 'solana-pay-for-wc' );
+    $this->method_description = __( 'Take payments in SOL, USDC, USDT and more with Solana Pay.', 'solana-pay-for-wc' );
     $this->supports           = array( 'products' );
   }
 
