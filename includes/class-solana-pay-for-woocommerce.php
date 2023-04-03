@@ -122,16 +122,22 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
           'description' => __( 'Select default cryptocurrency for your products. <b>This will overwrite the Woocommerce default currency setting</b>.', 'solana-pay-for-wc' ),
           'options'     => $this->get_solana_tokens(),
         ),
-        'rpc_endpoint'  => array(
-          'title'       => __( 'Solana RPC Endpoint', 'solana-pay-for-wc' ),
+        'live_rpc'      => array(
+          'title'       => __( 'Mainnet-Beta RPC Endpoint', 'solana-pay-for-wc' ),
           'type'        => 'url',
-          'default'     => self::DEVNET_ENDPOINT,
-          'description' => __( 'RPC endpoint for connection to Solana Blockchain.', 'solana-pay-for-wc' ),
+          'default'     => '',
+          'description' => __( 'RPC endpoint for connection to the Solana Mainnet-Beta.', 'solana-pay-for-wc' ),
         ),
         array(
           'title'       => esc_html__( 'Optional Settings', 'solana-pay-for-wc' ),
           'type'        => 'title',
           'description' => __( 'Options below are not mandatory.', 'solana-pay-for-wc' ),
+        ),
+        'test_rpc'      => array(
+          'title'       => __( 'Devnet RPC Endpoint', 'solana-pay-for-wc' ),
+          'type'        => 'url',
+          'default'     => self::DEVNET_ENDPOINT,
+          'description' => __( 'RPC endpoint for connection to the Solana Devnet.', 'solana-pay-for-wc' ),
         ),
         'brand_name'    => array(
           'title'       => __( 'Brand Name', 'solana-pay-for-wc' ),
@@ -160,7 +166,8 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     $this->testmode        = 'yes' === $this->get_option( 'testmode', 'yes' );
     $this->merchant_wallet = $this->get_option( 'merchant_wallet' );
     $this->cryptocurrency  = $this->get_option( 'cryptocurrency' );
-    $this->rpc_endpoint    = $this->get_option( 'rpc_endpoint' );
+    $this->live_rpc        = $this->get_option( 'live_rpc' );
+    $this->test_rpc        = $this->get_option( 'test_rpc' );
     $this->brand_name      = $this->get_option( 'brand_name' );
     $this->description     = $this->get_option( 'description' );
     $this->instructions    = $this->get_option( 'instructions' );
