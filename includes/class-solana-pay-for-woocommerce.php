@@ -179,6 +179,44 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     }
   }
 
+  /**
+   * Validate wallet address settings field. Clear the field in case of error.
+   */
+  public function validate_merchant_wallet_field( $key, $value ) {
+    if ( ! preg_match( '/^[1-9A-HJ-NP-Za-km-z]{32,44}$/', $value ) ) {
+      \WC_Admin_Settings::add_error( esc_html__( 'Invalid Solana Wallet Address', 'solana-pay-for-wc' ) );
+      $value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
+    }
+
+    return $value;
+  }
+
+  /**
+   * Validate Live RPC Endpoint settings field. Clear the field in case of error.
+   */
+  public function validate_live_rpc_field( $key, $value ) {
+    $post_data = $this->get_post_data();
+    $testmode = isset( $post_data[ "woocommerce_{$this->id}_testmode" ] );
+
+    if ( ! $testmode && ! wp_http_validate_url( $value ) ) {
+      \WC_Admin_Settings::add_error( esc_html__( 'Invalid Mainnet-Beta RPC Endpoint', 'solana-pay-for-wc' ) );
+      $value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
+    }
+
+    return $value;
+  }
+
+  /**
+   * Set Test RPC Endpoint to default if not set correctly.
+   */
+  public function validate_test_rpc_field( $key, $value ) {
+    if ( empty( trim( $value ) ) || ! wp_http_validate_url( $value ) ) {
+      $value = self::DEVNET_ENDPOINT;
+    }
+
+    return $value;
+  }
+
   private function add_actions_and_filters() {
     add_action( "woocommerce_update_options_payment_gateways_$this->id", array( $this, 'process_admin_options' ) );
     add_action( "woocommerce_thank_you_$this->id", array( $this, 'thank_you_page' ) );
