@@ -181,10 +181,11 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   private function add_actions_and_filters() {
     add_action( "woocommerce_update_options_payment_gateways_$this->id", array( $this, 'process_admin_options' ) );
     add_action( "woocommerce_thank_you_$this->id", array( $this, 'thank_you_page' ) );
-    add_action( 'woocommerce_after_checkout_form', array( $this, 'add_custom_payment_modal' ), 10 );
     add_action( "woocommerce_api_$this->id" , array( $this, 'handle_webhook_request' ) );
 
-    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+    // Enqueue main script and add its target bind element
+    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_main_script' ) );
+    add_action( 'wp_footer', array( $this, 'output_script_target_element' ), -10 );
 
     add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_order_button_html' ) );
 
@@ -243,15 +244,6 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   }
 
   /**
-   * Add an hidden custom modal for our payment gateway.
-   * It will be shown when 'Place order' button is clicked.
-   * It also serves as the mount target for the Svelte app.
-   */
-  public function add_custom_payment_modal() {
-    echo get_template_html( '/includes/templates/payment_modal_html.php' );
-  }
-
-  /**
    * Add custom 'Place order' button with Solana Pay icon
    */
   public function add_custom_order_button_html( $button ) {
@@ -260,9 +252,19 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
   /**
    * Enqueue main js script
-   * No need to enqueue CSS since main js import all css and other js files as they are needed.
+   * main js is the entry script that imports other css and js files when needed.
    */
-  public function enqueue_scripts() {
+  public function enqueue_main_script() {
+    // Script is needed only on cart, checkout and pay_for_order pages. Return otherwise
+    if ( ! is_cart() && ! is_checkout() && ! isset( $_GET['pay_for_order'] ) ) {
+      return;
+    }
+
+    // Return if our payment gateway is disabled
+    if ( 'no' === $this->enabled ) {
+      return;
+    }
+
     $scripts = glob( PLUGIN_DIR . '/frontend/build/main*.js' );
     if ( count( $scripts ) ) {
       $handle = $this->id . '_mainjs';
@@ -280,6 +282,14 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
         )
       );
     }
+  }
+
+  /**
+   * Add a placeholder element where Svelte in main js will be bound.
+   * Svelte will inject our custom Solana modal in it.
+   */
+  public function output_script_target_element() {
+    echo '<div id="solana_pay_for_wc_svelte_target"></div>';
   }
 
   /**
