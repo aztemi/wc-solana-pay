@@ -1,75 +1,23 @@
 <script>
-  import Alpine from "alpinejs";
   import { Buffer } from "buffer";
   import { onMount } from "svelte";
 
-  let isAlpineLoaded = false;
   let SolanaPay = null;
-  let alreadyCalled = false;
-
-  function handleWindowOnload() {
-    window.Buffer = Buffer;
-    window.Alpine = Alpine;
-    Alpine.start();
-    handlePaymentMethodChange();
-    Alpine.store("initialized", true);
-    isAlpineLoaded = true;
-  }
-
-  function handlePaymentMethodChange() {
-    const selected_method = document.querySelector("input[name='payment_method']:checked").value;
-    const { id } = solana_pay_for_wc;
-    Alpine.store("solana_pay_selected", selected_method === id);
-    setTimeout(() => {
-      if (!alreadyCalled) addClickToSolanaPayButton();
-    }, 1000);
-  }
-
-  function addClickToSolanaPayButton() {
-    const btn = jQuery("#solana_pay_for_wc_checkout_place_order");
-    if (btn.length) {
-      alreadyCalled = true;
-      btn.on("click", function (event) {
-        // check if Checkout form input is valid
-        jQuery("form.woocommerce-checkout .validate-required:visible :input").trigger("validate");
-        const invalidFields = Array.from(
-          jQuery("form.woocommerce-checkout .validate-required.woocommerce-invalid:visible")
-        );
-
-        if (invalidFields.length <= 0) {
-          // open Solana Pay modal
-          dispatchEvent(new Event("openmodal"));
-        }
-
-        // prevent default
-        event.preventDefault();
-      });
-    }
-  }
-
-  function isFormInputValid() {
-    jQuery("form.woocommerce-checkout .validate-required:visible :input").trigger("validate");
-    const invalidFields = Array.from(
-      jQuery("form.woocommerce-checkout .validate-required.woocommerce-invalid:visible")
-    );
-    return invalidFields.length ? false : true;
-  }
 
   onMount(async () => {
+    window.Buffer = Buffer;
     SolanaPay = (await import("./solana_pay.svelte")).default;
   });
 </script>
 
-<svelte:window on:load={handleWindowOnload} on:change={handlePaymentMethodChange} />
-
-{#if isAlpineLoaded && SolanaPay}
+{#if SolanaPay}
   <svelte:component this={SolanaPay} />
 {/if}
 
 <style lang="stylus">
 
   :global
-    #solana_pay_for_wc_checkout_place_order
+    .solana_pay_for_wc_place_order
       display flex
       align-items center
       justify-content center

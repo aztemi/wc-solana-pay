@@ -226,7 +226,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_main_script' ) );
     add_action( 'wp_footer', array( $this, 'output_script_target_element' ), -10 );
 
-    add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_order_button_html' ) );
+    add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_place_order_button' ) );
 
     add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_action_links' ) );
   }
@@ -283,10 +283,34 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   }
 
   /**
-   * Add custom 'Place order' button with Solana Pay icon
+   * Replace WC 'Place order' button with custom 'Pay with Solana Pay' button for express checkout
    */
-  public function add_custom_order_button_html( $button ) {
-    return get_template_html( '/includes/templates/order_button_html.php', array( 'button' => $button ) );
+  public function add_custom_place_order_button( $button ) {
+    $scripts = glob( PLUGIN_DIR . '/frontend/build/place_order_button*.js' );
+    
+    if ( count( $scripts ) ) {
+      $buttonjs = str_replace( PLUGIN_DIR, '', $scripts[0] );
+      $error_msg = esc_html__( 'Some inputs are not valid. Please fill all required fields.', 'solana-pay-for-wc' );
+      $script = get_template_html(
+        $buttonjs,
+        array(
+          'id'  => $this->id,
+          'msg' => $error_msg,
+        )
+      );
+  
+      $button = get_template_html(
+        '/includes/place_order_button.php',
+        array(
+          'id'        => $this->id,
+          'button'    => $button,
+          'script'    => $script,
+          'btn_class' => $this->get_button_classname(),
+        )
+      );
+    }
+
+    return $button;
   }
 
   /**
