@@ -227,8 +227,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
     add_action( 'wp_footer', array( $this, 'output_script_target_element' ), -10 );
 
     add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_place_order_button' ) );
-
-    add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_action_links' ) );
+    add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_settings_link' ) );
   }
 
   private function get_solana_tokens() {
@@ -258,17 +257,19 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   }
 
   /**
-   * Add custom action links to Installed Plugins admin page
+   * Show 'Settings' action link on Installed Plugins admin page
    */
-  public function add_action_links( $links ) {
-    array_unshift(
-      $links,
-      sprintf(
-        '<a href="%1$s">%2$s</a>',
-        admin_url( "admin.php?page=wc-settings&tab=checkout&section=$this->id" ),
-        __( 'Settings', 'solana-pay-for-wc' )
-      )
-    );
+  public function add_settings_link( $links ) {
+    if ( current_user_can( 'manage_woocommerce' ) ) {
+      array_unshift(
+        $links,
+        sprintf(
+          '<a href="%1$s">%2$s</a>',
+          admin_url( "admin.php?page=wc-settings&tab=checkout&section=$this->id" ),
+          __( 'Settings', 'solana-pay-for-wc' )
+        )
+      );
+    }
 
     return $links;
   }
@@ -325,6 +326,11 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
     // Return if our payment gateway is disabled
     if ( 'no' === $this->enabled ) {
+      return;
+    }
+
+    // Return if merchant wallet or Mainnet-Beta RPC is not configured
+    if ( empty( $this->merchant_wallet ) || ( empty( $this->live_rpc ) && ! $this->testmode ) ) {
       return;
     }
 
