@@ -1,204 +1,132 @@
 <script>
-  import BigNumber from "bignumber.js";
-  import { onMount, onDestroy } from "svelte";
-  import { clusterApiUrl, Connection, PublicKey, Keypair } from "@solana/web3.js";
-  import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
-  import { createTransfer, findReference, FindReferenceError } from "@solana/pay";
-  import Wallet from "../lib/components/wallet.svelte";
-  import QrCode from "../lib/components/qrcode.svelte";
+  import { onMount } from "svelte";
+  import { Keypair } from "@solana/web3.js";
+  import { order } from "../lib/store/order.js";
+  import Modal from "../lib/components/modal.svelte";
 
-  const { id } = solana_pay_for_wc;
-  const endpoint = clusterApiUrl("devnet");
-  const USDC = {
-    devnet: new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
-  };
-  const splToken = USDC.devnet;
-
-  let connection = null;
-  let stopPolling = false;
-  let recipient, reference, label, amount, nonce, message, memo;
-  let solAmount,
-    solPrice = 0;
-  let loading = false;
+  const { id, btn_class } = solana_pay_for_wc;
+  let showModal = false;
 
   onMount(() => {
-    connection = new Connection(endpoint, "confirmed");
-    getSolanaUSDPrice();
+    getSolUSDPrice();
   });
 
-  onDestroy(() => {
-    stopPolling = true;
-  });
-
-  function handleOpenModal() {
-    // style connect button
-    jQuery(".wallet-adapter-button").addClass("alt");
-
+  function openModal() {
+    order.reset();
     // query data from the backend
-    getCheckoutData().then(() => {
-      stopPolling = false;
-      pollConfirmedTxn();
+    getCheckoutOrder().then(() => {
+      showModal = true;
     });
   }
 
-  function handleCloseModal() {
-    stopPolling = true;
-  }
-
-  async function getCheckoutData() {
-    loading = true;
-
-    const ref = new Keypair().publicKey;
-    const url = `/wc-api/${id}?ref=${ref.toBase58()}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    recipient = new PublicKey(data.recipient);
-    reference = new PublicKey(data.reference);
-    amount = new BigNumber(parseFloat(data.amount).toFixed(2));
-    if (solPrice) solAmount = (parseFloat(data.amount) / solPrice).toFixed(2);
-    label = data.label;
-    nonce = data.nonce;
-    message = `Thank You - #${nonce} - ${label}`;
-    memo = `OrderNonce#${nonce}`;
-    loading = false;
-  }
-
-  async function getSolanaUSDPrice() {
-    const url = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
-    const response = await fetch(url);
-    const data = await response.json();
-
-    solPrice = data?.solana?.usd;
-  }
-
-  // poll every 1s for confirmed transaction since we don't know if Qr-Code is scanned or not.
-  async function pollConfirmedTxn() {
-    if (!connection) return;
-
-    let signatureInfo;
-
-    await new Promise((resolve, reject) => {
-      const interval = setInterval(async () => {
-        if (stopPolling) {
-          clearInterval(interval);
-          reject(new Error("Polling Cancelled"));
-        }
-
-        // console.count("Polling for transaction...");
-        try {
-          signatureInfo = await findReference(connection, reference, { finality: "confirmed" });
-          console.log("Payment signature found: ", signatureInfo.signature);
-          clearInterval(interval);
-          resolve(signatureInfo);
-        } catch (error) {
-          if (!(error instanceof FindReferenceError)) {
-            console.error(error);
-            clearInterval(interval);
-            reject(error);
-          }
-        }
-      }, 1000);
-    }).catch(() => {
-      /* ignore */
-    });
-
-    if (signatureInfo?.signature) handlePaymentReceived();
+  function closeModal() {
+    showModal = false;
   }
 
   $: {
-    if ($walletStore?.connected && !$walletStore?.connecting && !$walletStore?.disconnecting) {
-      triggerTxn($walletStore.publicKey);
+    if ($order.paymentSignature) {
+      console.log("Payment confirmed on client side. Txn: ", $order.paymentSignature);
+      // submit checkout form. Backend will then be informed to confirm payment
+      jQuery("form.checkout").submit();
+      closeModal();
     }
   }
 
-  async function triggerTxn(payer) {
-    if ($walletStore?.connected && connection) {
-      const tx = await createTransfer(connection, payer, { recipient, amount, splToken, reference, memo });
-      const res = await $walletStore.sendTransaction(tx, connection);
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function getSolUSDPrice() {
+    let numTry = 0;
+    const maxTry = 5; // Max number of tries in case of failure
+    const url = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
+
+    while (numTry < maxTry && !$order.solPrice) {
+      try {
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        order.setSolPrice(data?.solana?.usd);
+      } catch (error) {
+        console.error(error);
+      }
+      numTry++;
+      await sleep(1000);
     }
   }
 
-  function handlePaymentReceived() {
-    // close modal
-    dispatchEvent(new Event("closemodal"));
+  async function getCheckoutOrder() {
+    try {
+      const ref = new Keypair().publicKey;
+      const url = `/wc-api/${id}?ref=${ref.toBase58()}`;
 
-    // submit checkout form. Backend will then be informed to confirm payment
-    jQuery("form.checkout.woocommerce-checkout").submit();
+      const resp = await fetch(url);
+      const data = await resp.json();
+      order.setOrder(data);
+    } catch (error) {
+      console.error(error);
+    }
   }
 </script>
 
-<svelte:window on:openmodal={handleOpenModal} on:closemodal={handleCloseModal} />
+<svelte:window on:openmodal={openModal} />
 
-<section>
-  <div>
-    <img src="/wp-content/plugins/solana-pay-for-woocommerce/assets/img/solana_pay_black.svg" alt="Solana Pay" />
-  </div>
-  <div class="amount">
-    <span>Amount:</span>
-    <div>
-      <p><strong>{amount} USDC</strong></p>
-      {#if solAmount}
-        <p>({solAmount} SOL)</p>
+{#if showModal}
+  <div class="overlay">
+    <div class="modal">
+      <button class={`closeBtn button alt ${btn_class}`} on:click={closeModal}>x</button>
+      {#if $order.updated}
+        <Modal />
+      {:else}
+        <p>loading</p>
       {/if}
     </div>
   </div>
-  <div class="container">
-    <div>
-      <p>Connect your Browser Wallet to pay</p>
-      <div class="wallet">
-        <Wallet network={endpoint} />
-      </div>
-    </div>
-    <div class="spacer">
-      <span> OR </span>
-    </div>
-    <div>
-      <p>Scan QR Code with your Mobile Wallet to pay</p>
-      <div class="qrcode">
-        {#if loading}
-          <p>loading</p>
-        {:else if recipient}
-          {#key splToken}
-            <QrCode {recipient} {amount} {splToken} {reference} {label} {message} {memo} />
-          {/key}
-        {/if}
-      </div>
-    </div>
-  </div>
-</section>
+{/if}
 
 <style lang="stylus">
-  p
-    margin 0
 
-  .amount
+  .overlay
+    position fixed
+    z-index 1000
+    left 0
+    top 0
+    width 100%
+    height 100vh
     display flex
-    flex-direction row
     align-items center
     justify-content center
-    margin 1rem 0
-    div
-      margin-left 2rem
-      strong
-        font-weight 800
-        font-size 1.7rem
+    overflow hidden
+    .modal
+      position relative
+      max-width 90vw
+      max-height 90%
+      padding 1rem 2rem
+      background-color white
+      border 1px solid black
+      border-radius 0.5rem
+      box-shadow 0 4px 23px 0 rgb(0 0 0 / 20%)
+      overflow-y auto
+      .closeBtn
+        position absolute
+        top 1rem
+        right 1rem
 
-  .container
-    display flex
-    flex-direction column
-    align-items center
-    text-align center
-
-    .wallet
-      margin-top 1rem
-
-    .spacer
-      margin 1rem 0
+  :global
+    .solana_pay_for_wc_place_order
+      display flex
+      align-items center
+      justify-content center
+      padding-left 0.2em
+      padding-right 0.2em
       span
-        &::before, &::after
-          content "\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0"
-          text-decoration line-through
-          padding 0 0.5rem
+        padding 0
+        margin 0
+      img
+        display inline-block
+        padding 0
+        border 0
+        max-height 1.2em
+        margin-left 0.5em
 
 </style>
