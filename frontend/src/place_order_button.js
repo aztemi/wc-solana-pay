@@ -9,8 +9,10 @@
  */
 (function ($$) {
   let ourBtn, theirBtn;
-  const id = "<?php echo $id ?>";
-  const msg = "<?php echo $msg ?>";
+  const id = "<?php echo $id ?>".trim();
+  const errorMsg = "<?php echo $error_msg ?>".trim();
+  const termsMsg = "<?php echo $terms_msg ?>".trim();
+  const isPayPage = "<?php echo $pay_page ?>".trim();
   const previousOnload = window.onload;
   const previousOnchange = window.onchange;
 
@@ -19,15 +21,22 @@
   }
 
   function handleOnclick(evt) {
-    const checkoutForm = $$("form.checkout");
-    checkoutForm.find(".validate-required:visible :input:visible").trigger("validate").trigger("blur");
-    const invalidFields = checkoutForm.find(".validate-required.woocommerce-invalid:visible").length;
-
+    let msg = "";
+    const form = $$(isPayPage ? "form#order_review" : "form.checkout");
+    form.find(".validate-required:visible :input:visible").trigger("validate").trigger("blur");
+    const invalidFields = form.find(".validate-required.woocommerce-invalid:visible").length;
     if (invalidFields) {
-      $$(".woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message").remove();
-      const errorMsg = `<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout"><ul class="woocommerce-error" role="alert"><li>${msg}</li></ul></div>`;
-      checkoutForm.get(0)?.scrollIntoView({ behavior: "smooth" });
-      checkoutForm.prepend(errorMsg);
+      msg += `<li>${errorMsg}</li>`;
+    } else {
+      const terms = $("form #terms");
+      if (terms && !terms.checked) msg += `<li>${termsMsg}</li>`;
+    }
+
+    $$(".woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message").remove();
+    if (msg) {
+      msg = `<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout"><ul class="woocommerce-error" role="alert">${msg}</ul></div>`;
+      form.get(0)?.scrollIntoView({ behavior: "smooth" });
+      form.prepend(msg);
     } else {
       // show Solana payment modal
       dispatchEvent(new Event("openmodal"));

@@ -4,7 +4,7 @@
   import { order } from "../lib/store/order.js";
   import Modal from "../lib/components/modal.svelte";
 
-  const { id, btn_class } = solana_pay_for_wc;
+  const { id, btn_class, pay_page } = solana_pay_for_wc;
   let showModal = false;
 
   onMount(() => {
@@ -26,8 +26,9 @@
   $: {
     if ($order.paymentSignature) {
       console.log("Payment confirmed on client side. Txn: ", $order.paymentSignature);
-      // submit checkout form. Backend will then be informed to confirm payment
-      jQuery("form.checkout").submit();
+      // submit form and close popup modal. This will inform the backend to confirm payment
+      const form = jQuery(pay_page ? "form#order_review" : "form.checkout");
+      form.submit();
       closeModal();
     }
   }
@@ -62,6 +63,7 @@
 
       const resp = await fetch(url);
       const data = await resp.json();
+      data.amount = solana_pay_for_wc.amount;
       order.setOrder(data);
     } catch (error) {
       console.error(error);

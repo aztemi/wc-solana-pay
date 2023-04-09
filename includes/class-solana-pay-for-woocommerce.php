@@ -164,9 +164,9 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   private function get_settings() {
     $this->enabled         = $this->get_option( 'enabled' );
     $this->testmode        = 'yes' === $this->get_option( 'testmode', 'yes' );
-    $this->merchant_wallet = $this->get_option( 'merchant_wallet' );
+    $this->merchant_wallet = $this->get_option( 'merchant_wallet', '' );
     $this->cryptocurrency  = $this->get_option( 'cryptocurrency' );
-    $this->live_rpc        = $this->get_option( 'live_rpc' );
+    $this->live_rpc        = $this->get_option( 'live_rpc', '' );
     $this->test_rpc        = $this->get_option( 'test_rpc' );
     $this->brand_name      = $this->get_option( 'brand_name' );
     $this->description     = $this->get_option( 'description' );
@@ -177,6 +177,23 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
       $this->method_description .= $testmode_msg;
       $this->description .= $testmode_msg;
     }
+  }
+
+  /**
+   * Check if our payment gateway is available for use in the frontend
+   */
+  public function is_available() {
+    // Return false if our payment gateway is disabled
+    if ( 'no' === $this->enabled ) {
+      return false;
+    }
+
+    // Return false if merchant wallet or Mainnet-Beta RPC is not configured
+    if ( empty( $this->merchant_wallet ) || ( empty( $this->live_rpc ) && ! $this->testmode ) ) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
@@ -218,16 +235,29 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   }
 
   private function add_actions_and_filters() {
-    add_action( "woocommerce_update_options_payment_gateways_$this->id", array( $this, 'process_admin_options' ) );
+    if ( is_admin() ) {
+      // Save Admin page settings
+      add_action( "woocommerce_update_options_payment_gateways_$this->id", array( $this, 'process_admin_options' ) );
+
+      // Add 'Settings' link to the Installed Plugins page after plugin activation
+      add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_settings_link' ) );
+    }
+
+    if ( is_checkout() || is_checkout_pay_page() ) {
+      // Enqueue main script and add its target bind element
+      add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_main_script' ) );
+      add_action( 'wp_footer', array( $this, 'output_script_target_element' ), -10 );
+
+      // Add custom 'Pay with Solana Pay' express checkout button
+      add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_place_order_button' ) );
+      add_filter( 'woocommerce_pay_order_button_html', array( $this, 'add_custom_place_order_button' ) );
+    }
+
+    // Add instructions to the Thank You page
     add_action( "woocommerce_thank_you_$this->id", array( $this, 'thank_you_page' ) );
+
+    // Endpoint to handle webhook GET request
     add_action( "woocommerce_api_$this->id" , array( $this, 'handle_webhook_request' ) );
-
-    // Enqueue main script and add its target bind element
-    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_main_script' ) );
-    add_action( 'wp_footer', array( $this, 'output_script_target_element' ), -10 );
-
-    add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_place_order_button' ) );
-    add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_settings_link' ) );
   }
 
   private function get_solana_tokens() {
@@ -288,18 +318,21 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
    */
   public function add_custom_place_order_button( $button ) {
     $scripts = glob( PLUGIN_DIR . '/frontend/build/place_order_button*.js' );
-    
+
     if ( count( $scripts ) ) {
       $buttonjs = str_replace( PLUGIN_DIR, '', $scripts[0] );
       $error_msg = esc_html__( 'Some inputs are not valid. Please fill all required fields.', 'solana-pay-for-wc' );
+      $terms_msg = esc_html__( 'Please read and accept the terms and conditions to proceed with your order.', 'solana-pay-for-wc' );
       $script = get_template_html(
         $buttonjs,
         array(
-          'id'  => $this->id,
-          'msg' => $error_msg,
+          'id'        => $this->id,
+          'error_msg' => $error_msg,
+          'terms_msg' => $terms_msg,
+          'pay_page'  => is_checkout_pay_page(),
         )
       );
-  
+
       $button = get_template_html(
         '/includes/place_order_button.php',
         array(
@@ -319,19 +352,16 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
    * main js is the entry script that imports other css and js files when needed.
    */
   public function enqueue_main_script() {
-    // Script is needed only on cart, checkout and pay_for_order pages. Return otherwise
-    if ( ! is_cart() && ! is_checkout() && ! isset( $_GET['pay_for_order'] ) ) {
-      return;
-    }
-
-    // Return if our payment gateway is disabled
-    if ( 'no' === $this->enabled ) {
-      return;
-    }
-
-    // Return if merchant wallet or Mainnet-Beta RPC is not configured
-    if ( empty( $this->merchant_wallet ) || ( empty( $this->live_rpc ) && ! $this->testmode ) ) {
-      return;
+    // if order is created, get order currency otherwise get cart currency
+    $currency_code = '';
+    if ( is_checkout_pay_page() ) {
+      $order_id = absint( get_query_var( 'order-pay' ) );
+      $order = wc_get_order( $order_id );
+      if ( $order ) {
+        $currency_code = $order->get_currency();
+      }
+    } else {
+      $currency_code = get_woocommerce_currency();
     }
 
     $scripts = glob( PLUGIN_DIR . '/frontend/build/main*.js' );
@@ -348,6 +378,9 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
           'id'        => $this->id,
           'baseurl'   => PLUGIN_URL,
           'btn_class' => $this->get_button_classname(),
+          'amount'    => $this->get_order_total(),
+          'currency'  => $currency_code,
+          'pay_page'  => is_checkout_pay_page(),
         )
       );
     }
@@ -455,7 +488,7 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
   }
 
   public function handle_webhook_request() {
-    $ref = isset( $_GET[ 'ref' ] ) ? $_GET[ 'ref' ] : null;
+    $ref = isset( $_GET['ref'] ) ? wc_clean( wp_unslash( $_GET['ref'] ) ) : null;
     if ( is_null( $ref ) ) {
       return;
     }
@@ -465,7 +498,6 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
       'label'     => $this->brand_name,
       'recipient' => $this->merchant_wallet,
       'currency'  => $this->cryptocurrency,
-      'amount'    => WC()->cart->get_cart_contents_total(),
       'nonce'     => wp_create_nonce( substr( str_shuffle( MD5( microtime() ) ), 0, 12 ) ),
     );
 

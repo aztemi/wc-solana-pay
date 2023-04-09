@@ -24,7 +24,7 @@ $img_alt = esc_attr( __( 'Solana Pay', 'solana-pay-for-wc' ) );
   <?php echo $button ?>
 </template>
 <template id="template_our_btn">
-  <button id="place_order" class="solana_pay_for_wc_place_order button alt <?php echo $btn_class ?>" style="display:flex;align-items:center;justify-content:center">
+  <button type="submit" id="place_order" class="solana_pay_for_wc_place_order button alt <?php echo $btn_class ?>" style="display:flex;align-items:center;justify-content:center">
     <span><?php echo esc_html( $button_text ) ?></span>
     <img src="<?php echo $img_src ?>" alt="<?php echo $img_alt ?>" style="margin-left:0.5em" />
   </button>
