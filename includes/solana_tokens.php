@@ -15,19 +15,19 @@ function get_supported_solana_tokens() {
   $supported_tokens = array(
     'USDC' => array(
       'symbol'       => 'USDC',
-      'name'         => __( 'Circle USD Coin', 'solana-pay-for-wc' ),
+      'name'         => __( 'Circle USD Coin', 'solana-pay-for-woocommerce' ),
       'devnet'       => '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
       'mainnet-beta' => 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     ),
     'USDT' => array(
       'symbol'       => 'USD₮',
-      'name'         => __( 'Tether USDt', 'solana-pay-for-wc' ),
+      'name'         => __( 'Tether USDt', 'solana-pay-for-woocommerce' ),
       'devnet'       => 'EJwZgeZrdC8TXTQbQBoL6bfuAnFUUy1PVCMB4DYPzVaS', // USDT (Saber Devnet)
       'mainnet-beta' => 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
     ),
     'SOL' => array(
       'symbol'       => 'SOL',
-      'name'         => __( 'Solana', 'solana-pay-for-wc' ),
+      'name'         => __( 'Solana', 'solana-pay-for-woocommerce' ),
       'devnet'       => '', // N/A for SOL
       'mainnet-beta' => '', // N/A for SOL
     ),

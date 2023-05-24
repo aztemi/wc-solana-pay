@@ -14,9 +14,9 @@ namespace AZTemi\Solana_Pay_for_WC;
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) { die; }
 
-$button_text = __( 'Pay with', 'solana-pay-for-wc' );
+$button_text = __( 'Pay with', 'solana-pay-for-woocommerce' );
 $img_src = esc_url( PLUGIN_URL . '/assets/img/solana_pay_white_gradient.svg' );
-$img_alt = esc_attr( __( 'Solana Pay', 'solana-pay-for-wc' ) );
+$img_alt = esc_attr( __( 'Solana Pay', 'solana-pay-for-woocommerce' ) );
 ?>
 
 <span id="place_order_btn_wrapper"></span>

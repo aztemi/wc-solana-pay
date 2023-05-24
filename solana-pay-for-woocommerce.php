@@ -10,7 +10,7 @@
  * Author URI:        https://www.aztemi.com
  * License:           GPLv3 or later
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain:       solana-pay-for-wc
+ * Text Domain:       solana-pay-for-woocommerce
  * Domain Path:       /languages
  *
  * @package AZTemi\Solana_Pay_for_WC
@@ -27,14 +27,14 @@ define( 'PLUGIN_URL', rtrim( plugin_dir_url( __FILE__ ), '/\\' ) );
 define( 'PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 // Load plugin textdomain.
-load_plugin_textdomain( 'solana-pay-for-wc', false, PLUGIN_DIR . '/languages/' );
+load_plugin_textdomain( 'solana-pay-for-woocommerce', false, dirname( PLUGIN_BASENAME ) . '/languages' );
 
 // load plugin helper functions
 require_once PLUGIN_DIR . '/includes/functions.php';
 
 // return if WooCommerce is not active
 if ( ! is_woocommerce_activated() ) {
-  show_error_notice( __( '<b>Solana Pay for WooCommerce</b> requires <b>WooCommerce</b> to be installed and active.', 'solana-pay-for-wc' ) );
+  show_error_notice( __( '<b>Solana Pay for WooCommerce</b> requires <b>WooCommerce</b> to be installed and active.', 'solana-pay-for-woocommerce' ) );
   return;
 }
 

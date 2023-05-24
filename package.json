@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "makepot": "wp-pot --dest-file languages/$npm_package_name.pot --domain solana-pay-for-wc --no-file-paths",
+    "makepot": "wp-pot --dest-file languages/$npm_package_name.pot --domain $npm_package_name",
     "package": "cd .. && zip -r $npm_package_name-$npm_package_version.zip $npm_package_name -x .gitignore package-lock.json package.json **.git/\\* **node_modules/\\*  **svelte/\\* && cd $npm_package_name"
   },
   "repository": {
