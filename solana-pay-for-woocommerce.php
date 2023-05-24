@@ -3,7 +3,7 @@
  * Plugin Name:       Solana Pay for WooCommerce
  * Plugin URI:        https://github.com/t4top/solana-pay-for-woocommerce
  * Description:       Add Solana Pay to your WooCommerce store and start taking payments in SOL, USDC, USDT and more.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            t4top
