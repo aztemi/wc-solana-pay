@@ -6,10 +6,10 @@
  * - "Pay with Solana Pay" express checkout button when our Solana Pay payment method is selected and
  * - default "Place Order" button when other payment methods are selected.
  *
- * @package T4top\Solana_Pay_for_WC
+ * @package AZTemi\Solana_Pay_for_WC
  */
 
-namespace T4top\Solana_Pay_for_WC;
+namespace AZTemi\Solana_Pay_for_WC;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) { die; }

@@ -1,22 +1,22 @@
 <?php
 /**
  * Plugin Name:       Solana Pay for WooCommerce
- * Plugin URI:        https://github.com/t4top/solana-pay-for-woocommerce
- * Description:       Add Solana Pay to your WooCommerce store and start taking payments in SOL, USDC, USDT and more.
+ * Plugin URI:        https://github.com/aztemi/solana-pay-for-woocommerce
+ * Description:       Adds Solana Pay to your WooCommerce store for accepting payments in SOL, USDC, USDT and more.
  * Version:           0.2.0
  * Requires at least: 5.2
  * Requires PHP:      7.2
- * Author:            t4top
- * Author URI:        https://github.com/t4top/
+ * Author:            AZTemi
+ * Author URI:        https://www.aztemi.com
  * License:           GPLv3 or later
- * License URI:       https://github.com/t4top/solana-pay-for-woocommerce/blob/main/LICENSE
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       solana-pay-for-wc
  * Domain Path:       /languages
  *
- * @package T4top\Solana_Pay_for_WC
+ * @package AZTemi\Solana_Pay_for_WC
  */
 
-namespace T4top\Solana_Pay_for_WC;
+namespace AZTemi\Solana_Pay_for_WC;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) { die; }

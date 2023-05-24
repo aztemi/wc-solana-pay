@@ -2,10 +2,10 @@
 /**
  * Helper functions and utilities.
  *
- * @package T4top\Solana_Pay_for_WC
+ * @package AZTemi\Solana_Pay_for_WC
  */
 
-namespace T4top\Solana_Pay_for_WC;
+namespace AZTemi\Solana_Pay_for_WC;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) { die; }

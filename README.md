@@ -26,7 +26,7 @@ Below are some of the major features of this zkApp.
 1. Clone this git repository and change to the project directory
 
 ```bash
-git clone https://github.com/t4top/solana-pay-for-woocommerce.git
+git clone https://github.com/aztemi/solana-pay-for-woocommerce.git
 cd solana-pay-for-woocommerce
 ```
 
@@ -48,7 +48,7 @@ npm run package
 
 ## Buy me a coffee
 
-Solana Wallet: [BFSi8WeoE2bLJtMUpB6KVggJZ4Uv5DavVrVsm5kdrQwY](solana:BFSi8WeoE2bLJtMUpB6KVggJZ4Uv5DavVrVsm5kdrQwY?label=Buy%20t4top%20a%20coffee&message=Thanks%20for%20your%20support&memo=Solana%20Pay)
+Solana Wallet: BFSi8WeoE2bLJtMUpB6KVggJZ4Uv5DavVrVsm5kdrQwY
 
 ## License
 
