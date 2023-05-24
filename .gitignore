@@ -33,3 +33,6 @@ lerna-debug.log*
 *.sqlite
 .DS_Store
 Thumbs.db
+
+# ignore frontend build directory
+frontend/build

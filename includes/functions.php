@@ -7,16 +7,8 @@
 
 namespace T4top\Solana_Pay_for_WC;
 
-use StephenHill\Base58;
-
-/**
- * start session
- */
-function start_session() {
-  if ( !session_id() ) {
-    session_start();
-  }
-}
+// die if accessed directly
+if ( ! defined( 'WPINC' ) ) { die; }
 
 /**
  * Check if WooCommerce plugin is activated or not.
@@ -42,7 +34,7 @@ function show_error_notice( $notice ) {
 }
 
 /**
- * Declare gateway class
+ * Register gateway class
  *
  * @param  gateways array List of gateways currently registered
  * @return          array Extended gateways list
@@ -53,31 +45,11 @@ function register_gateway_class( $gateways = [] ) {
 }
 
 /**
- * Initialize gateway class
+ * Activate gateway class and features
  */
-function init_gateway_class() {
+function activate_gateway() {
   require PLUGIN_DIR . '/includes/class-solana-pay-for-woocommerce.php';
-}
-
-/**
- * Enqueue a css style or js script to the front end html.
- *
- * @param  relpath string Relative path to file to enqueue.
- * @param  deps    array  An array of registered script handles this file depends on.
- * @return         string A unique handle name of the file
- */
-function enqueue_file( $relpath, $deps = [] ) {
-  $handle = str_replace( array( '/', '.' ), '_', $relpath );
-  $url = PLUGIN_URL . $relpath;
-  
-  if ( 0 === substr_compare( $relpath, '.css', -4, 4, true ) ) {
-    $path = PLUGIN_DIR . $relpath;
-    wp_enqueue_style( $handle, $url, $deps, filemtime( $path ), 'all' );
-  } else {
-    wp_enqueue_script( $handle, $url, $deps, null, true );
-  }
-
-  return $handle;
+  require PLUGIN_DIR . '/includes/solana_tokens.php';
 }
 
 /**
@@ -101,7 +73,11 @@ function load_enqueued_scripts_as_modules( $enqueued_scripts = [] ) {
 }
 
 /**
- * Todo
+ * Load a template file as HTML
+ *
+ * @param  relpath string Relative path to the php file to load.
+ * @param  args    array  List of variables to import into symbol table of the file.
+ * @return         string HTML string of loaded php file.
  */
 function get_template_html( $relpath, $args = [] ) {
   ob_start();

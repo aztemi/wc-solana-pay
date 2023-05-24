@@ -7,6 +7,9 @@
 
 namespace T4top\Solana_Pay_for_WC;
 
+// die if accessed directly
+if ( ! defined( 'WPINC' ) ) { die; }
+
 // return if WooCommerce payment gateway class is missing
 if ( ! class_exists( '\WC_Payment_Gateway' ) ) {
   return;
@@ -20,170 +23,283 @@ if ( class_exists( __NAMESPACE__ . '\Solana_Pay_for_WooCommerce' ) ) {
 class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
   protected const DEVNET_ENDPOINT = 'https://api.devnet.solana.com';
-  protected const CHECKOUT_SESSION_DATA = 'solana_pay_for_wc_session_data';
+
+  public function __construct() {
+    // Init session for this plugin
+    $this->init_session();
+
+    // Setup general properties
+    $this->setup_properties();
+
+    // Load settings
+    $this->init_form_fields();
+    $this->init_settings();
+
+    // Get settings into local variables
+    $this->get_settings();
+
+    // Actions & filters
+    $this->add_actions_and_filters();
+  }
 
   /**
-   * Array of enqueued scripts
+   * Add initialized plugin session entry to WC session
    */
-  protected $enqueued_scripts = [];
+  private function init_session() {
+    if ( isset( WC()->session ) && ! WC()->session->{ $this->id } ) {
+      WC()->session->{ $this->id } = array();
+    }
+  }
 
-  public function __construct() {    
-    $this->id                 = strtolower( str_replace( __NAMESPACE__ . '\\', '', __CLASS__ ) );
+  /**
+   * Remove plugin session entry from WC session
+   */
+  private function clear_session() {
+    unset( WC()->session->{ $this->id } );
+  }
+
+  /**
+   * Read plugin session data
+   */
+  private function get_session_data() {
+    if ( isset( WC()->session ) && isset( WC()->session->{ $this->id } ) ) {
+      return WC()->session->{ $this->id };
+    }
+
+    return array();
+  }
+
+  /**
+   * Update plugin session data
+   */
+  private function update_session_data( $data ) {
+    if ( isset( WC()->session ) ) {
+      WC()->session->{ $this->id } = $data;
+    }
+  }
+
+  private function setup_properties() {
+    $this->id                 = 'spfwc';
     $this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
     $this->has_fields         = false;
     $this->title              = __( 'Solana Pay', 'solana-pay-for-wc' );
     $this->method_title       = $this->title;
-    $this->method_description = __( 'Add Solana Pay to your WooCommerce store.', 'solana-pay-for-wc' );
-
-    $this->enabled            = $this->get_option('enabled');
-    $this->is_testmode        = $this->get_option('is_testmode');
-    $this->merchant_wallet    = $this->get_option('merchant_wallet');
-    $this->cryptocurrency     = $this->get_option('cryptocurrency');
-    $this->description        = $this->get_option('description');
-    $this->instructions       = $this->get_option('instructions');
-
-    // add settings form fields and initialize them
-    $this->init_form_fields();
-    $this->init_settings();
-
-    
-    add_action( "woocommerce_update_options_payment_gateways_$this->id", array( $this, 'process_admin_options' ) );
-    add_action( "woocommerce_thank_you_$this->id", array( $this, 'thank_you_page' ) );
-    add_action( 'woocommerce_after_checkout_form', array( $this, 'add_custom_payment_modal' ), 10 );
-    add_action( "woocommerce_api_$this->id" , array( $this, 'handle_webhook_request' ) );
-
-    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_files' ) );
-
-    add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_order_button_html' ) );
-    add_filter( 'woocommerce_currency', array( $this, 'change_woocommerce_currency' ) );
-    add_filter( 'woocommerce_currencies', array( $this, 'add_woocommerce_currencies' ) );
-    add_filter( 'woocommerce_currency_symbol', array( $this, 'add_woocommerce_currency_symbol' ), 10, 2 );
-    
-    add_filter( 'woocommerce_checkout_fields', array( $this, 'remove_unused_fields' ) );
-
-    add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_action_links' ) );
-  }
-
-  /**
-   *
-   */
-  public function remove_unused_fields( $fields ) {
-    $fields['billing']['billing_first_name']['required'] = false;
-    $fields['billing']['billing_last_name']['required'] = false;
-    $fields['billing']['billing_email']['required'] = false;
-
-    $fields['billing']['billing_company']['required'] = false;
-    $fields['billing']['billing_address_1']['required'] = false;
-    $fields['billing']['billing_address_2']['required'] = false;
-    $fields['billing']['billing_postcode']['required'] = false;
-    $fields['billing']['billing_city']['required'] = false;
-    $fields['billing']['billing_state']['required'] = false;
-    $fields['billing']['billing_phone']['required'] = false;
-
-    // unset( $fields['billing']['billing_company'] );
-    // unset( $fields['billing']['billing_address_1'] );
-    // unset( $fields['billing']['billing_address_2'] );
-    // unset( $fields['billing']['billing_postcode'] );
-    // unset( $fields['billing']['billing_city'] );
-    // unset( $fields['billing']['billing_state'] );
-    // unset( $fields['billing']['billing_phone'] );
-
-    return $fields;
+    $this->method_description = __( 'Take payments in SOL, USDC, USDT and more with Solana Pay.', 'solana-pay-for-wc' );
+    $this->supports           = array( 'products' );
   }
 
   /**
    * Initialise Gateway Settings Form Fields
    */
   public function init_form_fields() {
-    $this->form_fields = apply_filters('solanapay_wc_form_fields',
+    $this->form_fields = apply_filters( 'solana_pay_wc_form_fields',
       array(
         'enabled' => array(
-          'title'       => __('Enable/Disable', 'solana-pay-for-wc'),
+          'title'       => __( 'Enable/Disable', 'solana-pay-for-wc' ),
           'type'        => 'checkbox',
-          'label'       => __('Enable Solana Pay for your store.', 'solana-pay-for-wc'),
+          'label'       => __( 'Enable Solana Pay', 'solana-pay-for-wc' ),
           'default'     => 'no',
+          'description' => __( 'This gateway must be enabled in order to use Solana Pay.', 'solana-pay-for-wc' ),
           'desc_tip'    => true,
-          'description' => __( 'In order to use Solana Pay processing, this Gateway must be enabled.', 'solana-pay-for-wc' ),
         ),
-        'is_testmode' => array(
-          'title'       => __('Test Mode', 'solana-pay-for-wc'),
+        'testmode'      => array(
+          'title'       => __( 'Test Mode', 'solana-pay-for-wc' ),
           'type'        => 'checkbox',
-          'label'       => __('Enable Test Mode. Must be unchecked for Production.', 'solana-pay-for-wc'),
+          'label'       => __( 'Enable Test Mode', 'solana-pay-for-wc' ),
           'default'     => 'yes',
+          'description' => __( 'Enable Test Mode to use Solana Devnet. Uncheck to use Solana Mainnet-Beta for Production.', 'solana-pay-for-wc' ),
           'desc_tip'    => true,
-          'description' => __('Solana Devnet is used for Test Mode. Mainnet Beta is used for Production.', 'solana-pay-for-wc'),
         ),
         'merchant_wallet' => array(
-          'title'       => __('Solana Wallet Address', 'solana-pay-for-wc'),
+          'title'       => __( 'Solana Wallet Address', 'solana-pay-for-wc' ),
           'type'        => 'text',
           'default'     => '',
-          'desc_tip'    => true,
-          'description' => __('Your Solana wallet address where all payments will be sent.', 'solana-pay-for-wc'),
+          'description' => __( 'Merchant Solana wallet address where all payments will be sent.', 'solana-pay-for-wc' ),
         ),
         'cryptocurrency' => array(
-          'title'       => __('Cryptocurrency', 'solanapay_wc'),
+          'title'       => __( 'Store Currency', 'solana-pay-for-wc' ),
           'type'        => 'select',
-          'default'     => 'USDC',
-          'desc_tip'    => true,
-          'description' => __('Select the default cryptocurrency of your products.', 'solanapay_wc'),
-          'options'     => array(
-                            'USDC' => __( 'USDC', 'solana-pay-for-wc' ),
-                            'SOL'  => __( 'SOL', 'solana-pay-for-wc' ),
-                           ),
+          'description' => __( 'Select default cryptocurrency for your products. <b>This will overwrite the Woocommerce default currency setting</b>.', 'solana-pay-for-wc' ),
+          'options'     => $this->get_solana_tokens(),
         ),
-        'description' => array(
-          'title'       => __('Description', 'solana-pay-for-wc'),
-          'type'        => 'textarea',
-          'default'     => __('Complete your payment with Solana Pay.', 'solana-pay-for-wc'),
-          'desc_tip'    => true,
-          'description' => __('Payment method description that the customer will see in the checkout.', 'solana-pay-for-wc'),
+        'live_rpc'      => array(
+          'title'       => __( 'Mainnet-Beta RPC Endpoint', 'solana-pay-for-wc' ),
+          'type'        => 'url',
+          'default'     => '',
+          'description' => __( 'RPC endpoint for connection to the Solana Mainnet-Beta.', 'solana-pay-for-wc' ),
         ),
-        'instructions' => array(
-          'title'       => __('Instructions', 'solana-pay-for-wc'),
+        array(
+          'title'       => esc_html__( 'Optional Settings', 'solana-pay-for-wc' ),
+          'type'        => 'title',
+          'description' => __( 'Options below are not mandatory.', 'solana-pay-for-wc' ),
+        ),
+        'test_rpc'      => array(
+          'title'       => __( 'Devnet RPC Endpoint', 'solana-pay-for-wc' ),
+          'type'        => 'url',
+          'default'     => self::DEVNET_ENDPOINT,
+          'description' => __( 'RPC endpoint for connection to the Solana Devnet.', 'solana-pay-for-wc' ),
+        ),
+        'brand_name'    => array(
+          'title'       => __( 'Brand Name', 'solana-pay-for-wc' ),
+          'type'        => 'text',
+          'default'     => get_bloginfo( 'name' ) ?? '',
+          'description' => __( 'Merchant name displayed in payment instructions.', 'solana-pay-for-wc' ),
+        ),
+        'description'   => array(
+          'title'       => __( 'Description', 'solana-pay-for-wc' ),
           'type'        => 'textarea',
-          'default'     => __('Thank you for using Solana Pay', 'solana-pay-for-wc'),
-          'desc_tip'    => true,
-          'description' => __('Delivery or other useful instructions that will be added to the thank you page and order emails.', 'solana-pay-for-wc'),
+          'default'     => __( 'Complete your payment with Solana Pay.', 'solana-pay-for-wc' ),
+          'description' => __( 'Payment method description that the customer will see in the checkout.', 'solana-pay-for-wc' ),
+        ),
+        'instructions'  => array(
+          'title'       => __( 'Instructions', 'solana-pay-for-wc' ),
+          'type'        => 'textarea',
+          'default'     => __( 'Thank you for using Solana Pay', 'solana-pay-for-wc' ),
+          'description' => __( 'Delivery or other useful instructions that will be added to the Thank You page and order emails.', 'solana-pay-for-wc' ),
         ),
       )
     );
   }
 
-  public function change_woocommerce_currency( $currency ) {
-    $currency = 'USDC';
-    if ( 'SOL' == $this->cryptocurrency ) {
-      $currency = 'SOL';
-    }
-    return $currency;
-  }
+  private function get_settings() {
+    $this->enabled         = $this->get_option( 'enabled' );
+    $this->testmode        = 'yes' === $this->get_option( 'testmode', 'yes' );
+    $this->merchant_wallet = $this->get_option( 'merchant_wallet', '' );
+    $this->cryptocurrency  = $this->get_option( 'cryptocurrency' );
+    $this->live_rpc        = $this->get_option( 'live_rpc', '' );
+    $this->test_rpc        = $this->get_option( 'test_rpc' );
+    $this->brand_name      = $this->get_option( 'brand_name' );
+    $this->description     = $this->get_option( 'description' );
+    $this->instructions    = $this->get_option( 'instructions' );
 
-  // Add crypto tokens supported by Solana Pay to woocommerce currency list
-  public function add_woocommerce_currencies( $currencies ) {
-    $currencies['USDC'] = __( 'USDC', 'solana-pay-for-wc' );
-    $currencies['SOL']  = __( 'SOL (Solana)', 'solana-pay-for-wc' );
-    return $currencies;
-  }
-
-  public function add_woocommerce_currency_symbol( $currency_symbol, $currency ) {
-    switch( $currency ) {
-      case 'USDC': $currency_symbol = 'USDC'; break;
-      case 'SOL' : $currency_symbol = 'SOL'; break;
+    if ( $this->testmode ) {
+      $testmode_msg = ' (' . esc_html__( 'Test Mode enabled. Devnet in use', 'solana-pay-for-wc' ) . ')';
+      $this->method_description .= $testmode_msg;
+      $this->description .= $testmode_msg;
     }
-    return $currency_symbol;
   }
 
   /**
-   * Add custom action links to Installed Plugins admin page
+   * Check if our payment gateway is available for use in the frontend
    */
-  public function add_action_links( $links ) {
-    array_unshift(
-      $links,
-      sprintf(
-        '<a href="%1$s">%2$s</a>',
-        admin_url( "admin.php?page=wc-settings&tab=checkout&section=$this->id" ),
-        __( 'Settings', 'solana-pay-for-wc' )
-      )
-    );
+  public function is_available() {
+    // Return false if our payment gateway is disabled
+    if ( 'no' === $this->enabled ) {
+      return false;
+    }
+
+    // Return false if merchant wallet or Mainnet-Beta RPC is not configured
+    if ( empty( $this->merchant_wallet ) || ( empty( $this->live_rpc ) && ! $this->testmode ) ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Validate wallet address settings field. Clear the field in case of error.
+   */
+  public function validate_merchant_wallet_field( $key, $value ) {
+    if ( ! preg_match( '/^[1-9A-HJ-NP-Za-km-z]{32,44}$/', $value ) ) {
+      \WC_Admin_Settings::add_error( esc_html__( 'Invalid Solana Wallet Address', 'solana-pay-for-wc' ) );
+      $value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
+    }
+
+    return $value;
+  }
+
+  /**
+   * Validate Live RPC Endpoint settings field. Clear the field in case of error.
+   */
+  public function validate_live_rpc_field( $key, $value ) {
+    $post_data = $this->get_post_data();
+    $testmode = isset( $post_data[ "woocommerce_{$this->id}_testmode" ] );
+
+    if ( ! $testmode && ! wp_http_validate_url( $value ) ) {
+      \WC_Admin_Settings::add_error( esc_html__( 'Invalid Mainnet-Beta RPC Endpoint', 'solana-pay-for-wc' ) );
+      $value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
+    }
+
+    return $value;
+  }
+
+  /**
+   * Set Test RPC Endpoint to default if not set correctly.
+   */
+  public function validate_test_rpc_field( $key, $value ) {
+    if ( empty( trim( $value ) ) || ! wp_http_validate_url( $value ) ) {
+      $value = self::DEVNET_ENDPOINT;
+    }
+
+    return $value;
+  }
+
+  private function add_actions_and_filters() {
+    if ( is_admin() ) {
+      // Save Admin page settings
+      add_action( "woocommerce_update_options_payment_gateways_$this->id", array( $this, 'process_admin_options' ) );
+
+      // Add 'Settings' link to the Installed Plugins page after plugin activation
+      add_filter( 'plugin_action_links_' . PLUGIN_BASENAME,  array( $this, 'add_settings_link' ) );
+    }
+
+    if ( is_checkout() || is_checkout_pay_page() ) {
+      // Enqueue main script and add its target bind element
+      add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_main_script' ) );
+      add_action( 'wp_footer', array( $this, 'output_script_target_element' ), -10 );
+
+      // Add custom 'Pay with Solana Pay' express checkout button
+      add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_place_order_button' ) );
+      add_filter( 'woocommerce_pay_order_button_html', array( $this, 'add_custom_place_order_button' ) );
+    }
+
+    // Add instructions to the Thank You page
+    add_action( "woocommerce_thank_you_$this->id", array( $this, 'thank_you_page' ) );
+
+    // Endpoint to handle webhook GET request
+    add_action( "woocommerce_api_$this->id" , array( $this, 'handle_webhook_request' ) );
+  }
+
+  private function get_solana_tokens() {
+    $tokens = get_supported_solana_tokens();
+    $arr = array();
+    foreach( $tokens as $k => $v ) {
+      $arr[ $k ] = sprintf( '%s (%s)', $v['name'], $v['symbol'] );
+    }
+
+    return $arr;
+  }
+
+  /**
+   * Update WC currency after Admin Panel options are saved.
+   */
+  public function process_admin_options() {
+    // save regular settings
+    $saved = parent::process_admin_options();
+
+    $post_data = $this->get_post_data();
+    if ( isset( $post_data[ "woocommerce_{$this->id}_cryptocurrency" ] ) ) {
+      $this->cryptocurrency  = $this->get_option( 'cryptocurrency' );
+      update_option( 'woocommerce_currency', $this->cryptocurrency );
+    }
+
+    return $saved;
+  }
+
+  /**
+   * Show 'Settings' action link on Installed Plugins admin page
+   */
+  public function add_settings_link( $links ) {
+    if ( current_user_can( 'manage_woocommerce' ) ) {
+      array_unshift(
+        $links,
+        sprintf(
+          '<a href="%1$s">%2$s</a>',
+          admin_url( "admin.php?page=wc-settings&tab=checkout&section=$this->id" ),
+          __( 'Settings', 'solana-pay-for-wc' )
+        )
+      );
+    }
 
     return $links;
   }
@@ -193,77 +309,118 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
    */
   public function thank_you_page() {
     if ( $this->instructions ) {
-			echo wp_kses_post( wpautop( wptexturize( $this->instructions ) ) );
-		}
-  }
-
-  /**
-   * Add an hidden custom modal for our payment gateway.
-   * It will be shown when 'Place order' button is clicked.
-   * It also serves as the mount target for the Svelte app.
-   */
-  public function add_custom_payment_modal() {
-    echo get_template_html( '/includes/templates/payment_modal_html.php' );
-  }
-
-  /**
-   * Add custom 'Place order' button with Solana Pay icon
-   */
-  public function add_custom_order_button_html( $button ) {
-    return get_template_html( '/includes/templates/order_button_html.php', array( 'button' => $button ) );
-  }
-
-  /**
-   * Enqueue our custom css styles and js scripts
-   */
-  public function enqueue_files() {
-    // enqueue styles
-    // foreach( glob( PLUGIN_DIR . '/assets/build/*.css' ) as $file ) {
-    //   $file = str_replace( PLUGIN_DIR, '', $file );
-    //   enqueue_file( $file );
-    // }
-    
-    // enqueue scripts
-    foreach( glob( PLUGIN_DIR . '/assets/build/main*.js' ) as $file ) {
-      $file = str_replace( PLUGIN_DIR, '', $file );
-      $this->enqueued_scripts[] = enqueue_file( $file, ['jquery'] );
+      echo wp_kses_post( wpautop( wptexturize( $this->instructions ) ) );
     }
-    if ( count( $this->enqueued_scripts ) ) {
-      load_enqueued_scripts_as_modules( $this->enqueued_scripts );
+  }
 
+  /**
+   * Replace WC 'Place order' button with custom 'Pay with Solana Pay' button for express checkout
+   */
+  public function add_custom_place_order_button( $button ) {
+    $scripts = glob( PLUGIN_DIR . '/frontend/build/place_order_button*.js' );
+
+    if ( count( $scripts ) ) {
+      $buttonjs = str_replace( PLUGIN_DIR, '', $scripts[0] );
+      $error_msg = esc_html__( 'Some inputs are not valid. Please fill all required fields.', 'solana-pay-for-wc' );
+      $terms_msg = esc_html__( 'Please read and accept the terms and conditions to proceed with your order.', 'solana-pay-for-wc' );
+      $script = get_template_html(
+        $buttonjs,
+        array(
+          'id'        => $this->id,
+          'error_msg' => $error_msg,
+          'terms_msg' => $terms_msg,
+          'pay_page'  => is_checkout_pay_page(),
+        )
+      );
+
+      $button = get_template_html(
+        '/includes/place_order_button.php',
+        array(
+          'id'        => $this->id,
+          'button'    => $button,
+          'script'    => $script,
+          'btn_class' => $this->get_button_classname(),
+        )
+      );
+    }
+
+    return $button;
+  }
+
+  /**
+   * Enqueue main js script
+   * main js is the entry script that imports other css and js files when needed.
+   */
+  public function enqueue_main_script() {
+    // if order is created, get order currency otherwise get cart currency
+    $currency_code = '';
+    if ( is_checkout_pay_page() ) {
+      $order_id = absint( get_query_var( 'order-pay' ) );
+      $order = wc_get_order( $order_id );
+      if ( $order ) {
+        $currency_code = $order->get_currency();
+      }
+    } else {
+      $currency_code = get_woocommerce_currency();
+    }
+
+    $scripts = glob( PLUGIN_DIR . '/frontend/build/main*.js' );
+    if ( count( $scripts ) ) {
+      $handle = $this->id . '_mainjs';
+      $mainjs = str_replace( PLUGIN_DIR, PLUGIN_URL, $scripts[0] );
+
+      wp_enqueue_script( $handle, $mainjs, ['jquery'], null, true );
+      load_enqueued_scripts_as_modules( [ $handle ] );
       wp_localize_script(
-        $this->enqueued_scripts[0],
+        $handle,
         'solana_pay_for_wc',
         array(
-          'id'       => $this->id,
-          'enabled'  => $this->enabled,
-          'order'    => $this->get_session_data(),
-          'currency' => $this->cryptocurrency,
+          'id'        => $this->id,
+          'baseurl'   => PLUGIN_URL,
+          'btn_class' => $this->get_button_classname(),
+          'amount'    => $this->get_order_total(),
+          'currency'  => $currency_code,
+          'pay_page'  => is_checkout_pay_page(),
         )
       );
     }
   }
 
-	/**
-	 * Process the payment and return the result.
-	 *
-	 * @param int $order_id Order ID.
-	 * @return array
-	 */
-	public function process_payment( $order_id ) {
+  /**
+   * Add a placeholder element where Svelte in main js will be bound.
+   * Svelte will inject our custom Solana modal in it.
+   */
+  public function output_script_target_element() {
+    echo '<div id="solana_pay_for_wc_svelte_target"></div>';
+  }
+
+  /**
+   * Get WordPress default class name for button element
+   */
+  public function get_button_classname() {
+    return esc_attr( function_exists( 'wp_theme_get_element_class_name' ) ? wp_theme_get_element_class_name( 'button' ) : '' );
+  }
+
+  /**
+   * Process the payment and return the result.
+   *
+   * @param int $order_id Order ID.
+   * @return array
+   */
+  public function process_payment( $order_id ) {
     $order = wc_get_order( $order_id );
     $amount = $order->get_total();
-    
-		if ( $amount > 0 ) {
-			// Mark as processing or on-hold.
-			// $order->update_status( apply_filters( 'woocommerce_cod_process_payment_order_status', $order->has_downloadable_item() ? 'on-hold' : 'processing', $order ), __( 'Payment pending.', 'solana-pay-for-wc' ) );
 
-      if ( true != $this->confirm_solana_payment( $order_id ) ) {
+    if ( $amount > 0 ) {
+      // confirm payment transaction on chain
+      $payment_confirmed = $this->confirm_solana_payment( $order_id );
+      if ( ! $payment_confirmed ) {
         return;
       }
     }
 
     $order->payment_complete();
+    $this->clear_session();
 
     // Remove cart.
     WC()->cart->empty_cart();
@@ -273,13 +430,13 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
       'result'   => 'success',
       'redirect' => $this->get_return_url( $order ),
     );
-	}
+  }
 
   public function confirm_solana_payment( $order_id ) {
     $url = self::DEVNET_ENDPOINT;
     $data = $this->get_session_data();
-    $reference = $data->reference;
-    $nonce = $data->nonce;
+    $reference = $data['reference'];
+    $nonce = $data['nonce'];
 
     $body = wp_json_encode(
       array(
@@ -301,10 +458,10 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
     if ( is_wp_error( $response ) ) {
       $error_message = $response->get_error_message();
-      wc_add_notice( __('Payment error:', 'solana-pay-for-wc') . '<p>' . esc_html( $error_message ) . '</p>', 'error' );
+      wc_add_notice( __( 'Payment error:', 'solana-pay-for-wc' ) . '<p>' . esc_html( $error_message ) . '</p>', 'error' );
     } else {
       $response_code = wp_remote_retrieve_response_code( $response );
-  
+
       if ( 200 === $response_code ) {
         $response_body = wp_remote_retrieve_body( $response );
         $response = json_decode( $response_body, true );
@@ -315,46 +472,33 @@ class Solana_Pay_for_WooCommerce extends \WC_Payment_Gateway {
 
           if ( str_contains( $memo, $nonce ) ) {
             $signature = $result[0]['signature'];
-    
+
             // update order info
             wc_add_order_item_meta( $order_id, 'solana_pay_reference', $reference );
             wc_add_order_item_meta( $order_id, 'solana_pay_signature', $signature );
             wc_add_order_item_meta( $order_id, 'solana_pay_nonce', $nonce );
-    
+
             return true;
           }
-        }        
+        }
       }
     }
 
     return false;
   }
 
-  public function update_session_data( $data ) {
-    $_SESSION[ self::CHECKOUT_SESSION_DATA ] = json_encode( $data );
-  }
-
-  public function get_session_data() {
-    start_session();
-
-    if ( isset( $_SESSION[ self::CHECKOUT_SESSION_DATA ] ) ) {
-      return json_decode( $_SESSION[ self::CHECKOUT_SESSION_DATA ] );
-    }
-    
-    return array();
-  }
-
   public function handle_webhook_request() {
-    $ref = isset( $_GET[ 'ref' ] ) ? $_GET[ 'ref' ] : null;
-    if (is_null($ref)) return;
+    $ref = isset( $_GET['ref'] ) ? wc_clean( wp_unslash( $_GET['ref'] ) ) : null;
+    if ( is_null( $ref ) ) {
+      return;
+    }
 
     $data = array(
-      'recipient' => $this->merchant_wallet,
       'reference' => $ref,
-      'label'     => get_bloginfo( 'name' ),
-      'amount'    => WC()->cart->get_cart_contents_total(),
+      'label'     => $this->brand_name,
+      'recipient' => $this->merchant_wallet,
       'currency'  => $this->cryptocurrency,
-      'nonce'     => wp_create_nonce(substr(str_shuffle(MD5(microtime())), 0, 12)),
+      'nonce'     => wp_create_nonce( substr( str_shuffle( MD5( microtime() ) ), 0, 12 ) ),
     );
 
     $this->update_session_data( $data );
