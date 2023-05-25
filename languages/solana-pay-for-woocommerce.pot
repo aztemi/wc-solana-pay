@@ -1,12 +1,12 @@
-# Copyright (C) 2023 solana-pay-for-wc
-# This file is distributed under the same license as the solana-pay-for-wc package.
+# Copyright (C) 2023 solana-pay-for-woocommerce
+# This file is distributed under the same license as the solana-pay-for-woocommerce package.
 msgid ""
 msgstr ""
-"Project-Id-Version: solana-pay-for-wc\n"
+"Project-Id-Version: solana-pay-for-woocommerce\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-03-27 14:47+0000\n"
+"POT-Creation-Date: 2023-05-19 15:25+0000\n"
 "Project-Id-Version: undefined\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -15,71 +15,223 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Solana Pay"
-msgstr ""
-
-msgid "Add Solana Pay to your WooCommerce store."
-msgstr ""
-
-msgid "Enable/Disable"
-msgstr ""
-
-msgid "Enable Solana Pay for your store."
-msgstr ""
-
-msgid "In order to use Solana Pay processing, this Gateway must be enabled."
-msgstr ""
-
-msgid "Test Mode"
-msgstr ""
-
-msgid "Enable Test Mode. Must be unchecked for Production."
-msgstr ""
-
-msgid "Solana Devnet is used for Test Mode. Mainnet Beta is used for Production."
-msgstr ""
-
-msgid "Solana Wallet Address"
-msgstr ""
-
-msgid "Your Solana wallet address where all payments will be sent."
-msgstr ""
-
-msgid "USDC"
-msgstr ""
-
-msgid "SOL"
-msgstr ""
-
-msgid "Description"
-msgstr ""
-
-msgid "Complete your payment with Solana Pay."
-msgstr ""
-
-msgid "Payment method description that the customer will see in the checkout."
-msgstr ""
-
-msgid "Instructions"
-msgstr ""
-
-msgid "Thank you for using Solana Pay"
-msgstr ""
-
-msgid "Delivery or other useful instructions that will be added to the thank you page and order emails."
-msgstr ""
-
-msgid "SOL (Solana)"
-msgstr ""
-
+#: ../admin/class-solana-pay-for-woocommerce-admin.php:88
 msgid "Settings"
 msgstr ""
 
-msgid "Payment error:"
+#: ../admin/class-solana-pay-payment-gateway.php:162, ../public/partials/public_place_order_button.php:26
+msgid "Solana Pay"
 msgstr ""
 
-msgid "Pay with"
+#: ../admin/class-solana-pay-payment-gateway.php:164
+msgid "Accept payments in SOL, USDC, USDT and more with Solana Pay."
 msgstr ""
 
-msgid "<b>Solana Pay for WooCommerce</b> requires <b>WooCommerce</b> to be installed and active."
+#: ../admin/class-solana-pay-payment-gateway.php:189
+msgid "Test Mode enabled. Devnet in use"
+msgstr ""
+
+#: ../admin/class-solana-pay-payment-gateway.php:229
+msgid "Solana Pay setup is not complete. Please set Merchant Wallet Address"
+msgstr ""
+
+#: ../admin/class-solana-pay-payment-gateway.php:235
+msgid "Solana Pay setup is not complete. Please set Mainnet-Beta RPC Endpoint"
+msgstr ""
+
+#: ../admin/class-solana-pay-payment-gateway.php:247
+msgid "Solana Pay setup is not complete. Please enable at least 1 Solana Token."
+msgstr ""
+
+#: ../admin/class-solana-pay-payment-gateway.php:277
+msgid "Invalid Solana Wallet Address"
+msgstr ""
+
+#: ../admin/class-solana-pay-payment-gateway.php:300
+msgid "Invalid Mainnet-Beta RPC Endpoint"
+msgstr ""
+
+#: ../admin/class-solana-pay-payment-gateway.php:344
+msgid "Update currently not available. Please check your connection and reload."
+msgstr ""
+
+#: ../admin/class-solana-pay-payment-webhook.php:170
+msgid "Thank you for your order"
+msgstr ""
+
+#. translators: %d: rpc call response code error, e.g. 404
+#: ../admin/class-solana-pay.php:102
+msgid "RPC remote call failed with code %d"
+msgstr ""
+
+#: ../admin/class-solana-pay.php:91
+msgid "Connection to RPC failed"
+msgstr ""
+
+#: ../admin/class-solana-pay.php:133
+msgid "Payment transaction not found. Please try again."
+msgstr ""
+
+#: ../admin/class-solana-pay.php:174
+msgid "Unable to confirm payment transaction details. Please try again."
+msgstr ""
+
+#: ../admin/class-solana-pay.php:198
+msgid "Payment currency not in supported Solana tokens list."
+msgstr ""
+
+#: ../admin/class-solana-pay.php:369
+msgid "Solana Pay payment completed"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:18
+msgid "Enable/Disable"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:20
+msgid "Enable Solana Pay"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:22
+msgid "This gateway must be enabled in order to use Solana Pay."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:26
+msgid "Test Mode"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:28
+msgid "Enable Test Mode"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:30
+msgid "Enable Test Mode to use Solana Devnet. Uncheck to use Solana Mainnet-Beta for Production."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:34
+msgid "Merchant Wallet Address"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:37
+msgid "Merchant Solana wallet address where all payments will be sent."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:40
+msgid "Mainnet-Beta RPC Endpoint"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:43
+msgid "RPC endpoint for connection to the Solana Mainnet-Beta."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:47
+msgid "Enable cryptocurrencies you want to accept for payments."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:50
+msgid "Optional Settings"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:52
+msgid "Options below are not mandatory."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:55
+msgid "Devnet RPC Endpoint"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:58
+msgid "RPC endpoint for connection to the Solana Devnet."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:61
+msgid "Brand Name"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:64
+msgid "Merchant name displayed in payment instructions."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:67
+msgid "Description"
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:69
+msgid "Complete your payment with Solana Pay."
+msgstr ""
+
+#: ../admin/partials/admin-settings.php:70
+msgid "Payment method description that the customer will see in the checkout."
+msgstr ""
+
+#: ../admin/partials/admin_payment_details.php:30, ../public/partials/public_payment_details.php:29
+msgid "Solana Pay Payment Details"
+msgstr ""
+
+#: ../admin/partials/admin_payment_details.php:33, ../public/partials/public_payment_details.php:33
+msgid "Transaction ID"
+msgstr ""
+
+#: ../admin/partials/admin_payment_details.php:34, ../public/partials/public_payment_details.php:34
+msgid "Customer Wallet"
+msgstr ""
+
+#: ../admin/partials/admin_payment_details.php:35, ../public/partials/public_payment_details.php:35
+msgid "Payment Amount"
+msgstr ""
+
+#: ../admin/partials/admin_payment_details.php:36, ../public/partials/public_payment_details.php:36
+msgid "Reference Account"
+msgstr ""
+
+#: ../admin/partials/admin_tokens_table.php:63
+msgid "Enable"
+msgstr ""
+
+#: ../admin/partials/admin_tokens_table.php:64
+msgid "Coin / Token"
+msgstr ""
+
+#: ../admin/partials/admin_tokens_table.php:65
+msgid "Label"
+msgstr ""
+
+#: ../admin/partials/admin_tokens_table.php:66
+msgid "Exchange Rate"
+msgstr ""
+
+#: ../admin/partials/admin_tokens_table.php:67
+msgid "% Commission"
+msgstr ""
+
+#: ../admin/partials/admin_tokens_table.php:68
+msgid "Preview"
+msgstr ""
+
+#: ../admin/partials/admin_tokens_table.php:175
+msgid "Solana Tokens"
+msgstr ""
+
+#: ../includes/class-solana-pay-for-woocommerce.php:60
+msgid "<b>Solana Pay for WooCommerce</b> is an extension for <b>WooCommerce</b>. Please install and activate <b>WooCommerce</b> plugin."
+msgstr ""
+
+#: ../includes/class-solana-pay-for-woocommerce.php:66
+msgid "<b>Solana Pay for WooCommerce</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP."
+msgstr ""
+
+#: ../public/class-solana-pay-for-woocommerce-public.php:87
+msgid "Pay with Browser Wallet"
+msgstr ""
+
+#: ../public/class-solana-pay-for-woocommerce-public.php:88
+msgid "OR"
+msgstr ""
+
+#: ../public/class-solana-pay-for-woocommerce-public.php:89
+msgid "Scan QR Code with Mobile Wallet"
+msgstr ""
+
+#: ../public/class-solana-pay-for-woocommerce-public.php:133
+msgid "Some inputs are not valid. Please fill all required fields."
 msgstr ""

@@ -1,15 +1,18 @@
 import BigNumber from "bignumber.js";
 import { writable } from "svelte/store";
 import { PublicKey } from "@solana/web3.js";
+import TestmodeTokens from "../../../assets/json/supported_solana_tokens_devnet.json";
+import LiveTokens from "../../../assets/json/supported_solana_tokens_mainnet_beta.json";
 
 const emptyOrder = {
   updated: false,
-  solPrice: 0,
-  amount: new BigNumber(0),
-  solAmount: "",
-  nonce: "",
   recipient: null,
   reference: null,
+  amount: new BigNumber(0),
+  currency: "",
+  endpoint: "",
+  tokens: {},
+  activeToken: "",
   label: "",
   message: "",
   memo: "",
@@ -22,46 +25,45 @@ function createOrderStore() {
   return {
     subscribe,
 
-    reset: () => update(old => Object.assign({}, emptyOrder, { solPrice: old.solPrice, updated: false })),
+    reset: () => update(_ => Object.assign({}, emptyOrder)),
+
+    confirmPayment: paymentSignature => update(old => Object.assign({}, old, { paymentSignature })),
+
+    setActiveToken: key => update(old => Object.assign({}, old, { activeToken: key })),
 
     setOrder: order =>
       update(old => {
-        const { solPrice } = old;
-        let { recipient, reference, amount, label, nonce } = order;
+        const DP = 4; // default decimal places
+        let { recipient, reference, amount, testmode, tokens } = order;
 
         recipient = new PublicKey(recipient);
         reference = new PublicKey(reference);
-        amount = new BigNumber(parseFloat(amount).toFixed(2));
+        amount = new BigNumber(parseFloat(amount));
 
-        let solAmount = 0;
-        if (solPrice) solAmount = (amount.toNumber() / solPrice).toFixed(2);
+        // update tokens
+        let paymentTokens = {};
+        let activeToken = "";
+        const keySuffix = "_SOLANA";
+        const supportedTokens = testmode ? TestmodeTokens : LiveTokens;
+        for (const [key, value] of Object.entries(tokens)) {
+          const token = key.replace(keySuffix, "");
+          if (token in supportedTokens) {
+            paymentTokens[key] = supportedTokens[token];
+            paymentTokens[key]["amount"] = new BigNumber(parseFloat(value)).decimalPlaces(DP, BigNumber.ROUND_CEIL);
+            if (!activeToken) activeToken = key;
+            if (paymentTokens[key]["mint"]) paymentTokens[key]["mint"] = new PublicKey(paymentTokens[key]["mint"]);
+          }
+        }
 
-        const message = `Thank You - (#${nonce}: ${label})`;
-        const memo = `OrderNonce#${nonce}`;
-
-        return Object.assign({}, old, {
+        return Object.assign({}, old, order, {
           updated: true,
           recipient,
           reference,
           amount,
-          solAmount,
-          label,
-          nonce,
-          message,
-          memo
+          activeToken,
+          tokens: paymentTokens
         });
-      }),
-
-    setSolPrice: solPrice =>
-      update(old => {
-        const { amount } = old;
-        let solAmount = 0;
-        if (amount.toNumber()) solAmount = (amount.toNumber() / solPrice).toFixed(2);
-
-        return Object.assign({}, old, { solPrice, solAmount });
-      }),
-
-    confirmPayment: paymentSignature => update(old => Object.assign({}, old, { paymentSignature }))
+      })
   };
 }
 

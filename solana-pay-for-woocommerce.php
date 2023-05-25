@@ -1,42 +1,46 @@
 <?php
 /**
- * Plugin Name:       Solana Pay for WooCommerce
- * Plugin URI:        https://github.com/t4top/solana-pay-for-woocommerce
- * Description:       Add Solana Pay to your WooCommerce store and start taking payments in SOL, USDC, USDT and more.
- * Version:           0.2.0
- * Requires at least: 5.2
- * Requires PHP:      7.2
- * Author:            t4top
- * Author URI:        https://github.com/t4top/
- * License:           GPLv3 or later
- * License URI:       https://github.com/t4top/solana-pay-for-woocommerce/blob/main/LICENSE
- * Text Domain:       solana-pay-for-wc
- * Domain Path:       /languages
+ * Plugin Name: Solana Pay for WooCommerce
+ * Plugin URI:  https://github.com/aztemi/solana-pay-for-woocommerce
+ * Description: Adds Solana Pay to your WooCommerce store and lets you accept payments in SOL, USDC, USDT and more.
+ * Version:     1.0.0
+ * Author:      AZTemi
+ * Author URI:  https://www.aztemi.com
+ * License:     GPLv3 or later
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
+ * Text Domain: solana-pay-for-woocommerce
+ * Domain Path: /languages
  *
- * @package T4top\Solana_Pay_for_WC
+ * Requires PHP:         7.2
+ * Requires at least:    5.2
+ * Tested up to:         6.2
+ * WC requires at least: 3.0
+ * WC tested up to:      7.7
+ *
+ * @package AZTemi\Solana_Pay_for_WC
  */
 
-namespace T4top\Solana_Pay_for_WC;
+namespace AZTemi\Solana_Pay_for_WC;
 
 // die if accessed directly
-if ( ! defined( 'WPINC' ) ) { die; }
-
-// define named constants
-define( 'PLUGIN_DIR', rtrim( plugin_dir_path( __FILE__ ), '/\\' ) );
-define( 'PLUGIN_URL', rtrim( plugin_dir_url( __FILE__ ), '/\\' ) );
-define( 'PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-
-// Load plugin textdomain.
-load_plugin_textdomain( 'solana-pay-for-wc', false, PLUGIN_DIR . '/languages/' );
-
-// load plugin helper functions
-require_once PLUGIN_DIR . '/includes/functions.php';
-
-// return if WooCommerce is not active
-if ( ! is_woocommerce_activated() ) {
-  show_error_notice( __( '<b>Solana Pay for WooCommerce</b> requires <b>WooCommerce</b> to be installed and active.', 'solana-pay-for-wc' ) );
-  return;
+if ( ! defined( 'WPINC' ) ) {
+	die;
 }
 
-add_filter( 'woocommerce_payment_gateways', __NAMESPACE__ . '\register_gateway_class' );
-add_action( 'plugins_loaded', __NAMESPACE__ . '\activate_gateway' );
+// define named constants
+define( __NAMESPACE__ . '\PLUGIN_ID', 'spfwc' );
+define( __NAMESPACE__ . '\PLUGIN_DIR', untrailingslashit( __DIR__ ) );
+define( __NAMESPACE__ . '\PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+define( __NAMESPACE__ . '\PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+
+
+// load plugin core class and start it
+function load_plugin_class() {
+
+	require_once PLUGIN_DIR . '/includes/class-solana-pay-for-woocommerce.php';
+
+	$plugin = new Solana_Pay_For_WooCommerce();
+	$plugin->run();
+
+}
+load_plugin_class();
