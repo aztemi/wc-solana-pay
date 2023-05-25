@@ -11,7 +11,6 @@
   let ourBtn, theirBtn;
   const id = "<?php echo $id ?>".trim();
   const errorMsg = "<?php echo $error_msg ?>".trim();
-  const termsMsg = "<?php echo $terms_msg ?>".trim();
   const isPayPage = "<?php echo $pay_page ?>".trim();
   const previousOnload = window.onload;
   const previousOnchange = window.onchange;
@@ -25,11 +24,9 @@
     const form = $$(isPayPage ? "form#order_review" : "form.checkout");
     form.find(".validate-required:visible :input:visible").trigger("validate").trigger("blur");
     const invalidFields = form.find(".validate-required.woocommerce-invalid:visible").length;
-    if (invalidFields) {
+    const notChecked = form.find(".validate-required:visible :input[type='checkbox']:visible:not(:checked)").length;
+    if (invalidFields || notChecked) {
       msg += `<li>${errorMsg}</li>`;
-    } else {
-      const terms = $("form #terms");
-      if (terms && !terms.checked) msg += `<li>${termsMsg}</li>`;
     }
 
     $$(".woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message").remove();

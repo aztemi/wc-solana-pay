@@ -1,0 +1,28 @@
+{
+  "USDC": {
+    "symbol": "USDC",
+    "name": "Circle USD Coin",
+    "mint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr",
+    "decimals": 6,
+    "icon": "assets/img/tokens/usdc.png",
+    "coingecko": "usd-coin",
+    "stablecoin": "USD"
+  },
+  "USDT": {
+    "symbol": "USD₮",
+    "name": "Tether USDt",
+    "mint": "EJwZgeZrdC8TXTQbQBoL6bfuAnFUUy1PVCMB4DYPzVaS",
+    "decimals": 6,
+    "icon": "assets/img/tokens/usdt.png",
+    "coingecko": "tether",
+    "stablecoin": "USD"
+  },
+  "SOL": {
+    "symbol": "SOL",
+    "name": "Solana",
+    "mint": "",
+    "decimals": 9,
+    "icon": "assets/img/tokens/sol.png",
+    "coingecko": "solana"
+  }
+}

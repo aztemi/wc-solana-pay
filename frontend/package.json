@@ -2,13 +2,16 @@
   "name": "solana-pay-for-woocommerce-frontend",
   "private": true,
   "version": "0.2.0",
-  "author": "t4top@aztemi",
+  "author": "aztemi",
   "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
+    "clean": "rm -rf ../assets/script/",
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build:modal": "PACKAGE_NAME=modal vite build",
+    "build:button": "PACKAGE_NAME=button vite build",
+    "build:table": "PACKAGE_NAME=table vite build",
+    "build": "npm run clean && npm run build:modal && npm run build:button && npm run build:table"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.2",

@@ -1,25 +1,46 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
+  import { Connection } from "@solana/web3.js";
   import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
   import { createTransfer, findReference, FindReferenceError } from "@solana/pay";
   import { order } from "../store/order.js";
+  import { clickOutside } from "../actions/click_outside.js";
   import Wallet from "./wallet.svelte";
   import QrCode from "./qrcode.svelte";
+  import OrDivider from "./or_divider.svelte";
 
-  // Delay in ms between polling interval for confirmed transaction on chain
+  // Delay in ms between polling intervals for confirming transaction on chain
   const POLLING_DELAY = 2000;
-
-  const { baseurl } = solana_pay_for_wc;
-  const { recipient, reference, label, amount, solAmount, message, memo } = $order;
-  const endpoint = clusterApiUrl("devnet");
-  const USDC = {
-    devnet: new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr")
-  };
-  const splToken = USDC.devnet;
 
   let connection = null;
   let pollingInterval = null;
+  let dropdownOpen = false;
+  let name, splAmount, splToken, icon, symbol;
+
+  const { baseurl, pay_page, wallet_msg, or_msg, qrcode_msg } = solana_pay_for_wc;
+  const { recipient, reference, label, message, memo, amount, currency, endpoint, tokens } = $order;
+  const dropdownRequired = Object.keys(tokens).length > 1;
+
+  $: {
+    if ($order.activeToken) {
+      const key = $order.activeToken;
+      ({ name, amount: splAmount, icon, symbol, mint: splToken } = tokens[key]);
+
+      const form = jQuery(pay_page ? "form#order_review" : "form.checkout");
+      const input = form.find("input[name='spfwc_payment_token']");
+      if (input.length) {
+        input.val(key);
+      } else {
+        form.append(`<input type="hidden" name="spfwc_payment_token" value="${key}" />`);
+      }
+    }
+  }
+
+  $: {
+    if ($walletStore?.connected && !$walletStore?.connecting && !$walletStore?.disconnecting) {
+      payWithConnectedWallet($walletStore.publicKey);
+    }
+  }
 
   onMount(() => {
     connection = new Connection(endpoint, "confirmed");
@@ -53,87 +74,161 @@
     }
   }
 
-  $: {
-    if ($walletStore?.connected && !$walletStore?.connecting && !$walletStore?.disconnecting) {
-      payWithConnectedWallet($walletStore.publicKey);
-    }
-  }
-
   async function payWithConnectedWallet(payer) {
     if ($walletStore?.connected && connection) {
-      const tx = await createTransfer(connection, payer, { recipient, amount, splToken, reference, memo });
+      const tx = await createTransfer(connection, payer, { recipient, amount: splAmount, splToken, reference, memo });
       await $walletStore.sendTransaction(tx, connection);
     }
   }
 </script>
 
 <section>
-  <div>
-    <img src={`${baseurl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
+  <div class="total">
+    <span class="dashicons dashicons-cart" />
+    <span>
+      <bdi>
+        <span><b>{amount.toNumber()}</b></span>
+        <span class="woocommerce-Price-currencySymbol"><b>{@html currency}</b></span>
+      </bdi>
+    </span>
   </div>
-  <div class="amount">
-    <span>Amount:</span>
-    <div>
-      <p><strong>{amount} USDC</strong></p>
-      {#if solAmount}
-        <p>({solAmount} SOL)</p>
-      {/if}
-    </div>
-  </div>
-  <div class="container">
-    <div>
-      <p>Connect your Browser Wallet to pay</p>
-      <div class="wallet">
-        <Wallet network={endpoint} />
-      </div>
-    </div>
-    <div class="spacer">
-      <span> OR </span>
-    </div>
-    <div>
-      <p>Scan QR Code with your Mobile Wallet to pay</p>
-      <div class="qrcode">
-        {#if recipient}
-          {#key splToken}
-            <QrCode {recipient} {amount} {splToken} {reference} {label} {message} {memo} />
-          {/key}
+
+  <div class="topay">
+    <span class="token_amount"><b>{splAmount.toNumber()}</b></span>
+    <span class="tokens">
+      <button
+        class:nopointer={!dropdownRequired}
+        on:click|preventDefault|stopPropagation={() => {
+          if (dropdownRequired) dropdownOpen = !dropdownOpen;
+        }}
+      >
+        <img src={`${baseurl}/${icon}`} alt={name} />
+        <span class="token_symbol">{symbol}</span>
+        {#if dropdownRequired}
+          {#if dropdownOpen}
+            <span class="dashicons dashicons-arrow-up-alt2" />
+          {:else}
+            <span class="dashicons dashicons-arrow-down-alt2" />
+          {/if}
         {/if}
-      </div>
+      </button>
+      {#if dropdownOpen}
+        <div class="dropdown">
+          <ul
+            class="popup_shadow"
+            use:clickOutside={() => {
+              dropdownOpen = false;
+            }}
+          >
+            {#each Object.entries(tokens) as [key, token]}
+              <li class:selected={key === $order.activeToken}>
+                <button
+                  on:click|preventDefault|stopPropagation={() => {
+                    order.setActiveToken(key);
+                    dropdownOpen = false;
+                  }}
+                >
+                  <img src={`${baseurl}/${token.icon}`} alt={token.name} />
+                  <span class="token_symbol">{token.symbol}</span>
+                </button>
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
+    </span>
+  </div>
+
+  <div class="options">
+    <p>{wallet_msg}</p>
+    <div class="wallet">
+      <Wallet network={endpoint} />
+    </div>
+
+    <OrDivider text={or_msg} />
+
+    <p>{qrcode_msg}</p>
+    <div class="qrcode">
+      {#key splToken}
+        <QrCode {recipient} amount={splAmount} {splToken} {reference} {label} {message} {memo} />
+      {/key}
     </div>
   </div>
 </section>
 
 <style lang="stylus">
-  p
-    margin 0
+  section
+    padding 1rem 2rem
+    p
+      margin 0
 
-  .amount
+  .total
     display flex
-    flex-direction row
+    align-items center
+    justify-content right
+    padding-right 0.5rem
+    & > span
+      margin-left 0.2rem
+
+  .topay
+    display flex
     align-items center
     justify-content center
-    margin 1rem 0
-    div
-      margin-left 2rem
-      strong
-        font-weight 800
-        font-size 1.7rem
+    .token_amount
+      font-size 2rem
+      padding 0 0.5rem
+    .nopointer
+      cursor auto
+    .tokens
+      display inline-block
+      button
+        display flex
+        align-items center
+        line-height 1
+        border 0
+        padding 0.5rem 1rem
+        width 100%
+        outline none
+        background-color transparent
+        color currentcolor
+        img
+          width 1.5rem
+          border-radius 50%
+        .token_symbol
+          font-size 1.5rem
+          padding 0 0.7rem
+          white-space nowrap
+      .dropdown
+        position relative
+        z-index 2000
+        ul
+          list-style-type none
+          position absolute
+          padding 0
+          top 0.2rem
+          right 0
+          margin 0
+          width 100%
+          border-radius 0.5rem
+          background-color var(--modal_back_color)
+          li
+            padding 0
+            &:hover, &.selected
+              background-color var(--popup_li_back_color)
+            &:first-of-type
+              border-radius 0.5rem 0.5rem 0 0
+            &:last-of-type
+              border-radius 0 0 0.5rem 0.5rem
 
-  .container
+  .options
+    padding-top 1rem
     display flex
     flex-direction column
     align-items center
-    text-align center
-
+    .wallet, .qrcode
+      display flex
+      justify-content center
     .wallet
-      margin-top 1rem
-
-    .spacer
-      margin 1rem 0
-      span
-        &::before, &::after
-          content "\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0"
-          text-decoration line-through
-          padding 0 0.5rem
+      padding-top 0.5rem
 
 </style>
