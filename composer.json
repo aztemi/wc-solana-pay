@@ -1,0 +1,29 @@
+{
+    "name": "aztemi/solana-pay-for-woocommerce",
+    "description": "Solana Pay powered payment gateway for WordPress and WooCommerce",
+    "type": "project",
+    "license": "GPLv3 or later",
+    "authors": [
+        {
+            "name": "aztemi"
+        }
+    ],
+    "scripts": {
+        "lint": [
+            "phpcs --standard=pbs-rules-set.xml --warning-severity=0 --report-source --report-full=phpcs-report.txt --extensions=php,html ."
+        ],
+        "makepot": [
+            "WP_CLI_PHP_ARGS=\"-d memory_limit=1G\" wp i18n make-pot . ./languages/solana-pay-for-woocommerce.pot --domain=solana-pay-for-woocommerce"
+        ]
+    },
+    "require-dev": {
+        "wp-cli/wp-cli-bundle": "^2.7",
+        "woocommerce/woocommerce-sniffs": "^0.1.3",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

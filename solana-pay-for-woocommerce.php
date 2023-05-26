@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Solana Pay for WooCommerce
  * Plugin URI:  https://github.com/aztemi/solana-pay-for-woocommerce
- * Description: Adds Solana Pay to your WooCommerce store and lets you accept payments in SOL, USDC, USDT and more.
+ * Description: Adds Solana Pay to your WooCommerce store for accepting payments in SOL, USDC, USDT and more.
  * Version:     1.0.0
  * Author:      AZTemi
  * Author URI:  https://www.aztemi.com
