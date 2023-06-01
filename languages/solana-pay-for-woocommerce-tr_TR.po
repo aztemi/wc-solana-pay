@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: undefined\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/solana-pay-for-"
 "woocommerce\n"
-"POT-Creation-Date: 2023-05-19 15:25+0000\n"
-"PO-Revision-Date: 2023-05-19 17:34+0200\n"
+"POT-Creation-Date: 2023-05-26T11:38:21+00:00\n"
+"PO-Revision-Date: 2023-05-26 14:04+0200\n"
 "Last-Translator: \n"
 "Language-Team: Turkish (Turkey)\n"
 "Language: tr_TR\n"
@@ -25,107 +25,131 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: ../admin/class-solana-pay-for-woocommerce-admin.php:88
+#. Plugin Name of the plugin
+msgid "Solana Pay for WooCommerce"
+msgstr "Solana Pay for WooCommerce"
+
+#. Plugin URI of the plugin
+msgid "https://github.com/aztemi/solana-pay-for-woocommerce"
+msgstr "https://github.com/aztemi/solana-pay-for-woocommerce"
+
+#. Description of the plugin
+msgid ""
+"Adds Solana Pay to your WooCommerce store for accepting payments in SOL, "
+"USDC, USDT and more."
+msgstr ""
+"Solana Pay'i WooCommerce mağazanıza ekler ve SOL, USDC, USDT ve diğer kripto "
+"para ödemeleri kabul etmenizi sağlar."
+
+#. Author of the plugin
+msgid "AZTemi"
+msgstr "AZTemi"
+
+#. Author URI of the plugin
+msgid "https://www.aztemi.com"
+msgstr "https://www.aztemi.com"
+
+#: admin/class-solana-pay-for-woocommerce-admin.php:88
 msgid "Settings"
 msgstr "Ayarlar"
 
-#: ../admin/class-solana-pay-payment-gateway.php:162,
-#: ../public/partials/public_place_order_button.php:26
+#: admin/class-solana-pay-payment-gateway.php:162
+#: public/partials/public_place_order_button.php:26
 msgid "Solana Pay"
 msgstr "Solana Pay"
 
-#: ../admin/class-solana-pay-payment-gateway.php:164
+#: admin/class-solana-pay-payment-gateway.php:164
 msgid "Accept payments in SOL, USDC, USDT and more with Solana Pay."
 msgstr ""
 "Solana Pay ile SOL, USDC, USDT ve diğer kripto paraları ödemeleri kabul edin."
 
-#: ../admin/class-solana-pay-payment-gateway.php:189
+#: admin/class-solana-pay-payment-gateway.php:189
 msgid "Test Mode enabled. Devnet in use"
 msgstr "Test Modu etkinleştirildi. Devnet kullanımda"
 
-#: ../admin/class-solana-pay-payment-gateway.php:229
+#: admin/class-solana-pay-payment-gateway.php:229
 msgid "Solana Pay setup is not complete. Please set Merchant Wallet Address"
 msgstr ""
 "Solana Pay kurulumu tamamlanmadı. Lütfen Satıcı Cüzdan Adresini ayarlayın"
 
-#: ../admin/class-solana-pay-payment-gateway.php:235
+#: admin/class-solana-pay-payment-gateway.php:235
 msgid "Solana Pay setup is not complete. Please set Mainnet-Beta RPC Endpoint"
 msgstr ""
 "Solana Pay kurulumu tamamlanmadı. Lütfen Mainnet-Beta RPC Uç Noktasını "
 "ayarlayın"
 
-#: ../admin/class-solana-pay-payment-gateway.php:247
+#: admin/class-solana-pay-payment-gateway.php:247
 msgid ""
 "Solana Pay setup is not complete. Please enable at least 1 Solana Token."
 msgstr ""
 "Solana Pay kurulumu tamamlanmadı. Lütfen en az 1 Solana jetonu (token) "
 "etkinleştirin."
 
-#: ../admin/class-solana-pay-payment-gateway.php:277
+#: admin/class-solana-pay-payment-gateway.php:277
 msgid "Invalid Solana Wallet Address"
 msgstr "Geçersiz Solana Cüzdan Adresi"
 
-#: ../admin/class-solana-pay-payment-gateway.php:300
+#: admin/class-solana-pay-payment-gateway.php:300
 msgid "Invalid Mainnet-Beta RPC Endpoint"
 msgstr "Geçersiz Mainnet-Beta RPC Uç Noktası"
 
-#: ../admin/class-solana-pay-payment-gateway.php:344
+#: admin/class-solana-pay-payment-gateway.php:344
 msgid ""
 "Update currently not available. Please check your connection and reload."
 msgstr ""
 "Güncelleme şu anda kullanılamıyor. Lütfen bağlantınızı kontrol edin ve "
 "yeniden yükleyin."
 
-#: ../admin/class-solana-pay-payment-webhook.php:170
+#: admin/class-solana-pay-payment-webhook.php:170
 msgid "Thank you for your order"
 msgstr "Bizi tercih ettiğiniz için teşekkür ederiz"
 
-#. translators: %d: rpc call response code error, e.g. 404
-#: ../admin/class-solana-pay.php:102
-msgid "RPC remote call failed with code %d"
-msgstr "RPC uzak araması, %d koduyla başarısız oldu"
-
-#: ../admin/class-solana-pay.php:91
+#: admin/class-solana-pay.php:91
 msgid "Connection to RPC failed"
 msgstr "RPC bağlantısı başarısız oldu"
 
-#: ../admin/class-solana-pay.php:133
+#. translators: %d: rpc call response code error, e.g. 404
+#: admin/class-solana-pay.php:102
+msgid "RPC remote call failed with code %d"
+msgstr "RPC uzak araması, %d koduyla başarısız oldu"
+
+#: admin/class-solana-pay.php:133
 msgid "Payment transaction not found. Please try again."
 msgstr "Ödeme işlemi bulunamadı. Lütfen tekrar deneyin."
 
-#: ../admin/class-solana-pay.php:174
+#: admin/class-solana-pay.php:174
 msgid "Unable to confirm payment transaction details. Please try again."
 msgstr "Ödeme işlemi onaylanamıyor. Lütfen tekrar deneyin."
 
-#: ../admin/class-solana-pay.php:198
+#: admin/class-solana-pay.php:198
 msgid "Payment currency not in supported Solana tokens list."
 msgstr "Ödeme para birimi Solana jeton (token) listesinde bulunmamaktadır."
 
-#: ../admin/class-solana-pay.php:369
+#: admin/class-solana-pay.php:369
 msgid "Solana Pay payment completed"
 msgstr "Solana Pay ödemesi tamamlandı"
 
-#: ../admin/partials/admin-settings.php:18
+#: admin/partials/admin-settings.php:18
 msgid "Enable/Disable"
 msgstr "Etkinleştirme / Devre dışı"
 
-#: ../admin/partials/admin-settings.php:20
+#: admin/partials/admin-settings.php:20
 msgid "Enable Solana Pay"
 msgstr "Solana Pay'i etkinleştir"
 
-#: ../admin/partials/admin-settings.php:22
+#: admin/partials/admin-settings.php:22
 msgid "This gateway must be enabled in order to use Solana Pay."
 msgstr "Solana Pay'i kullanmak için bu ağ geçidi etkinleştirilmelidir."
 
-#: ../admin/partials/admin-settings.php:26
+#: admin/partials/admin-settings.php:26
 msgid "Test Mode"
 msgstr "Test Modu"
 
-#: ../admin/partials/admin-settings.php:28
+#: admin/partials/admin-settings.php:28
 msgid "Enable Test Mode"
 msgstr "Test Modunu Etkinleştir"
 
-#: ../admin/partials/admin-settings.php:30
+#: admin/partials/admin-settings.php:30
 msgid ""
 "Enable Test Mode to use Solana Devnet. Uncheck to use Solana Mainnet-Beta "
 "for Production."
@@ -133,117 +157,117 @@ msgstr ""
 "Solana Devnet'i kullanmak için Test Modunu etkinleştirin. Üretim sürümü için "
 "Solana Mainnet-Beta'yı kullanmak üzere kutunun işaretini  kaldırın."
 
-#: ../admin/partials/admin-settings.php:34
+#: admin/partials/admin-settings.php:34
 msgid "Merchant Wallet Address"
 msgstr "Satıcı Cüzdan Adresi"
 
-#: ../admin/partials/admin-settings.php:37
+#: admin/partials/admin-settings.php:37
 msgid "Merchant Solana wallet address where all payments will be sent."
 msgstr "Tüm ödemelerin gönderileceği satıcı Solana cüzdan adresi."
 
-#: ../admin/partials/admin-settings.php:40
+#: admin/partials/admin-settings.php:40
 msgid "Mainnet-Beta RPC Endpoint"
 msgstr "Mainnet-Beta RPC Uç Noktası"
 
-#: ../admin/partials/admin-settings.php:43
+#: admin/partials/admin-settings.php:43
 msgid "RPC endpoint for connection to the Solana Mainnet-Beta."
 msgstr "Solana Mainnet-Beta'ya bağlantı için RPC uç noktası."
 
-#: ../admin/partials/admin-settings.php:47
+#: admin/partials/admin-settings.php:47
 msgid "Enable cryptocurrencies you want to accept for payments."
 msgstr ""
 "Ödemeler için kabul etmek istediğiniz kripto para birimlerini etkinleştirin."
 
-#: ../admin/partials/admin-settings.php:50
+#: admin/partials/admin-settings.php:50
 msgid "Optional Settings"
 msgstr "İsteğe Bağlı Ayarlar"
 
-#: ../admin/partials/admin-settings.php:52
+#: admin/partials/admin-settings.php:52
 msgid "Options below are not mandatory."
 msgstr "Aşağıdaki seçenekler zorunlu değildir."
 
-#: ../admin/partials/admin-settings.php:55
+#: admin/partials/admin-settings.php:55
 msgid "Devnet RPC Endpoint"
 msgstr "Devnet RPC Uç Noktası"
 
-#: ../admin/partials/admin-settings.php:58
+#: admin/partials/admin-settings.php:58
 msgid "RPC endpoint for connection to the Solana Devnet."
 msgstr "Solana Devnet'e bağlantı için RPC uç noktası."
 
-#: ../admin/partials/admin-settings.php:61
+#: admin/partials/admin-settings.php:61
 msgid "Brand Name"
 msgstr "Marka Adı"
 
-#: ../admin/partials/admin-settings.php:64
+#: admin/partials/admin-settings.php:64
 msgid "Merchant name displayed in payment instructions."
 msgstr "Ödeme talimatlarında görüntülenen satıcı adı."
 
-#: ../admin/partials/admin-settings.php:67
+#: admin/partials/admin-settings.php:67
 msgid "Description"
 msgstr "Açıklamalar"
 
-#: ../admin/partials/admin-settings.php:69
+#: admin/partials/admin-settings.php:69
 msgid "Complete your payment with Solana Pay."
 msgstr "Ödemenizi Solana Pay ile tamamlayın."
 
-#: ../admin/partials/admin-settings.php:70
+#: admin/partials/admin-settings.php:70
 msgid "Payment method description that the customer will see in the checkout."
 msgstr "Müşterinin kasada göreceği ödeme yöntemi açıklaması."
 
-#: ../admin/partials/admin_payment_details.php:30,
-#: ../public/partials/public_payment_details.php:29
+#: admin/partials/admin_payment_details.php:30
+#: public/partials/public_payment_details.php:29
 msgid "Solana Pay Payment Details"
 msgstr "Solana Pay Ödeme Detayları"
 
-#: ../admin/partials/admin_payment_details.php:33,
-#: ../public/partials/public_payment_details.php:33
+#: admin/partials/admin_payment_details.php:33
+#: public/partials/public_payment_details.php:33
 msgid "Transaction ID"
 msgstr "İşlem Kodu"
 
-#: ../admin/partials/admin_payment_details.php:34,
-#: ../public/partials/public_payment_details.php:34
+#: admin/partials/admin_payment_details.php:34
+#: public/partials/public_payment_details.php:34
 msgid "Customer Wallet"
 msgstr "Müşteri Cüzdanı"
 
-#: ../admin/partials/admin_payment_details.php:35,
-#: ../public/partials/public_payment_details.php:35
+#: admin/partials/admin_payment_details.php:35
+#: public/partials/public_payment_details.php:35
 msgid "Payment Amount"
 msgstr "Ödeme Miktarı"
 
-#: ../admin/partials/admin_payment_details.php:36,
-#: ../public/partials/public_payment_details.php:36
+#: admin/partials/admin_payment_details.php:36
+#: public/partials/public_payment_details.php:36
 msgid "Reference Account"
 msgstr "İşlem Adresi"
 
-#: ../admin/partials/admin_tokens_table.php:63
+#: admin/partials/admin_tokens_table.php:63
 msgid "Enable"
 msgstr "Etkinleştir"
 
-#: ../admin/partials/admin_tokens_table.php:64
+#: admin/partials/admin_tokens_table.php:64
 msgid "Coin / Token"
 msgstr "Koin / Jeton"
 
-#: ../admin/partials/admin_tokens_table.php:65
+#: admin/partials/admin_tokens_table.php:65
 msgid "Label"
 msgstr "Etiket"
 
-#: ../admin/partials/admin_tokens_table.php:66
+#: admin/partials/admin_tokens_table.php:66
 msgid "Exchange Rate"
 msgstr "Döviz Kuru"
 
-#: ../admin/partials/admin_tokens_table.php:67
+#: admin/partials/admin_tokens_table.php:67
 msgid "% Commission"
 msgstr "% Komisyon"
 
-#: ../admin/partials/admin_tokens_table.php:68
+#: admin/partials/admin_tokens_table.php:68
 msgid "Preview"
 msgstr "Önizleme"
 
-#: ../admin/partials/admin_tokens_table.php:175
+#: admin/partials/admin_tokens_table.php:175
 msgid "Solana Tokens"
 msgstr "Solana Jetonları"
 
-#: ../includes/class-solana-pay-for-woocommerce.php:60
+#: includes/class-solana-pay-for-woocommerce.php:60
 msgid ""
 "<b>Solana Pay for WooCommerce</b> is an extension for <b>WooCommerce</b>. "
 "Please install and activate <b>WooCommerce</b> plugin."
@@ -251,7 +275,7 @@ msgstr ""
 "<b>WooCommerce for Solana Pay</b>, <b>WooCommerce</b> için bir uzantıdır. "
 "Lütfen <b>WooCommerce</b> eklentisini (plugin) yükleyin ve etkinleştirin."
 
-#: ../includes/class-solana-pay-for-woocommerce.php:66
+#: includes/class-solana-pay-for-woocommerce.php:66
 msgid ""
 "<b>Solana Pay for WooCommerce</b> requires <b>BC Math</b>. Please install "
 "<b>BC Math</b> extension for PHP."
@@ -259,37 +283,18 @@ msgstr ""
 "<b>WooCommerce for Solana Pay</b>, <b>BC Math</b> gerektirir. Lütfen <b>BC "
 "Math</b> PHP uzantısını yükleyin."
 
-#: ../public/class-solana-pay-for-woocommerce-public.php:87
+#: public/class-solana-pay-for-woocommerce-public.php:87
 msgid "Pay with Browser Wallet"
 msgstr "Tarayıcı Uzantılı Cüzdanı ile Öde"
 
-#: ../public/class-solana-pay-for-woocommerce-public.php:88
+#: public/class-solana-pay-for-woocommerce-public.php:88
 msgid "OR"
 msgstr "VEYA"
 
-#: ../public/class-solana-pay-for-woocommerce-public.php:89
+#: public/class-solana-pay-for-woocommerce-public.php:89
 msgid "Scan QR Code with Mobile Wallet"
 msgstr "Mobil Cüzdan ile QR Kodunu Tarayın"
 
-#: ../public/class-solana-pay-for-woocommerce-public.php:133
+#: public/class-solana-pay-for-woocommerce-public.php:133
 msgid "Some inputs are not valid. Please fill all required fields."
 msgstr "Bazı girişler geçerli değil. Lütfen tüm gerekli alanları doldurun."
-
-#~ msgid "Solana Pay for WooCommerce"
-#~ msgstr "Solana Pay for WooCommerce"
-
-#~ msgid "https://app.aztemi.com/solana-pay-for-woocommerce"
-#~ msgstr "https://app.aztemi.com/solana-pay-for-woocommerce"
-
-#~ msgid ""
-#~ "Adds Solana Pay to your WooCommerce store and lets you accept payments in "
-#~ "SOL, USDC, USDT and more."
-#~ msgstr ""
-#~ "Solana Pay'i WooCommerce mağazanıza ekler ve SOL, USDC, USDT ve diğer "
-#~ "kripto para ödemeleri kabul etmenizi sağlar."
-
-#~ msgid "AZTemi"
-#~ msgstr "AZTemi"
-
-#~ msgid "https://www.aztemi.com"
-#~ msgstr "https://www.aztemi.com"

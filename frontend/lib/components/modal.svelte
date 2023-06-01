@@ -1,234 +1,135 @@
 <script>
-  import { onMount, onDestroy } from "svelte";
-  import { Connection } from "@solana/web3.js";
-  import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
-  import { createTransfer, findReference, FindReferenceError } from "@solana/pay";
+  import { Keypair } from "@solana/web3.js";
   import { order } from "../store/order.js";
-  import { clickOutside } from "../actions/click_outside.js";
-  import Wallet from "./wallet.svelte";
-  import QrCode from "./qrcode.svelte";
-  import OrDivider from "./or_divider.svelte";
+  import Widget from "./widget.svelte";
 
-  // Delay in ms between polling intervals for confirming transaction on chain
-  const POLLING_DELAY = 2000;
-
-  let connection = null;
-  let pollingInterval = null;
-  let dropdownOpen = false;
-  let name, splAmount, splToken, icon, symbol;
-
-  const { baseurl, pay_page, wallet_msg, or_msg, qrcode_msg } = solana_pay_for_wc;
-  const { recipient, reference, label, message, memo, amount, currency, endpoint, tokens } = $order;
-  const dropdownRequired = Object.keys(tokens).length > 1;
+  let showModal = false;
+  const { id, baseurl, pay_page, order_id } = solana_pay_for_wc;
 
   $: {
-    if ($order.activeToken) {
-      const key = $order.activeToken;
-      ({ name, amount: splAmount, icon, symbol, mint: splToken } = tokens[key]);
-
+    if ($order.paymentSignature) {
+      // console.log("Payment confirmed on client side. Txn: ", $order.paymentSignature);
+      // submit form and close popup modal. This will inform the backend to confirm payment
       const form = jQuery(pay_page ? "form#order_review" : "form.checkout");
-      const input = form.find("input[name='spfwc_payment_token']");
-      if (input.length) {
-        input.val(key);
-      } else {
-        form.append(`<input type="hidden" name="spfwc_payment_token" value="${key}" />`);
-      }
+      form.submit();
+      closeModal();
     }
   }
 
-  $: {
-    if ($walletStore?.connected && !$walletStore?.connecting && !$walletStore?.disconnecting) {
-      payWithConnectedWallet($walletStore.publicKey);
-    }
+  async function openModal() {
+    order.reset();
+    // query data from the backend
+    getCheckoutOrder().then(() => {
+      showModal = true;
+    });
   }
 
-  onMount(() => {
-    connection = new Connection(endpoint, "confirmed");
-    startPolling();
-  });
-
-  onDestroy(() => {
-    stopPolling();
-  });
-
-  // poll every 1s for confirmed transaction on chain since we don't know if Qr-Code is scanned or not.
-  function startPolling() {
-    pollingInterval = setInterval(confirmPaymentTxn, POLLING_DELAY);
+  function closeModal() {
+    showModal = false;
   }
 
-  function stopPolling() {
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      pollingInterval = null;
-    }
-  }
-
-  // Confirm transaction on chain
-  async function confirmPaymentTxn() {
-    if (!connection) return;
+  async function getCheckoutOrder() {
     try {
-      const signatureInfo = await findReference(connection, reference, { finality: "confirmed" });
-      if (signatureInfo?.signature) order.confirmPayment(signatureInfo.signature);
-    } catch (error) {
-      if (!(error instanceof FindReferenceError)) console.error(error);
-    }
-  }
+      const ref = new Keypair().publicKey;
+      let url = `?wc-api=${id}&ref=${ref.toBase58()}&`;
 
-  async function payWithConnectedWallet(payer) {
-    if ($walletStore?.connected && connection) {
-      const tx = await createTransfer(connection, payer, { recipient, amount: splAmount, splToken, reference, memo });
-      await $walletStore.sendTransaction(tx, connection);
+      if (pay_page) {
+        // pay order page
+        url += `order_id=${order_id}`;
+      } else {
+        // checkout page
+        const cartCreated = sessionStorage.getItem("wc_cart_created");
+        url += `cart_created=${cartCreated}`;
+      }
+
+      const resp = await fetch(url);
+      const data = await resp.json();
+      order.setOrder(data);
+    } finally {
+      // do nothing
     }
   }
 </script>
 
-<section>
-  <div class="total">
-    <span class="dashicons dashicons-cart" />
-    <span>
-      <bdi>
-        <span><b>{amount.toNumber()}</b></span>
-        <span class="woocommerce-Price-currencySymbol"><b>{@html currency}</b></span>
-      </bdi>
-    </span>
-  </div>
+<svelte:window on:openmodal={openModal} />
 
-  <div class="topay">
-    <span class="token_amount"><b>{splAmount.toNumber()}</b></span>
-    <span class="tokens">
-      <button
-        class:nopointer={!dropdownRequired}
-        on:click|preventDefault|stopPropagation={() => {
-          if (dropdownRequired) dropdownOpen = !dropdownOpen;
-        }}
-      >
-        <img src={`${baseurl}/${icon}`} alt={name} />
-        <span class="token_symbol">{symbol}</span>
-        {#if dropdownRequired}
-          {#if dropdownOpen}
-            <span class="dashicons dashicons-arrow-up-alt2" />
-          {:else}
-            <span class="dashicons dashicons-arrow-down-alt2" />
-          {/if}
-        {/if}
-      </button>
-      {#if dropdownOpen}
-        <div class="dropdown">
-          <ul
-            class="popup_shadow"
-            use:clickOutside={() => {
-              dropdownOpen = false;
-            }}
-          >
-            {#each Object.entries(tokens) as [key, token]}
-              <li class:selected={key === $order.activeToken}>
-                <button
-                  on:click|preventDefault|stopPropagation={() => {
-                    order.setActiveToken(key);
-                    dropdownOpen = false;
-                  }}
-                >
-                  <img src={`${baseurl}/${token.icon}`} alt={token.name} />
-                  <span class="token_symbol">{token.symbol}</span>
-                </button>
-              </li>
-            {/each}
-          </ul>
-        </div>
+{#if showModal}
+  <div class="spfwc_overlay">
+    <div class="spfwc_modal spfwc_popup_shadow">
+      <div class="spfwc_header">
+        <img src={`${baseurl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
+        <button class="closeBtn" on:click={closeModal}><span class="dashicons dashicons-no-alt" /></button>
+      </div>
+      {#if $order.updated}
+        <Widget />
+      {:else}
+        <p>loading...</p>
       {/if}
-    </span>
-  </div>
-
-  <div class="options">
-    <p>{wallet_msg}</p>
-    <div class="wallet">
-      <Wallet network={endpoint} />
-    </div>
-
-    <OrDivider text={or_msg} />
-
-    <p>{qrcode_msg}</p>
-    <div class="qrcode">
-      {#key splToken}
-        <QrCode {recipient} amount={splAmount} {splToken} {reference} {label} {message} {memo} />
-      {/key}
     </div>
   </div>
-</section>
+{/if}
 
 <style lang="stylus">
-  section
-    padding 1rem 2rem
-    p
-      margin 0
+  :root
+    --overlay_back_color alpha(#000, 0.7)
+    --modal_back_color #fff
+    --modal_border_color #000
+    --popup_border_shadow_color rgb(0 0 0 / 20%)
+    --popup_li_back_color #fafafa
 
-  .total
-    display flex
-    align-items center
-    justify-content right
-    padding-right 0.5rem
-    & > span
-      margin-left 0.2rem
-
-  .topay
+  .spfwc_overlay
+    position fixed
+    z-index 1000
+    left 0
+    top 0
+    width 100%
+    height 100vh
     display flex
     align-items center
     justify-content center
-    .token_amount
-      font-size 2rem
-      padding 0 0.5rem
-    .nopointer
-      cursor auto
-    .tokens
-      display inline-block
-      button
+    overflow hidden
+    background-color var(--overlay_back_color)
+    .spfwc_modal
+      position relative
+      overflow-y auto
+      max-width 90vw
+      max-height 90%
+      border-radius 0.5rem
+      border 1px solid var(--modal_border_color)
+      background-color var(--modal_back_color)
+      .spfwc_header
+        padding 0.7rem 1rem 0 1rem
         display flex
         align-items center
-        line-height 1
+        justify-content space-between
+      .closeBtn
         border 0
-        padding 0.5rem 1rem
-        width 100%
-        outline none
+        line-height 1
+        text-align center
+        cursor pointer
         background-color transparent
         color currentcolor
-        img
-          width 1.5rem
-          border-radius 50%
-        .token_symbol
-          font-size 1.5rem
-          padding 0 0.7rem
-          white-space nowrap
-      .dropdown
-        position relative
-        z-index 2000
-        ul
-          list-style-type none
-          position absolute
-          padding 0
-          top 0.2rem
-          right 0
-          margin 0
-          width 100%
-          border-radius 0.5rem
-          background-color var(--modal_back_color)
-          li
-            padding 0
-            &:hover, &.selected
-              background-color var(--popup_li_back_color)
-            &:first-of-type
-              border-radius 0.5rem 0.5rem 0 0
-            &:last-of-type
-              border-radius 0 0 0.5rem 0.5rem
+        .dashicons
+          font-size 3rem
+          display flex
+          align-items center
+          justify-content center
 
-  .options
-    padding-top 1rem
-    display flex
-    flex-direction column
-    align-items center
-    .wallet, .qrcode
+  :global
+    .spfwc_popup_shadow
+      box-shadow 0 4px 24px 0 var(--popup_border_shadow_color)
+    .solana_pay_for_wc_place_order
       display flex
+      align-items center
       justify-content center
-    .wallet
-      padding-top 0.5rem
+      span
+        padding 0
+        margin 0
+        margin-right 0.5em
+      img
+        display inline-block
+        padding 0
+        border 0
+        max-height 1.2em
 
 </style>

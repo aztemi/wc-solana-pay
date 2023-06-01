@@ -1,7 +1,7 @@
 {
   "name": "solana-pay-for-woocommerce",
   "version": "1.0.0",
-  "description": "Solana Pay payment gateway for WooCommerce",
+  "description": "Solana Pay powered payment gateway for WordPress and WooCommerce",
   "author": "aztemi",
   "license": "GPL-3.0-or-later",
   "type": "module",
@@ -9,10 +9,11 @@
     "frontend"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "makepot": "wp-pot --dest-file languages/$npm_package_name.pot --domain $npm_package_name",
-    "build": "npm run makepot && npm run build --workspaces",
-    "package": "cd .. && zip -r $npm_package_name-$npm_package_version.zip $npm_package_name -x .gitignore package-lock.json package.json **.git/\\* **node_modules/\\*  **frontend/\\* && cd $npm_package_name"
+    "postinstall": "composer install",
+    "makepot": "composer run-script makepot",
+    "lint": "composer run-script lint",
+    "build": "npm run build --workspaces",
+    "package": "rm -f $npm_package_name-$npm_package_version.zip && cd .. && zip -r $npm_package_name/$npm_package_name-$npm_package_version.zip $npm_package_name -x **phpcs-report.txt **pbs-rules-set.xml **composer.lock **composer.json **package-lock.json **package.json **.gitignore **.git/\\* **node_modules/\\* **vendor/\\* **frontend/\\* && cd $npm_package_name"
   },
   "repository": {
     "type": "git",
@@ -22,13 +23,12 @@
     "Solana",
     "Solana Pay",
     "WooCommerce",
-    "WordPress"
+    "WordPress",
+    "Crypto",
+    "Payment"
   ],
   "bugs": {
     "url": "https://github.com/aztemi/solana-pay-for-woocommerce/issues"
   },
-  "homepage": "https://github.com/aztemi/solana-pay-for-woocommerce#readme",
-  "devDependencies": {
-    "wp-pot-cli": "^1.5.0"
-  }
+  "homepage": "https://github.com/aztemi/solana-pay-for-woocommerce#readme"
 }

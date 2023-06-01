@@ -33,7 +33,12 @@ lerna-debug.log*
 *.sqlite
 .DS_Store
 Thumbs.db
+*.zip
 
 # ignore frontend build directory
 frontend/build
 assets/script
+
+# ignore files generated via composer
+vendor/
+phpcs-report.txt
