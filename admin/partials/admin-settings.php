@@ -43,11 +43,12 @@ return array(
 		'description' => __( 'RPC endpoint for connection to the Solana Mainnet-Beta.', 'solana-pay-for-woocommerce' ),
 	),
 	'tokens_table'  => array(
+		'title'       => __( 'Solana Tokens', 'solana-pay-for-woocommerce' ),
 		'type'        => 'tokens_table',
 		'desc_tip'    => __( 'Enable cryptocurrencies you want to accept for payments.', 'solana-pay-for-woocommerce' ),
 	),
 	array(
-		'title'       => esc_html__( 'Optional Settings', 'solana-pay-for-woocommerce' ),
+		'title'       => __( 'Optional Settings', 'solana-pay-for-woocommerce' ),
 		'type'        => 'title',
 		'description' => __( 'Options below are not mandatory.', 'solana-pay-for-woocommerce' ),
 	),

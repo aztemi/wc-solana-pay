@@ -101,52 +101,6 @@ class Webhook {
 
 
 	/**
-	 * Get Solana tokens available for payments and calculate how much the cost of the order in each token.
-	 */
-	private function get_payment_token_options( &$data ) {
-
-		$tokens = $this->hGateway->get_accepted_solana_tokens();
-		$table = $this->hGateway->get_tokens_table();
-
-		$amount = $data['amount'];
-		$data['tokens'] = array();
-
-		foreach ( $tokens as $k => $v ) {
-			if ( array_key_exists( $k, $table ) && $table[ $k ]['enabled'] ) {
-				$decimals = $tokens[ $k ]['decimals'];
-				$power = bcpow( '10', $decimals );
-				$amount_pow = bcmul( $amount, $power );
-				$rate = bcmul( $amount_pow, $table[ $k ]['rate'] );
-				$fee = bcdiv( bcmul( $rate, $table[ $k ]['fee'] ), '100' );
-				$data['tokens'][ $k ] = rtrim( bcdiv( bcadd( $rate, $fee ), $power, $decimals ), '0' );
-			}
-		}
-
-	}
-
-
-	/**
-	 * Get the order total in specified Solana payment tokens.
-	 *
-	 * @param  float  $amount   Order cost in store base currency.
-	 * @param  string $token_id Token ID.
-	 * @return string Expected payment amount as a BC Math string.
-	 */
-	public function get_payment_token_amount( $amount, $token_id ) {
-
-		$token_amount = '';
-		$data = $this->hSession->get_data();
-
-		if ( array_key_exists( $token_id, $data['tokens'] ) && ( $amount == $data['amount'] ) ) {
-			$token_amount = $data['tokens'][ $token_id ];
-		}
-
-		return $token_amount;
-
-	}
-
-
-	/**
 	 * Handle incoming webhook GET request.
 	 */
 	public function handle_webhook_request() {
@@ -181,8 +135,9 @@ class Webhook {
 			return;
 		}
 
-		// Add acceptable Solana tokens for payment and their rates
-		$this->get_payment_token_options( $data );
+		// Add acceptable Solana tokens options for payment and their rates
+		$options = $this->hGateway->get_accepted_solana_tokens_payment_options( $data['amount'] );
+		$data = array_merge( $data, $options );
 
 		// store the data in user session for later use during payment processing
 		$this->hSession->set_data( $data );

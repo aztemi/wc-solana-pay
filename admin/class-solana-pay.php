@@ -17,6 +17,7 @@ class Solana_Pay {
 
 	public const DEVNET_ENDPOINT = 'https://api.devnet.solana.com';
 
+
 	/**
 	 * Handle instance of the payment gateway class.
 	 *
@@ -295,6 +296,27 @@ class Solana_Pay {
 
 
 	/**
+	 * Get the order total in specified Solana payment tokens.
+	 *
+	 * @param  float  $amount   Order cost in store base currency.
+	 * @param  string $token_id Token ID.
+	 * @return string Expected payment amount as a BC Math string.
+	 */
+	private function get_payment_token_amount( $amount, $token_id ) {
+
+		$token_amount = '';
+		$data = $this->hSession->get_data();
+
+		if ( array_key_exists( $token_id, $data['tokens'] ) && ( $amount == $data['amount'] ) ) {
+			$token_amount = $data['tokens'][ $token_id ];
+		}
+
+		return $token_amount;
+
+	}
+
+
+	/**
 	 * Validates if an expected amount is fully paid or not.
 	 *
 	 * @param  string $amount  Expected amount to be paid.
@@ -323,12 +345,12 @@ class Solana_Pay {
 	/**
 	 * Validate payment transaction on Solana network.
 	 *
-	 * @param  \WC_Order $order        Order object.
-	 * @param  string    $token_amount Expected payment amount in specified Solana token.
-	 * @param  string    $token_id     Payment token ID.
+	 * @param  \WC_Order $order    Order object.
+	 * @param  string    $amount   Order cost amount in the store base currency.
+	 * @param  string    $token_id Payment token ID.
 	 * @return bool      true if transaction was found and correct amount was paid into merchant wallet, false otherwise.
 	 */
-	public function confirm_payment_onchain( $order, $token_amount, $token_id ) {
+	public function confirm_payment_onchain( $order, $amount, $token_id ) {
 
 		$paid = '';
 		$txn_id = '';
@@ -336,6 +358,8 @@ class Solana_Pay {
 		$balance = array();
 		$meta = array();
 
+		// get expected payment amount in Solana token
+		$token_amount = $this->get_payment_token_amount( $amount, $token_id );
 		// Return false if amount is not valid
 		if ( empty( trim( $token_amount ) ) ) {
 			return false;
@@ -370,6 +394,37 @@ class Solana_Pay {
 		$order->payment_complete( $txn_id );
 
 		return true;
+
+	}
+
+
+	/**
+	 * Get Solana tokens available for payments and calculate how much the cost of the order in each token.
+	 * Developer Commission for RPC usage is separated out if merchant own RPC is not provided.
+	 *
+	 * @param  string $amount Order amount in the store base currency.
+	 * @return array          List of payment options and their cost values.
+	 */
+	public function get_available_payment_options( $amount ) {
+
+		$tokens = $this->hGateway->get_accepted_solana_tokens();
+		$table = $this->hGateway->get_tokens_table();
+
+		$options = array();
+		$options['tokens'] = array();
+
+		foreach ( $tokens as $k => $v ) {
+			if ( array_key_exists( $k, $table ) && $table[ $k ]['enabled'] ) {
+				$decimals = $tokens[ $k ]['decimals'];
+				$power = bcpow( '10', $decimals );
+				$amount_pow = bcmul( $amount, $power );
+				$rate = bcmul( $amount_pow, $table[ $k ]['rate'] );
+				$fee = bcdiv( bcmul( $rate, $table[ $k ]['fee'] ), '100' );
+				$options['tokens'][ $k ] = rtrim( bcdiv( bcadd( $rate, $fee ), $power, $decimals ), '0' );
+			}
+		}
+
+		return $options;
 
 	}
 

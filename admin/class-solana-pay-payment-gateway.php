@@ -25,14 +25,15 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	 *
 	 * @var string
 	 */
-	protected const ORDER_META_KEY   = 'spfwc_payment';
+	protected const ORDER_META_KEY = 'spfwc_payment';
+
 
 	/**
 	 * Unique Key for storing tokens table settings in WP Option array.
 	 *
 	 * @var string
 	 */
-	protected const TOKENS_OPTION_KEY   = 'spfwc_tokens';
+	protected const TOKENS_OPTION_KEY = 'spfwc_tokens';
 
 
 	/**
@@ -92,14 +93,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Handle instance of the Webhook class for handling incoming GET request.
-	 *
-	 * @var Webhook
-	 */
-	protected $hWebhook;
-
-
-	/**
 	 * Handle instance of the Solana_Pay class for Solana payment verification.
 	 *
 	 * @var Solana_Pay
@@ -133,13 +126,13 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		require_once PLUGIN_DIR . '/admin/class-session.php';
 		$this->hSession = new Session();
 
-		// load webhook class for handling incoming GET request
-		require_once PLUGIN_DIR . '/admin/class-solana-pay-payment-webhook.php';
-		$this->hWebhook = new Webhook( $this, $this->hSession );
-
 		// load Solana Pay class
 		require_once PLUGIN_DIR . '/admin/class-solana-pay.php';
 		$this->hSolanapay = new Solana_Pay( $this, $this->hSession );
+
+		// load webhook class for handling incoming GET request
+		require_once PLUGIN_DIR . '/admin/class-solana-pay-payment-webhook.php';
+		new Webhook( $this, $this->hSession );
 
 		// load public class if on checkout or pay order page
 		if ( is_checkout() || is_checkout_pay_page() ) {
@@ -355,6 +348,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 				'/admin/partials/admin_tokens_table.php',
 				array(
 					'tip'             => $data['desc_tip'],
+					'title'           => $data['title'],
 					'script'          => $script,
 					'base_currency'   => $base_currency,
 					'show_currency'   => $show_currency,
@@ -371,7 +365,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Save tokens table settings
+	 * Save tokens table admin settings
 	 */
 	public function save_tokens_table() {
 
@@ -430,10 +424,9 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		// get order info and pending amount
 		$order = wc_get_order( $order_id );
 		$amount = $order->get_total();
-		$amount_token = $this->hWebhook->get_payment_token_amount( $amount, $payment_token );
 
 		// Confirm payment transaction on Solana chain, return if not found or if balance is less.
-		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount_token, $payment_token ) ) {
+		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount, $payment_token ) ) {
 			return array();
 		}
 
@@ -548,6 +541,19 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	public function get_accepted_solana_tokens() {
 
 		return $this->is_testmode ? Solana_Tokens::get_tokens_for_testmode() : Solana_Tokens::get_tokens_for_livemode();
+
+	}
+
+
+	/**
+	 * Get list of accepted Solana tokens available for payments and how much the cost of the order in each token.
+	 *
+	 * @param  string $amount Order amount in the store base currency.
+	 * @return array  List of payment options and their cost values.
+	 */
+	public function get_accepted_solana_tokens_payment_options( $amount ) {
+
+		return $this->hSolanapay->get_available_payment_options( $amount );
 
 	}
 

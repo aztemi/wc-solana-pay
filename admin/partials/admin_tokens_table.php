@@ -172,8 +172,10 @@ $body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $b
 ?>
 
 <tr valign="top">
-	<th scope="row" class="titledesc"><label><?php esc_html_e( 'Solana Tokens', 'solana-pay-for-woocommerce' ); ?><?php echo wc_help_tip( $tip, true ); ?></label></th>
-	<td class="forminp" id="token_details">
+	<th scope="row" class="titledesc">
+		<label><?php echo esc_html( $title ); ?><?php echo wc_help_tip( $tip, true ); ?></label>
+	</th>
+	<td class="forminp">
 		<div class="wc_input_table_wrapper">
 			<table class="wc_gateways widefat" style="min-width:55rem;max-width:75rem" cellspacing="0" cellpadding="0">
 				<thead><?php echo wp_kses_post( $header ); ?></thead>
