@@ -36,38 +36,21 @@ return array(
 		'default'     => '',
 		'description' => __( 'Merchant Solana wallet address where all payments will be sent.', 'solana-pay-for-woocommerce' ),
 	),
-	'live_rpc'      => array(
-		'title'       => __( 'Mainnet-Beta RPC Endpoint', 'solana-pay-for-woocommerce' ),
-		'type'        => 'url',
-		'default'     => '',
-		'description' => __( 'RPC endpoint for connection to the Solana Mainnet-Beta.', 'solana-pay-for-woocommerce' ),
-	),
 	'tokens_table'  => array(
 		'title'       => __( 'Solana Tokens', 'solana-pay-for-woocommerce' ),
 		'type'        => 'tokens_table',
 		'desc_tip'    => __( 'Enable cryptocurrencies you want to accept for payments.', 'solana-pay-for-woocommerce' ),
 	),
-	array(
-		'title'       => __( 'Optional Settings', 'solana-pay-for-woocommerce' ),
-		'type'        => 'title',
-		'description' => __( 'Options below are not mandatory.', 'solana-pay-for-woocommerce' ),
-	),
-	'test_rpc'      => array(
-		'title'       => __( 'Devnet RPC Endpoint', 'solana-pay-for-woocommerce' ),
-		'type'        => 'url',
-		'default'     => Solana_Pay::DEVNET_ENDPOINT,
-		'description' => __( 'RPC endpoint for connection to the Solana Devnet.', 'solana-pay-for-woocommerce' ),
-	),
 	'brand_name'    => array(
 		'title'       => __( 'Brand Name', 'solana-pay-for-woocommerce' ),
 		'type'        => 'text',
 		'default'     => get_bloginfo( 'name' ) ?? '',
-		'description' => __( 'Merchant name displayed in payment instructions.', 'solana-pay-for-woocommerce' ),
+		'description' => __( 'Merchant or Store name displayed in payment instructions.', 'solana-pay-for-woocommerce' ),
 	),
 	'description'   => array(
 		'title'       => __( 'Description', 'solana-pay-for-woocommerce' ),
 		'type'        => 'textarea',
 		'default'     => __( 'Complete your payment with Solana Pay.', 'solana-pay-for-woocommerce' ),
-		'description' => __( 'Payment method description that the customer will see in the checkout.', 'solana-pay-for-woocommerce' ),
+		'description' => __( 'Payment method description that customers will see on the checkout page.', 'solana-pay-for-woocommerce' ),
 	),
 );

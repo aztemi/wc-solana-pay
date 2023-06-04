@@ -15,7 +15,20 @@ if ( ! defined( 'WPINC' ) ) {
 
 class Solana_Pay {
 
+	/**
+	 * Default RPC node endpoint for Solana Devnet.
+	 *
+	 * @var string
+	 */
 	public const DEVNET_ENDPOINT = 'https://api.devnet.solana.com';
+
+
+	/**
+	 * Default RPC node endpoint for Solana Mainnet-Beta.
+	 *
+	 * @var string
+	 */
+	public const MAINNET_BETA_ENDPOINT = 'https://api.mainnet-beta.solana.com';
 
 
 	/**

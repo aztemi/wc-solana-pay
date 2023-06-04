@@ -53,22 +53,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 
 	/**
-	 * RPC endpoint for connection to the Solana Mainnet-Beta.
-	 *
-	 * @var string
-	 */
-	protected $live_rpc;
-
-
-	/**
-	 * RPC endpoint for connection to the Solana Devnet.
-	 *
-	 * @var string
-	 */
-	protected $test_rpc;
-
-
-	/**
 	 * Merchant or store name that will be displayed in payment instructions.
 	 *
 	 * @var string
@@ -170,8 +154,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		// update configurations
 		$this->enabled         = $this->get_option( 'enabled' );
-		$this->live_rpc        = $this->get_option( 'live_rpc', '' );
-		$this->test_rpc        = $this->get_option( 'test_rpc' );
 		$this->brand_name      = $this->get_option( 'brand_name' );
 		$this->description     = $this->get_option( 'description' );
 		$this->merchant_wallet = $this->get_option( 'merchant_wallet', '' );
@@ -223,12 +205,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 			$rtn = false;
 		}
 
-		// Return false if Mainnet-Beta RPC is not configured for Live mode
-		if ( empty( $this->live_rpc ) && ! $this->is_testmode ) {
-			\WC_Admin_Settings::add_error( esc_html__( 'Solana Pay setup is not complete. Please set Mainnet-Beta RPC Endpoint', 'solana-pay-for-woocommerce' ) );
-			$rtn = false;
-		}
-
 		// Return false if no token is enabled
 		$token_enabled = false;
 		foreach ( $this->tokens_table as $k => $v ) {
@@ -269,48 +245,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		if ( ! preg_match( '/^[1-9A-HJ-NP-Za-km-z]{32,44}$/', $value ) ) {
 			\WC_Admin_Settings::add_error( esc_html__( 'Invalid Solana Wallet Address', 'solana-pay-for-woocommerce' ) );
 			$value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
-		}
-
-		return $value;
-
-	}
-
-
-	/**
-	 * Validate Live RPC Endpoint settings field. Clear the field in case of error.
-	 * This is called from WC to validate a form field.
-	 *
-	 * @param  string $key  Field key.
-	 * @param  string $value Field data.
-	 * @return string
-	 */
-	public function validate_live_rpc_field( $key, $value ) {
-
-		$post_data = $this->get_post_data();
-		$testmode = isset( $post_data[ "woocommerce_{$this->id}_testmode" ] );
-
-		if ( ! $testmode && ! wp_http_validate_url( $value ) ) {
-			\WC_Admin_Settings::add_error( esc_html__( 'Invalid Mainnet-Beta RPC Endpoint', 'solana-pay-for-woocommerce' ) );
-			$value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
-		}
-
-		return $value;
-
-	}
-
-
-	/**
-	 * Set Test RPC Endpoint to default if not set correctly.
-	 * This is called from WC to validate a form field.
-	 *
-	 * @param  string $key  Field key.
-	 * @param  string $value Field data.
-	 * @return string
-	 */
-	public function validate_test_rpc_field( $key, $value ) {
-
-		if ( empty( trim( $value ) ) || ! wp_http_validate_url( $value ) ) {
-			$value = Solana_Pay::DEVNET_ENDPOINT;
 		}
 
 		return $value;
@@ -565,7 +499,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	 */
 	public function get_rpc_endpoint() {
 
-		return $this->is_testmode ? $this->test_rpc : $this->live_rpc;
+		return $this->is_testmode ? Solana_Pay::DEVNET_ENDPOINT : Solana_Pay::MAINNET_BETA_ENDPOINT;
 
 	}
 
