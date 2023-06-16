@@ -46,6 +46,7 @@ class Webhook {
 	private function register_hooks() {
 
 		add_action( 'woocommerce_api_' . PLUGIN_ID, array( $this, 'handle_webhook_request' ) );
+		add_action( 'woocommerce_api_' . PLUGIN_ID . '_txn', array( $this, 'handle_transaction_request' ) );
 
 	}
 
@@ -91,7 +92,7 @@ class Webhook {
 				$data['reference'] = $prev_data['reference'];
 		}
 
-		$data['memo'] = "@{$cart_created}";
+		$data['memo'] = "Cart@{$cart_created}";
 		$data['amount'] = (float) WC()->cart->get_total('edit');
 		$data['currency'] = get_woocommerce_currency_symbol( Solana_Tokens::get_store_currency('edit') );
 		$data['cart_hash'] = $cart_hash;
@@ -111,15 +112,19 @@ class Webhook {
 		$cart_created = isset( $_GET['cart_created'] ) ? trim( wc_clean( wp_unslash( $_GET['cart_created'] ) ) ) : '';
 
 		if ( empty( $ref ) ) {
-			return;
+			wp_send_json_error( 'Bad Request', 400 );
+			die();
 		}
 
 		// default return data
 		$data = array(
+			'amount'    => 0,
 			'reference' => $ref,
 			'testmode'  => $this->hGateway->get_testmode(),
 			'recipient' => $this->hGateway->get_merchant_wallet_address(),
 			'endpoint'  => $this->hGateway->get_rpc_endpoint(),
+			'suffix'    => Solana_Tokens::get_store_currency_key_suffix(),
+			'link'      => esc_url( home_url( '/?wc-api=' . PLUGIN_ID . '_txn' ) ),
 			'label'     => esc_html( $this->hGateway->get_brand_name() ),
 			'message'   => esc_html__( 'Thank you for your order', 'solana-pay-for-woocommerce' ),
 		);
@@ -132,19 +137,95 @@ class Webhook {
 			$this->get_cart_details( $cart_created, $data );
 
 		} else {
-			return;
+			wp_send_json_error( 'Bad Request', 400 );
+			die();
+
+		}
+
+		// prepend memo with the brand name
+		$data['memo'] = $data['label'] . ' - ' . $data['memo'];
+
+		// validate amount
+		$amount = $data['amount'];
+		if ( $amount <= 0 ) {
+			wp_send_json_error( 'Not Found', 404 );
+			die();
 		}
 
 		// Add acceptable Solana tokens options for payment and their rates
-		$options = $this->hGateway->get_accepted_solana_tokens_payment_options( $data['amount'] );
+		$options = $this->hGateway->get_accepted_solana_tokens_payment_options( $amount );
 		$data = array_merge( $data, $options );
+
+		// calculate payment details hash and use it as a unique reference id
+		$hash = md5( wp_json_encode( $data ) );
+		$data['id'] = $hash;
+		
+		// register payment details with the remote backend
+		$testmode = $this->hGateway->get_testmode();
+		if ( null === Solana_Pay::register_payment_details( $hash, $data, $testmode ) ) {
+			wp_send_json_error( 'Internal Server Error', 500 );
+			die();
+		}
 
 		// store the data in user session for later use during payment processing
 		$this->hSession->set_data( $data );
 
 		// send response
 		header( 'HTTP/1.1 200 OK' );
-		wp_send_json( $data );
+		wp_send_json( $data, 200 );
+		die();
+
+	}
+
+
+	/**
+	 * Handle incoming Transaction request based on Solana Pay Spec.
+	 */
+	public function handle_transaction_request() {
+
+		// validate incoming params
+		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
+		$token = isset( $_GET['token'] ) ? trim( wc_clean( wp_unslash( $_GET['token'] ) ) ) : '';
+
+		if ( empty( $id ) || empty( $token ) ) {
+			wp_send_json_error( 'Bad Request', 400 );
+			die();
+		}
+
+		// get account from payload body
+		$account = '';
+		$body = @file_get_contents('php://input');
+		if ( ! empty( $body ) ) {
+			$body = json_decode( $body, true );
+			$account = array_key_exists( 'account', $body ) ? trim( wc_clean( wp_unslash( $body['account'] ) ) ) : '';
+		}
+
+		if ( empty( $account ) ) {
+			// respond to GET request
+			header('Cache-Control: max-age=86400');
+			$data = array(
+				'label' => esc_html( $this->hGateway->get_brand_name() ),
+				'icon'  => esc_attr( $this->hGateway->icon ),
+			);
+		} else {
+			// respond to POST request
+			$testmode = $this->hGateway->get_testmode();
+			$txn_base64 = Solana_Pay::get_payment_transaction( $id, $account, $token, $testmode );
+
+			if ( empty( $txn_base64 ) ) {
+				wp_send_json_error( 'Not Found', 404 );
+				die();
+			}
+
+			$data = array(
+				'message'     => esc_html__( 'Thank you for your order', 'solana-pay-for-woocommerce' ),
+				'transaction' => trim( wc_clean( wp_unslash( $txn_base64 ) ) ),
+			);
+		}
+
+		// send response
+		header( 'HTTP/1.1 200 OK' );
+		wp_send_json( $data, 200 );
 		die();
 
 	}

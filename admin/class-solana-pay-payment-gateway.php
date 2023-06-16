@@ -501,7 +501,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	 */
 	public function get_rpc_endpoint() {
 
-		return $this->is_testmode ? Solana_Pay::DEVNET_ENDPOINT : Solana_Pay::MAINNET_BETA_ENDPOINT;
+		return Solana_Pay::rpc_endpoint( $this->is_testmode );
 
 	}
 

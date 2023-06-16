@@ -16,11 +16,27 @@ if ( ! defined( 'WPINC' ) ) {
 class Solana_Pay {
 
 	/**
+	 * Name of the Solana Devnet network.
+	 *
+	 * @var string
+	 */
+	protected const NETWORK_DEVNET = 'devnet';
+
+
+	/**
+	 * Name of the Solana Mainnet-Beta network.
+	 *
+	 * @var string
+	 */
+	protected const NETWORK_MAINNET_BETA = 'mainnet-beta';
+
+
+	/**
 	 * Default RPC node endpoint for Solana Devnet.
 	 *
 	 * @var string
 	 */
-	public const DEVNET_ENDPOINT = 'https://api.devnet.solana.com';
+	protected const RPC_ENDPOINT_DEVNET = 'https://spfwc.juxdan.io/v1/rpc-devnet/';
 
 
 	/**
@@ -28,7 +44,15 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	public const MAINNET_BETA_ENDPOINT = 'https://api.mainnet-beta.solana.com';
+	protected const RPC_ENDPOINT_MAINNET_BETA = 'https://spfwc.juxdan.io/v1/rpc/';
+
+
+	/**
+	 * Default endpoint for remote Solana transactions handling.
+	 *
+	 * @var string
+	 */
+	protected const TRANSACTION_ENDPOINT = 'https://spfwc.juxdan.io/v1/txn/';
 
 
 	/**
@@ -82,6 +106,10 @@ class Solana_Pay {
 	private function rpc_remote_post( $method, $params, $url ) {
 
 		$rtn = false;
+
+		$data = $this->hSession->get_data();
+		$id = $data['id'];
+		$url .= $id . '/';
 
 		$body = wp_json_encode(
 			array(
@@ -433,7 +461,12 @@ class Solana_Pay {
 				$amount_pow = bcmul( $amount, $power );
 				$rate = bcmul( $amount_pow, $table[ $k ]['rate'] );
 				$fee = bcdiv( bcmul( $rate, $table[ $k ]['fee'] ), '100' );
-				$options['tokens'][ $k ] = rtrim( bcdiv( bcadd( $rate, $fee ), $power, $decimals ), '0' );
+				$amount_in_token = rtrim( bcdiv( bcadd( $rate, $fee ), $power, $decimals ), '0' );
+
+				$options['tokens'][ $k ] = array(
+					'amount' => $amount_in_token,
+					'mint' => $tokens[ $k ]['mint']
+				);
 			}
 		}
 
@@ -452,6 +485,83 @@ class Solana_Pay {
 	public static function shorten_hash_address( $address, $limit = 6 ) {
 
 		return substr( $address, 0, $limit ) . '...' . substr( $address, -$limit );
+
+	}
+
+
+	/**
+	 * RPC endpoint based on testmode.
+	 *
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return string
+	 */
+	public static function rpc_endpoint( $testmode ) {
+
+		return $testmode ? self::RPC_ENDPOINT_DEVNET : self::RPC_ENDPOINT_MAINNET_BETA;
+
+	}
+
+
+	/**
+	 * Register payment transaction details with remote server.
+	 *
+	 * @param  string $ref_id   Remote reference ID of the transaction.
+	 * @param  string $data     Payment transaction details.
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return array|null
+	 */
+	public static function register_payment_details( $ref_id, $data, $testmode ) {
+
+		$rtn = null;
+		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
+		$url = sprintf( '%s%s/?network=%s', self::TRANSACTION_ENDPOINT, $ref_id, $network );
+
+		$response = wp_remote_post( $url, array(
+			'method'      => 'POST',
+			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
+			'timeout'     => 45,
+			'body'        => wp_json_encode( $data ),
+			'data_format' => 'body',
+			)
+		);
+
+		if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
+			$response_body = wp_remote_retrieve_body( $response );
+			$rtn = json_decode( $response_body, true );
+		}
+
+		return $rtn;
+
+	}
+
+
+	/**
+	 * Get payment transaction from remote server.
+	 *
+	 * @param  string $ref_id   Remote reference ID of the transaction.
+	 * @param  string $address  Wallet address of the transaction fee payer.
+	 * @param  string $token_id Payment token ID.
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return string
+	 */
+	public static function get_payment_transaction( $ref_id, $address, $token_id, $testmode ) {
+
+		$txn = '';
+		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
+		$url = sprintf( '%s%s/?account=%s&token=%s&network=%s', self::TRANSACTION_ENDPOINT, $ref_id, $address, $token_id, $network );
+		$response = wp_remote_get( $url, array(
+			'method'      => 'GET',
+			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
+			'timeout'     => 10,
+			)
+		);
+		if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
+			$response_body = wp_remote_retrieve_body( $response );
+			$response_array = json_decode( $response_body, true );
+			$txn = array_key_exists( 'txn', $response_array ) ? $response_array['txn'] : '';
+		}
+
+		return $txn;
 
 	}
 
