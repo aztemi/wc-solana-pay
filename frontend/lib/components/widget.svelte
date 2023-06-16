@@ -1,31 +1,30 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { Connection } from "@solana/web3.js";
-  import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
-  import { createTransfer, findReference, FindReferenceError } from "@solana/pay";
   import { order } from "../store/order.js";
   import { clickOutside } from "../actions/click_outside.js";
+  import { pollForTransaction } from "../utils/poll_for_transaction.js";
   import Wallet from "./wallet.svelte";
   import QrCode from "./qrcode.svelte";
   import OrDivider from "./or_divider.svelte";
 
-  // Delay in ms between polling intervals for confirming transaction on chain
-  const POLLING_DELAY = 2000;
-
-  let connection = null;
-  let pollingInterval = null;
+  let specLink;
+  let stopFunc = null;
   let dropdownOpen = false;
-  let name, splAmount, splToken, icon, symbol;
+  let name, splAmount, icon, symbol;
 
   const { baseurl, pay_page, wallet_msg, or_msg, qrcode_msg } = solana_pay_for_wc;
-  const { recipient, reference, label, message, memo, amount, currency, endpoint, tokens } = $order;
+  const { reference, label, message, amount, currency, endpoint, link, tokens } = $order;
   const dropdownRequired = Object.keys(tokens).length > 1;
 
   $: {
     if ($order.activeToken) {
       const key = $order.activeToken;
-      ({ name, amount: splAmount, icon, symbol, mint: splToken } = tokens[key]);
+      ({ name, amount: splAmount, icon, symbol } = tokens[key]);
 
+      // prepare `link` parameter in the Solana Pay Transaction Request spec
+      specLink = `${link}&token=${key}`;
+
+      // add selected payment token to an hidden field of the checkout form
       const form = jQuery(pay_page ? "form#order_review" : "form.checkout");
       const input = form.find("input[name='spfwc_payment_token']");
       if (input.length) {
@@ -36,50 +35,16 @@
     }
   }
 
-  $: {
-    if ($walletStore?.connected && !$walletStore?.connecting && !$walletStore?.disconnecting) {
-      payWithConnectedWallet($walletStore.publicKey);
-    }
-  }
-
   onMount(() => {
-    connection = new Connection(endpoint, "confirmed");
-    startPolling();
+    stopFunc = pollForTransaction(endpoint, reference);
   });
 
   onDestroy(() => {
-    stopPolling();
+    if (stopFunc) {
+      stopFunc();
+      stopFunc = null;
+    }
   });
-
-  // poll every 1s for confirmed transaction on chain since we don't know if Qr-Code is scanned or not.
-  function startPolling() {
-    pollingInterval = setInterval(confirmPaymentTxn, POLLING_DELAY);
-  }
-
-  function stopPolling() {
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      pollingInterval = null;
-    }
-  }
-
-  // Confirm transaction on chain
-  async function confirmPaymentTxn() {
-    if (!connection) return;
-    try {
-      const signatureInfo = await findReference(connection, reference, { finality: "confirmed" });
-      if (signatureInfo?.signature) order.confirmPayment(signatureInfo.signature);
-    } catch (error) {
-      if (!(error instanceof FindReferenceError)) console.error(error);
-    }
-  }
-
-  async function payWithConnectedWallet(payer) {
-    if ($walletStore?.connected && connection) {
-      const tx = await createTransfer(connection, payer, { recipient, amount: splAmount, splToken, reference, memo });
-      await $walletStore.sendTransaction(tx, connection);
-    }
-  }
 </script>
 
 <section>
@@ -142,15 +107,17 @@
   <div class="options">
     <p>{wallet_msg}</p>
     <div class="wallet">
-      <Wallet network={endpoint} />
+      {#key specLink}
+        <Wallet link={specLink} {endpoint} />
+      {/key}
     </div>
 
     <OrDivider text={or_msg} />
 
     <p>{qrcode_msg}</p>
     <div class="qrcode">
-      {#key splToken}
-        <QrCode {recipient} amount={splAmount} {splToken} {reference} {label} {message} {memo} />
+      {#key specLink}
+        <QrCode link={specLink} {label} {message} />
       {/key}
     </div>
   </div>
