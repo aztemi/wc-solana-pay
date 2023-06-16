@@ -268,6 +268,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		if ( $tablejs ) {
 			$base_currency = Solana_Tokens::get_store_currency('edit');
 			$show_currency = Solana_Tokens::get_store_currency();
+			$auto_refresh = __( 'Auto Refresh', 'solana-pay-for-woocommerce' );
 			$alert_msg = esc_html__( 'Update currently not available. Please check your connection and reload.', 'solana-pay-for-woocommerce' );
 
 			$script = get_partial_file_html(
@@ -284,6 +285,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 					'tip'             => $data['desc_tip'],
 					'title'           => $data['title'],
 					'script'          => $script,
+					'auto_refresh'    => $auto_refresh,
 					'base_currency'   => $base_currency,
 					'show_currency'   => $show_currency,
 					'tokens_table'    => $this->tokens_table,

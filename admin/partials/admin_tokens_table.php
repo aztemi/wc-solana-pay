@@ -72,7 +72,7 @@ function get_tokens_table_header( $show_currency ) {
 
 }
 
-function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency ) {
+function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency, $auto_refresh ) {
 
 	$rows = '';
 
@@ -109,7 +109,7 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		}
 
 		// Rate Update icon button
-		$update_icon = '<span class="dashicons dashicons-update" style="cursor:pointer" data-symbol="' . esc_attr( $v['symbol'] ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
+		$update_icon = '<span class="dashicons dashicons-update" style="cursor:pointer" title="' . esc_attr( $auto_refresh ) . '" data-symbol="' . esc_attr( $v['symbol'] ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
 
 		// Remove Rate Update button if token or stable coin is similar to store base currency
 		$stablecoin = array_key_exists( 'stablecoin', $v ) ? strtoupper( $v['stablecoin'] ) : '';
@@ -168,7 +168,7 @@ function get_coingecko_supported_currencies() {
 }
 
 $header = get_tokens_table_header( $show_currency );
-$body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency );
+$body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency, $auto_refresh );
 ?>
 
 <tr valign="top">
