@@ -2,6 +2,7 @@
   import { Keypair } from "@solana/web3.js";
   import { order } from "../store/order.js";
   import Widget from "./widget.svelte";
+  import Loading from "./loading.svelte";
 
   let showModal = false;
   const { id, baseurl, pay_page, order_id } = solana_pay_for_wc;
@@ -18,16 +19,15 @@
 
   async function openModal() {
     order.reset();
-    // query data from the backend
-    getCheckoutOrder().then(() => {
-      showModal = true;
-    });
+    showModal = true;
+    await getCheckoutOrder();
   }
 
   function closeModal() {
     showModal = false;
   }
 
+  // query payment details from the backend
   async function getCheckoutOrder() {
     try {
       const ref = new Keypair().publicKey;
@@ -42,9 +42,8 @@
         url += `cart_created=${cartCreated}`;
       }
 
-      const resp = await fetch(url);
-      const data = await resp.json();
-      order.setOrder(data);
+      const jsonOrder = await fetch(url).then(r => r.json());
+      order.setOrder(jsonOrder);
     } finally {
       // do nothing
     }
@@ -63,7 +62,7 @@
       {#if $order.updated}
         <Widget />
       {:else}
-        <p>loading...</p>
+        <Loading />
       {/if}
     </div>
   </div>
