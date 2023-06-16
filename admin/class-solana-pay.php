@@ -16,6 +16,14 @@ if ( ! defined( 'WPINC' ) ) {
 class Solana_Pay {
 
 	/**
+	 * Default scale precision for bc math functions.
+	 *
+	 * @var string
+	 */
+	private const BC_MATH_SCALE = 10;
+
+
+	/**
 	 * Name of the Solana Devnet network.
 	 *
 	 * @var string
@@ -53,6 +61,14 @@ class Solana_Pay {
 	 * @var string
 	 */
 	protected const TRANSACTION_ENDPOINT = 'https://spfwc.juxdan.io/v1/txn/';
+
+
+	/**
+	 * 0.5% fee for above default endpoints usage.
+	 *
+	 * @var string
+	 */
+	protected const ENDPOINT_USAGE_FEE = '0.50';
 
 
 	/**
@@ -349,7 +365,7 @@ class Solana_Pay {
 		$data = $this->hSession->get_data();
 
 		if ( array_key_exists( $token_id, $data['tokens'] ) && ( $amount == $data['amount'] ) ) {
-			$token_amount = $data['tokens'][ $token_id ];
+			$token_amount = $data['tokens'][ $token_id ]['amount'];
 		}
 
 		return $token_amount;
@@ -367,18 +383,26 @@ class Solana_Pay {
 	 */
 	private function validate_payment_amount( $amount, $balance, &$paid ) {
 
-		$amount = sprintf( '%.10f', $amount );
 		list( 'pre' => $pre, 'post' => $post, 'decimals' => $decimals ) = $balance;
+
+		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
 
 		$paid = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
 		$paid = rtrim( $paid, '0' ) . ' ' . $balance['symbol'];
 
-		return (
-				bccomp(
-					bcsub( $post, $pre ),
-					bcmul( $amount, bcpow( '10', $decimals ) )
-				) >= 0
-			);
+		// compensate for endpoint usage fee already deducted in transaction
+		$percent_fee = self::endpoints_usage_fee();
+		$rpc_fee = bcdiv( bcmul( $percent_fee, $amount ), 100 );
+		$expected_amount = bcsub( $amount, $rpc_fee );
+
+		$validated = bccomp(
+				bcsub( $post, $pre ),
+				bcmul( $expected_amount, bcpow( '10', $decimals ) )
+			) >= 0;
+
+		bcscale( $old_scale ); // reset back to old scale
+
+		return $validated;
 
 	}
 
@@ -454,6 +478,8 @@ class Solana_Pay {
 		$options = array();
 		$options['tokens'] = array();
 
+		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
+
 		foreach ( $tokens as $k => $v ) {
 			if ( array_key_exists( $k, $table ) && $table[ $k ]['enabled'] ) {
 				$decimals = $tokens[ $k ]['decimals'];
@@ -469,6 +495,8 @@ class Solana_Pay {
 				);
 			}
 		}
+
+		bcscale( $old_scale ); // reset back to old scale
 
 		return $options;
 
@@ -498,6 +526,18 @@ class Solana_Pay {
 	public static function rpc_endpoint( $testmode ) {
 
 		return $testmode ? self::RPC_ENDPOINT_DEVNET : self::RPC_ENDPOINT_MAINNET_BETA;
+
+	}
+
+
+	/**
+	 * Get RPC and Transaction Endpoints usage fee.
+	 *
+	 * @return string
+	 */
+	public static function endpoints_usage_fee() {
+
+		return self::ENDPOINT_USAGE_FEE;
 
 	}
 

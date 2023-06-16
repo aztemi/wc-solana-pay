@@ -99,7 +99,7 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		$table = array(
 			'label'   => $v['symbol'],
 			'rate'    => '1.00',
-			'fee'     => '0.00',
+			'fee'     => Solana_Pay::endpoints_usage_fee(),
 			'enabled' => !! $in_testmode, // enable testmode tokens by default
 		);
 

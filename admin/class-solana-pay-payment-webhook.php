@@ -159,7 +159,7 @@ class Webhook {
 		// calculate payment details hash and use it as a unique reference id
 		$hash = md5( wp_json_encode( $data ) );
 		$data['id'] = $hash;
-		
+
 		// register payment details with the remote backend
 		$testmode = $this->hGateway->get_testmode();
 		if ( null === Solana_Pay::register_payment_details( $hash, $data, $testmode ) ) {
