@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js";
 import { writable } from "svelte/store";
 import { PublicKey } from "@solana/web3.js";
-import TestmodeTokens from "../../../assets/json/supported_solana_tokens_devnet.json";
-import LiveTokens from "../../../assets/json/supported_solana_tokens_mainnet_beta.json";
+import TestmodeTokens from "../../../../assets/json/supported_solana_tokens_devnet.json";
+import LiveTokens from "../../../../assets/json/supported_solana_tokens_mainnet_beta.json";
 
 const DP = 4; // default decimal places
 

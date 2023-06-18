@@ -142,7 +142,7 @@ class Solana_Pay_For_WooCommerce_Public {
 			);
 
 			$button = get_partial_file_html(
-				'/public/partials/public_place_order_button.php',
+				'/public/partials/public-place-order-button.php',
 				array(
 					'id'     => PLUGIN_ID,
 					'button' => $button,

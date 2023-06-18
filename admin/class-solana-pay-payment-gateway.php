@@ -280,7 +280,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 			);
 
 			$html = get_partial_file_html(
-				'/admin/partials/admin_tokens_table.php',
+				'/admin/partials/admin-tokens-table.php',
 				array(
 					'tip'             => $data['desc_tip'],
 					'title'           => $data['title'],
@@ -447,7 +447,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		$meta = $this->get_order_payment_meta( $order );
 		if ( count( $meta ) ) {
-			echo wp_kses_post( get_partial_file_html( '/admin/partials/admin_payment_details.php', $meta ) );
+			echo wp_kses_post( get_partial_file_html( '/admin/partials/admin-payment-details.php', $meta ) );
 		}
 
 	}
@@ -463,7 +463,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		$meta = $this->get_order_payment_meta( $order );
 		if ( count( $meta ) ) {
-			echo wp_kses_post( get_partial_file_html( '/public/partials/public_payment_details.php', $meta ) );
+			echo wp_kses_post( get_partial_file_html( '/public/partials/public-payment-details.php', $meta ) );
 		}
 
 	}
