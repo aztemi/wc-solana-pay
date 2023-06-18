@@ -157,11 +157,11 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		$this->brand_name      = $this->get_option( 'brand_name' );
 		$this->description     = $this->get_option( 'description' );
 		$this->merchant_wallet = $this->get_option( 'merchant_wallet', '' );
-		$this->is_testmode     = 'yes' === $this->get_option( 'testmode', 'yes' );
+		$this->is_testmode     = Solana_Pay::NETWORK_MAINNET_BETA != $this->get_option( 'network', Solana_Pay::NETWORK_DEVNET );
 
 		// update settings that depend on testmode status
 		if ( $this->is_testmode ) {
-			$testmode_msg = ' (' . esc_html__( 'Test Mode enabled. Devnet in use', 'solana-pay-for-woocommerce' ) . ')';
+			$testmode_msg = ' <b>(' . esc_html__( 'Test Mode enabled. Devnet in use', 'solana-pay-for-woocommerce' ) . ')</b>';
 			$this->method_description .= $testmode_msg;
 			$this->description .= $testmode_msg;
 		}

@@ -28,7 +28,7 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	protected const NETWORK_DEVNET = 'devnet';
+	public const NETWORK_DEVNET = 'devnet';
 
 
 	/**
@@ -36,7 +36,7 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	protected const NETWORK_MAINNET_BETA = 'mainnet-beta';
+	public const NETWORK_MAINNET_BETA = 'mainnet-beta';
 
 
 	/**
