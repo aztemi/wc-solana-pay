@@ -39,7 +39,7 @@ return array(
 										 ),
 	),
 	'tokens_table'  => array(
-		'title'       => __( 'Solana Tokens', 'solana-pay-for-woocommerce' ),
+		'title'       => __( 'Accepted Payment Tokens', 'solana-pay-for-woocommerce' ),
 		'type'        => 'tokens_table',
 		'desc_tip'    => __( 'Enable cryptocurrencies you want to accept for payments.', 'solana-pay-for-woocommerce' ),
 	),

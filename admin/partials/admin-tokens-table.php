@@ -60,12 +60,12 @@ function get_input( $name, $value, $style = '', $type = 'text' ) {
 function get_tokens_table_header( $show_currency ) {
 
 	$header = '<tr>'
-		. get_th( __( 'Enable', 'solana-pay-for-woocommerce' ), 'text-align:center;max-width:6rem' )
-		. get_th( __( 'Coin / Token', 'solana-pay-for-woocommerce' ), 'min-width:8rem' )
+		. get_th( __( 'Accept', 'solana-pay-for-woocommerce' ), 'text-align:center;max-width:6rem' )
+		. get_th( __( 'Token', 'solana-pay-for-woocommerce' ), 'min-width:10rem' )
 		. get_th( __( 'Label', 'solana-pay-for-woocommerce' ) )
 		. get_th( __( 'Exchange Rate', 'solana-pay-for-woocommerce' ), '', 3 )
-		. get_th( __( '% Commission', 'solana-pay-for-woocommerce' ), '', 2 )
-		. get_th( sprintf( '%s: 1.00 %s =', __( 'Preview', 'solana-pay-for-woocommerce' ), $show_currency ), 'text-align:center;min-width:7rem' )
+		. get_th( __( '% Commission', 'solana-pay-for-woocommerce' ), '' )
+		. get_th( sprintf( '%s: 1.00 %s =', __( 'Preview', 'solana-pay-for-woocommerce' ), $show_currency ), 'text-align:center;min-width:8rem' )
 		. '</tr>';
 
 	return $header;
@@ -109,7 +109,7 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		}
 
 		// Rate Update icon button
-		$update_icon = '<span class="dashicons dashicons-update" style="cursor:pointer" title="' . esc_attr( $auto_refresh ) . '" data-symbol="' . esc_attr( $v['symbol'] ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
+		$update_icon = '<span class="button-link dashicons dashicons-update" style="text-decoration-line:none" title="' . esc_attr( $auto_refresh ) . '" data-symbol="' . esc_attr( $v['symbol'] ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
 
 		// Remove Rate Update button if token or stable coin is similar to store base currency
 		$stablecoin = array_key_exists( 'stablecoin', $v ) ? strtoupper( $v['stablecoin'] ) : '';
@@ -130,15 +130,24 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		$label   = "spfwc_label[$i]";
 		$enabled = "spfwc_enabled[$i]";
 
+		// token icon & name
+		$token_icon = '<img src="' . PLUGIN_URL . '/' . $v['icon'] . '" alt="' . $v['name'] . ' icon" style="width:1.5rem;border-radius:50%">';
+		$token_name = '<span style="padding-left:0.3rem">' . esc_html( $v['name'] ) . '</span>';
+		$token_div = '<div style="display:flex;align-items:center">' . $token_icon . $token_name . '</div>';
+
+		// fee input & percent
+		$fee_input = get_input( $fee, $table['fee'], 'max-width:5rem' );
+		$percent = '<span style="padding-left:0.3rem"><strong>%</strong></span>';
+		$fee_div = '<div style="display:flex;align-items:center">' . $fee_input . $percent . '</div>';
+
 		$tr = '<tr class="' . $class . '" data-decimals="' . esc_attr( $v['decimals'] ) . '">'
 			. get_td( get_input( $id, $k, '', 'hidden' ) . get_input( $enabled, $table['enabled'], '', 'checkbox' ), 'text-align:center' )
-			. get_td( esc_attr( $v['name'] ), 'padding-left:0.5rem' )
+			. get_td( $token_div, 'padding-left:0.5rem' )
 			. get_td( get_input( $label, $table['label'], 'max-width:7rem' ), '' )
 			. get_td( $update_icon, 'text-align:right;padding-right:0 !important;vertical-align:bottom' )
 			. get_td( get_input( $rate, $table['rate'], 'max-width:7rem' ), '' )
 			. get_td( '<strong>+</strong>', 'text-align:center;vertical-align:middle' )
-			. get_td( get_input( $fee, $table['fee'], 'max-width:5rem' ), '' )
-			. get_td( '<strong>%</strong>', 'vertical-align:middle;padding-left:0 !important' )
+			. get_td( $fee_div, '' )
 			. get_td( '<span class="token_preview"></span>', 'text-align:right;padding-right:0.5rem' )
 			. '</tr>';
 		$rows .= $tr;
@@ -177,7 +186,7 @@ $body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $b
 	</th>
 	<td class="forminp">
 		<div class="wc_input_table_wrapper">
-			<table class="wc_gateways widefat" style="min-width:55rem;max-width:75rem" cellspacing="0" cellpadding="0">
+			<table class="wc_gateways widefat" style="min-width:60rem;max-width:75rem" cellspacing="0" cellpadding="0">
 				<thead><?php echo wp_kses_post( $header ); ?></thead>
 				<tbody><?php echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></tbody>
 			</table>
