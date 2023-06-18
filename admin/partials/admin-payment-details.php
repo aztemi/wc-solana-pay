@@ -12,6 +12,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+
 $short_txn = esc_html( Solana_Pay::shorten_hash_address( $transaction ) );
 
 function echo_p( $key, $value, $url = '' ) {

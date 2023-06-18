@@ -25,14 +25,15 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	 *
 	 * @var string
 	 */
-	protected const ORDER_META_KEY   = 'spfwc_payment';
+	protected const ORDER_META_KEY = 'spfwc_payment';
+
 
 	/**
 	 * Unique Key for storing tokens table settings in WP Option array.
 	 *
 	 * @var string
 	 */
-	protected const TOKENS_OPTION_KEY   = 'spfwc_tokens';
+	protected const TOKENS_OPTION_KEY = 'spfwc_tokens';
 
 
 	/**
@@ -49,22 +50,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	 * @var string
 	 */
 	protected $merchant_wallet;
-
-
-	/**
-	 * RPC endpoint for connection to the Solana Mainnet-Beta.
-	 *
-	 * @var string
-	 */
-	protected $live_rpc;
-
-
-	/**
-	 * RPC endpoint for connection to the Solana Devnet.
-	 *
-	 * @var string
-	 */
-	protected $test_rpc;
 
 
 	/**
@@ -89,14 +74,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	 * @var Session
 	 */
 	protected $hSession;
-
-
-	/**
-	 * Handle instance of the Webhook class for handling incoming GET request.
-	 *
-	 * @var Webhook
-	 */
-	protected $hWebhook;
 
 
 	/**
@@ -133,13 +110,13 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		require_once PLUGIN_DIR . '/admin/class-session.php';
 		$this->hSession = new Session();
 
-		// load webhook class for handling incoming GET request
-		require_once PLUGIN_DIR . '/admin/class-solana-pay-payment-webhook.php';
-		$this->hWebhook = new Webhook( $this, $this->hSession );
-
 		// load Solana Pay class
 		require_once PLUGIN_DIR . '/admin/class-solana-pay.php';
 		$this->hSolanapay = new Solana_Pay( $this, $this->hSession );
+
+		// load webhook class for handling incoming GET request
+		require_once PLUGIN_DIR . '/admin/class-solana-pay-payment-webhook.php';
+		new Webhook( $this, $this->hSession );
 
 		// load public class if on checkout or pay order page
 		if ( is_checkout() || is_checkout_pay_page() ) {
@@ -177,16 +154,14 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		// update configurations
 		$this->enabled         = $this->get_option( 'enabled' );
-		$this->live_rpc        = $this->get_option( 'live_rpc', '' );
-		$this->test_rpc        = $this->get_option( 'test_rpc' );
 		$this->brand_name      = $this->get_option( 'brand_name' );
 		$this->description     = $this->get_option( 'description' );
 		$this->merchant_wallet = $this->get_option( 'merchant_wallet', '' );
-		$this->is_testmode     = 'yes' === $this->get_option( 'testmode', 'yes' );
+		$this->is_testmode     = Solana_Pay::NETWORK_MAINNET_BETA != $this->get_option( 'network', Solana_Pay::NETWORK_DEVNET );
 
 		// update settings that depend on testmode status
 		if ( $this->is_testmode ) {
-			$testmode_msg = ' (' . esc_html__( 'Test Mode enabled. Devnet in use', 'solana-pay-for-woocommerce' ) . ')';
+			$testmode_msg = ' <b>(' . esc_html__( 'Test Mode enabled. Devnet in use', 'solana-pay-for-woocommerce' ) . ')</b>';
 			$this->method_description .= $testmode_msg;
 			$this->description .= $testmode_msg;
 		}
@@ -227,12 +202,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		// Return false if merchant wallet is not configured
 		if ( empty( $this->merchant_wallet ) ) {
 			\WC_Admin_Settings::add_error( esc_html__( 'Solana Pay setup is not complete. Please set Merchant Wallet Address', 'solana-pay-for-woocommerce' ) );
-			$rtn = false;
-		}
-
-		// Return false if Mainnet-Beta RPC is not configured for Live mode
-		if ( empty( $this->live_rpc ) && ! $this->is_testmode ) {
-			\WC_Admin_Settings::add_error( esc_html__( 'Solana Pay setup is not complete. Please set Mainnet-Beta RPC Endpoint', 'solana-pay-for-woocommerce' ) );
 			$rtn = false;
 		}
 
@@ -284,48 +253,6 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Validate Live RPC Endpoint settings field. Clear the field in case of error.
-	 * This is called from WC to validate a form field.
-	 *
-	 * @param  string $key  Field key.
-	 * @param  string $value Field data.
-	 * @return string
-	 */
-	public function validate_live_rpc_field( $key, $value ) {
-
-		$post_data = $this->get_post_data();
-		$testmode = isset( $post_data[ "woocommerce_{$this->id}_testmode" ] );
-
-		if ( ! $testmode && ! wp_http_validate_url( $value ) ) {
-			\WC_Admin_Settings::add_error( esc_html__( 'Invalid Mainnet-Beta RPC Endpoint', 'solana-pay-for-woocommerce' ) );
-			$value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
-		}
-
-		return $value;
-
-	}
-
-
-	/**
-	 * Set Test RPC Endpoint to default if not set correctly.
-	 * This is called from WC to validate a form field.
-	 *
-	 * @param  string $key  Field key.
-	 * @param  string $value Field data.
-	 * @return string
-	 */
-	public function validate_test_rpc_field( $key, $value ) {
-
-		if ( empty( trim( $value ) ) || ! wp_http_validate_url( $value ) ) {
-			$value = Solana_Pay::DEVNET_ENDPOINT;
-		}
-
-		return $value;
-
-	}
-
-
-	/**
 	 * Generate html for tokens table.
 	 * This is called from WC to generate the custom table for currency selection on Admin Settings page.
 	 *
@@ -341,6 +268,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		if ( $tablejs ) {
 			$base_currency = Solana_Tokens::get_store_currency('edit');
 			$show_currency = Solana_Tokens::get_store_currency();
+			$auto_refresh = __( 'Auto refresh exchange rate', 'solana-pay-for-woocommerce' );
 			$alert_msg = esc_html__( 'Update currently not available. Please check your connection and reload.', 'solana-pay-for-woocommerce' );
 
 			$script = get_partial_file_html(
@@ -352,10 +280,12 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 			);
 
 			$html = get_partial_file_html(
-				'/admin/partials/admin_tokens_table.php',
+				'/admin/partials/admin-tokens-table.php',
 				array(
 					'tip'             => $data['desc_tip'],
+					'title'           => $data['title'],
 					'script'          => $script,
+					'auto_refresh'    => $auto_refresh,
 					'base_currency'   => $base_currency,
 					'show_currency'   => $show_currency,
 					'tokens_table'    => $this->tokens_table,
@@ -371,7 +301,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Save tokens table settings
+	 * Save tokens table admin settings
 	 */
 	public function save_tokens_table() {
 
@@ -430,10 +360,9 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		// get order info and pending amount
 		$order = wc_get_order( $order_id );
 		$amount = $order->get_total();
-		$amount_token = $this->hWebhook->get_payment_token_amount( $amount, $payment_token );
 
 		// Confirm payment transaction on Solana chain, return if not found or if balance is less.
-		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount_token, $payment_token ) ) {
+		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount, $payment_token ) ) {
 			return array();
 		}
 
@@ -518,7 +447,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		$meta = $this->get_order_payment_meta( $order );
 		if ( count( $meta ) ) {
-			echo wp_kses_post( get_partial_file_html( '/admin/partials/admin_payment_details.php', $meta ) );
+			echo wp_kses_post( get_partial_file_html( '/admin/partials/admin-payment-details.php', $meta ) );
 		}
 
 	}
@@ -534,7 +463,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		$meta = $this->get_order_payment_meta( $order );
 		if ( count( $meta ) ) {
-			echo wp_kses_post( get_partial_file_html( '/public/partials/public_payment_details.php', $meta ) );
+			echo wp_kses_post( get_partial_file_html( '/public/partials/public-payment-details.php', $meta ) );
 		}
 
 	}
@@ -553,13 +482,26 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 
 	/**
+	 * Get list of accepted Solana tokens available for payments and how much the cost of the order in each token.
+	 *
+	 * @param  string $amount Order amount in the store base currency.
+	 * @return array  List of payment options and their cost values.
+	 */
+	public function get_accepted_solana_tokens_payment_options( $amount ) {
+
+		return $this->hSolanapay->get_available_payment_options( $amount );
+
+	}
+
+
+	/**
 	 * Get RPC endpoint
 	 *
 	 * @return string Current RPC endpoint
 	 */
 	public function get_rpc_endpoint() {
 
-		return $this->is_testmode ? $this->test_rpc : $this->live_rpc;
+		return Solana_Pay::rpc_endpoint( $this->is_testmode );
 
 	}
 

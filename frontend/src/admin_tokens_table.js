@@ -71,7 +71,7 @@ import BigNumber from "bignumber.js";
 
   // Enable Testmode checkbox handling
   function handleTestmodeCheckbox() {
-    if ($$("input[name*=spfwc_testmode]").is(":checked")) {
+    if ("devnet" === $$("select[name*=spfwc_network] option").filter(":selected").val()) {
       $$("tr.live_only").hide();
       $$("tr.testmode_only").show();
     } else {

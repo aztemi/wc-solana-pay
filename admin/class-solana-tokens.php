@@ -223,4 +223,16 @@ class Solana_Tokens {
 
 	}
 
+
+	/**
+	 * Get store base currency code suffix.
+	 *
+	 * @return string
+	 */
+	public static function get_store_currency_key_suffix() {
+
+		return self::TOKEN_KEY_SUFFIX;
+
+	}
+
 }

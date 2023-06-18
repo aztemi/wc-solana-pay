@@ -1,8 +1,10 @@
 import BigNumber from "bignumber.js";
 import { writable } from "svelte/store";
 import { PublicKey } from "@solana/web3.js";
-import TestmodeTokens from "../../../assets/json/supported_solana_tokens_devnet.json";
-import LiveTokens from "../../../assets/json/supported_solana_tokens_mainnet_beta.json";
+import TestmodeTokens from "../../../../assets/json/supported_solana_tokens_devnet.json";
+import LiveTokens from "../../../../assets/json/supported_solana_tokens_mainnet_beta.json";
+
+const DP = 4; // default decimal places
 
 const emptyOrder = {
   updated: false,
@@ -10,7 +12,8 @@ const emptyOrder = {
   reference: null,
   amount: new BigNumber(0),
   currency: "",
-  endpoint: "",
+  endpoint: "", // RPC endpoint
+  link: "", // `link` param in Solana Pay spec
   tokens: {},
   activeToken: "",
   label: "",
@@ -33,25 +36,24 @@ function createOrderStore() {
 
     setOrder: order =>
       update(old => {
-        const DP = 4; // default decimal places
-        let { recipient, reference, amount, testmode, tokens } = order;
+        let { id, recipient, reference, amount, testmode, tokens, suffix, endpoint, link } = order;
 
         recipient = new PublicKey(recipient);
         reference = new PublicKey(reference);
-        amount = new BigNumber(parseFloat(amount));
+        amount = new BigNumber(amount);
 
         // update tokens
         let paymentTokens = {};
         let activeToken = "";
-        const keySuffix = "_SOLANA";
         const supportedTokens = testmode ? TestmodeTokens : LiveTokens;
+
         for (const [key, value] of Object.entries(tokens)) {
-          const token = key.replace(keySuffix, "");
+          const token = key.replace(suffix, "");
           if (token in supportedTokens) {
             paymentTokens[key] = supportedTokens[token];
-            paymentTokens[key]["amount"] = new BigNumber(parseFloat(value)).decimalPlaces(DP, BigNumber.ROUND_CEIL);
-            if (!activeToken) activeToken = key;
+            paymentTokens[key]["amount"] = new BigNumber(value.amount).decimalPlaces(DP, BigNumber.ROUND_CEIL);
             if (paymentTokens[key]["mint"]) paymentTokens[key]["mint"] = new PublicKey(paymentTokens[key]["mint"]);
+            if (!activeToken) activeToken = key;
           }
         }
 
@@ -61,6 +63,8 @@ function createOrderStore() {
           reference,
           amount,
           activeToken,
+          endpoint: `${endpoint}${id}/`,
+          link: `${link}&id=${id}`,
           tokens: paymentTokens
         });
       })

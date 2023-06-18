@@ -6,7 +6,7 @@
 
   onMount(async () => {
     window.Buffer = Buffer;
-    SolanaPayModal = (await import("../lib/components/modal.svelte")).default;
+    SolanaPayModal = (await import("./lib/components/modal.svelte")).default;
   });
 </script>
 

@@ -15,7 +15,61 @@ if ( ! defined( 'WPINC' ) ) {
 
 class Solana_Pay {
 
-	public const DEVNET_ENDPOINT = 'https://api.devnet.solana.com';
+	/**
+	 * Default scale precision for bc math functions.
+	 *
+	 * @var string
+	 */
+	private const BC_MATH_SCALE = 10;
+
+
+	/**
+	 * Name of the Solana Devnet network.
+	 *
+	 * @var string
+	 */
+	public const NETWORK_DEVNET = 'devnet';
+
+
+	/**
+	 * Name of the Solana Mainnet-Beta network.
+	 *
+	 * @var string
+	 */
+	public const NETWORK_MAINNET_BETA = 'mainnet-beta';
+
+
+	/**
+	 * Default RPC node endpoint for Solana Devnet.
+	 *
+	 * @var string
+	 */
+	protected const RPC_ENDPOINT_DEVNET = 'https://spfwc.juxdan.io/v1/rpc-devnet/';
+
+
+	/**
+	 * Default RPC node endpoint for Solana Mainnet-Beta.
+	 *
+	 * @var string
+	 */
+	protected const RPC_ENDPOINT_MAINNET_BETA = 'https://spfwc.juxdan.io/v1/rpc/';
+
+
+	/**
+	 * Default endpoint for remote Solana transactions handling.
+	 *
+	 * @var string
+	 */
+	protected const TRANSACTION_ENDPOINT = 'https://spfwc.juxdan.io/v1/txn/';
+
+
+	/**
+	 * 0.5% fee for above default endpoints usage.
+	 *
+	 * @var string
+	 */
+	protected const ENDPOINT_USAGE_FEE = '0.50';
+
 
 	/**
 	 * Handle instance of the payment gateway class.
@@ -68,6 +122,10 @@ class Solana_Pay {
 	private function rpc_remote_post( $method, $params, $url ) {
 
 		$rtn = false;
+
+		$data = $this->hSession->get_data();
+		$id = $data['id'];
+		$url .= $id . '/';
 
 		$body = wp_json_encode(
 			array(
@@ -295,6 +353,27 @@ class Solana_Pay {
 
 
 	/**
+	 * Get the order total in specified Solana payment tokens.
+	 *
+	 * @param  float  $amount   Order cost in store base currency.
+	 * @param  string $token_id Token ID.
+	 * @return string Expected payment amount as a BC Math string.
+	 */
+	private function get_payment_token_amount( $amount, $token_id ) {
+
+		$token_amount = '';
+		$data = $this->hSession->get_data();
+
+		if ( array_key_exists( $token_id, $data['tokens'] ) && ( $amount == $data['amount'] ) ) {
+			$token_amount = $data['tokens'][ $token_id ]['amount'];
+		}
+
+		return $token_amount;
+
+	}
+
+
+	/**
 	 * Validates if an expected amount is fully paid or not.
 	 *
 	 * @param  string $amount  Expected amount to be paid.
@@ -304,18 +383,26 @@ class Solana_Pay {
 	 */
 	private function validate_payment_amount( $amount, $balance, &$paid ) {
 
-		$amount = sprintf( '%.10f', $amount );
 		list( 'pre' => $pre, 'post' => $post, 'decimals' => $decimals ) = $balance;
+
+		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
 
 		$paid = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
 		$paid = rtrim( $paid, '0' ) . ' ' . $balance['symbol'];
 
-		return (
-				bccomp(
-					bcsub( $post, $pre ),
-					bcmul( $amount, bcpow( '10', $decimals ) )
-				) >= 0
-			);
+		// compensate for endpoint usage fee already deducted in transaction
+		$percent_fee = self::endpoints_usage_fee();
+		$rpc_fee = bcdiv( bcmul( $percent_fee, $amount ), 100 );
+		$expected_amount = bcsub( $amount, $rpc_fee );
+
+		$validated = bccomp(
+				bcsub( $post, $pre ),
+				bcmul( $expected_amount, bcpow( '10', $decimals ) )
+			) >= 0;
+
+		bcscale( $old_scale ); // reset back to old scale
+
+		return $validated;
 
 	}
 
@@ -323,12 +410,12 @@ class Solana_Pay {
 	/**
 	 * Validate payment transaction on Solana network.
 	 *
-	 * @param  \WC_Order $order        Order object.
-	 * @param  string    $token_amount Expected payment amount in specified Solana token.
-	 * @param  string    $token_id     Payment token ID.
+	 * @param  \WC_Order $order    Order object.
+	 * @param  string    $amount   Order cost amount in the store base currency.
+	 * @param  string    $token_id Payment token ID.
 	 * @return bool      true if transaction was found and correct amount was paid into merchant wallet, false otherwise.
 	 */
-	public function confirm_payment_onchain( $order, $token_amount, $token_id ) {
+	public function confirm_payment_onchain( $order, $amount, $token_id ) {
 
 		$paid = '';
 		$txn_id = '';
@@ -336,6 +423,8 @@ class Solana_Pay {
 		$balance = array();
 		$meta = array();
 
+		// get expected payment amount in Solana token
+		$token_amount = $this->get_payment_token_amount( $amount, $token_id );
 		// Return false if amount is not valid
 		if ( empty( trim( $token_amount ) ) ) {
 			return false;
@@ -375,6 +464,46 @@ class Solana_Pay {
 
 
 	/**
+	 * Get Solana tokens available for payments and calculate how much the cost of the order in each token.
+	 * Developer Commission for RPC usage is separated out if merchant own RPC is not provided.
+	 *
+	 * @param  string $amount Order amount in the store base currency.
+	 * @return array          List of payment options and their cost values.
+	 */
+	public function get_available_payment_options( $amount ) {
+
+		$tokens = $this->hGateway->get_accepted_solana_tokens();
+		$table = $this->hGateway->get_tokens_table();
+
+		$options = array();
+		$options['tokens'] = array();
+
+		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
+
+		foreach ( $tokens as $k => $v ) {
+			if ( array_key_exists( $k, $table ) && $table[ $k ]['enabled'] ) {
+				$decimals = $tokens[ $k ]['decimals'];
+				$power = bcpow( '10', $decimals );
+				$amount_pow = bcmul( $amount, $power );
+				$rate = bcmul( $amount_pow, $table[ $k ]['rate'] );
+				$fee = bcdiv( bcmul( $rate, $table[ $k ]['fee'] ), '100' );
+				$amount_in_token = rtrim( bcdiv( bcadd( $rate, $fee ), $power, $decimals ), '0' );
+
+				$options['tokens'][ $k ] = array(
+					'amount' => $amount_in_token,
+					'mint' => $tokens[ $k ]['mint']
+				);
+			}
+		}
+
+		bcscale( $old_scale ); // reset back to old scale
+
+		return $options;
+
+	}
+
+
+	/**
 	 * Shorten transaction hash address for frontend UI.
 	 *
 	 * @param  string $address Hash or address to shorten.
@@ -384,6 +513,95 @@ class Solana_Pay {
 	public static function shorten_hash_address( $address, $limit = 6 ) {
 
 		return substr( $address, 0, $limit ) . '...' . substr( $address, -$limit );
+
+	}
+
+
+	/**
+	 * RPC endpoint based on testmode.
+	 *
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return string
+	 */
+	public static function rpc_endpoint( $testmode ) {
+
+		return $testmode ? self::RPC_ENDPOINT_DEVNET : self::RPC_ENDPOINT_MAINNET_BETA;
+
+	}
+
+
+	/**
+	 * Get RPC and Transaction Endpoints usage fee.
+	 *
+	 * @return string
+	 */
+	public static function endpoints_usage_fee() {
+
+		return self::ENDPOINT_USAGE_FEE;
+
+	}
+
+
+	/**
+	 * Register payment transaction details with remote server.
+	 *
+	 * @param  string $ref_id   Remote reference ID of the transaction.
+	 * @param  string $data     Payment transaction details.
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return array|null
+	 */
+	public static function register_payment_details( $ref_id, $data, $testmode ) {
+
+		$rtn = null;
+		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
+		$url = sprintf( '%s%s/?network=%s', self::TRANSACTION_ENDPOINT, $ref_id, $network );
+
+		$response = wp_remote_post( $url, array(
+			'method'      => 'POST',
+			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
+			'timeout'     => 45,
+			'body'        => wp_json_encode( $data ),
+			'data_format' => 'body',
+			)
+		);
+
+		if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
+			$response_body = wp_remote_retrieve_body( $response );
+			$rtn = json_decode( $response_body, true );
+		}
+
+		return $rtn;
+
+	}
+
+
+	/**
+	 * Get payment transaction from remote server.
+	 *
+	 * @param  string $ref_id   Remote reference ID of the transaction.
+	 * @param  string $address  Wallet address of the transaction fee payer.
+	 * @param  string $token_id Payment token ID.
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return string
+	 */
+	public static function get_payment_transaction( $ref_id, $address, $token_id, $testmode ) {
+
+		$txn = '';
+		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
+		$url = sprintf( '%s%s/?account=%s&token=%s&network=%s', self::TRANSACTION_ENDPOINT, $ref_id, $address, $token_id, $network );
+		$response = wp_remote_get( $url, array(
+			'method'      => 'GET',
+			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
+			'timeout'     => 10,
+			)
+		);
+		if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
+			$response_body = wp_remote_retrieve_body( $response );
+			$response_array = json_decode( $response_body, true );
+			$txn = array_key_exists( 'txn', $response_array ) ? $response_array['txn'] : '';
+		}
+
+		return $txn;
 
 	}
 
