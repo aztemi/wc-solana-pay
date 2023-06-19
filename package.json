@@ -1,6 +1,6 @@
 {
   "name": "solana-pay-for-woocommerce",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Solana Pay powered payment gateway for WordPress and WooCommerce",
   "author": "aztemi",
   "license": "GPL-3.0-or-later",

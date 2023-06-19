@@ -3,7 +3,7 @@ Contributors: aztemi
 Donate link: https://www.aztemi.com
 Tags: solana pay, solana, woocommerce, payment, payment gateway, crypto, cryptocurrency, usdc, usdt, wallet
 Requires at least: 5.2
-Tested up to: 6.2
+Tested up to: 6.2.2
 Stable tag: trunk
 Requires PHP: 7.2
 License: GPLv3 or later
