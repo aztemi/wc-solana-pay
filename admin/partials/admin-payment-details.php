@@ -2,10 +2,10 @@
 /**
  * HTML partial for custom payment details on admin order page.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -28,12 +28,12 @@ function echo_p( $key, $value, $url = '' ) {
 ?>
 
 <br class="clear" />
-<h3><?php esc_html_e( 'Solana Pay Payment Details', 'solana-pay-for-woocommerce' ); ?></h3>
+<h3><?php esc_html_e( 'Solana Pay Payment Details', 'wc-solana-pay' ); ?></h3>
 <div class="payment_details">
 <?php
-	echo_p( __( 'Transaction ID', 'solana-pay-for-woocommerce' ), $short_txn, $url );
-	echo_p( __( 'Customer Wallet', 'solana-pay-for-woocommerce' ), $payer );
-	echo_p( __( 'Payment Amount', 'solana-pay-for-woocommerce' ), $paid );
-	echo_p( __( 'Reference Account', 'solana-pay-for-woocommerce' ), $reference );
+	echo_p( __( 'Transaction ID', 'wc-solana-pay' ), $short_txn, $url );
+	echo_p( __( 'Customer Wallet', 'wc-solana-pay' ), $payer );
+	echo_p( __( 'Payment Amount', 'wc-solana-pay' ), $paid );
+	echo_p( __( 'Reference Account', 'wc-solana-pay' ), $reference );
 ?>
 </div>

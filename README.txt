@@ -1,4 +1,4 @@
-=== Solana Pay for Woocommerce ===
+=== Pay with Solana Pay for WooCommerce ===
 Contributors: aztemi
 Donate link: https://www.aztemi.com
 Tags: solana pay, solana, woocommerce, payment, payment gateway, crypto, cryptocurrency, usdc, usdt, wallet
@@ -9,7 +9,7 @@ Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Solana Pay for Woocommerce. Decentralized, permissionless, and fast payment gateway powered by Solana. Accept payments in SOL, USDC, USDT and more.
+Pay with Solana Pay for WooCommerce. Decentralized, permissionless, and fast payment gateway powered by Solana. Accept payments in SOL, USDC, USDT and more.
 
 == Description ==
 
@@ -21,7 +21,7 @@ A Quick and easy way to add crypto payments via Solana to your website. Give you
 
 = Released features =
 
-Currently,  **Solana Pay for Woocommerce** provides the following features:
+Currently,  **Pay with Solana Pay for WooCommerce** provides the following features:
 
 * No hidden commission. Payments go directly into the Solana wallet address that you configure.
 * Solana Pay checkout button on the Checkout page.
@@ -33,7 +33,7 @@ Currently,  **Solana Pay for Woocommerce** provides the following features:
 
 = Requirements =
 
-To install **Solana Pay for Woocommerce**, you need:
+To install **Pay with Solana Pay for WooCommerce**, you need:
 
 * WordPress Version 5.2 or newer (installed)
 * WooCommerce Version 3.0 or newer (installed and activated)
@@ -44,7 +44,7 @@ To install **Solana Pay for Woocommerce**, you need:
 
 1. Log in to WordPress admin.
 2. Go to **Plugins > Add New**.
-3. Search for the **Solana Pay for Woocommerce** plugin.
+3. Search for the **Pay with Solana Pay for WooCommerce** plugin.
 4. Click on **Install Now** and wait until the plugin is installed successfully.
 5. Click on **Activate**. (You can also activate on the **Plugins > Installed Plugins** page).
 
@@ -68,7 +68,7 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 = Which Solana tokens can be accepted as payment? =
 
-**Solana Pay for Woocommerce** plugin currently supports payments in SOL, USDC and USDT. Support for more tokens are planned to be added in the future.
+**Pay with Solana Pay for WooCommerce** plugin currently supports payments in SOL, USDC and USDT. Support for more tokens are planned to be added in the future.
 
 == Screenshots ==
 

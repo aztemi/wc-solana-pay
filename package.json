@@ -1,5 +1,5 @@
 {
-  "name": "solana-pay-for-woocommerce",
+  "name": "wc-solana-pay",
   "version": "1.1.0",
   "description": "Solana Pay powered payment gateway for WordPress and WooCommerce",
   "author": "aztemi",
@@ -13,11 +13,11 @@
     "makepot": "composer run-script makepot",
     "lint": "composer run-script lint",
     "build": "npm run build --workspaces",
-    "package": "rm -f $npm_package_name-$npm_package_version.zip && cd .. && zip -r $npm_package_name/$npm_package_name-$npm_package_version.zip $npm_package_name -x **phpcs-report.txt **pbs-rules-set.xml **composer.lock **composer.json **package-lock.json **package.json **.gitignore **.git/\\* **node_modules/\\* **vendor/\\* **frontend/\\* && cd $npm_package_name"
+    "package": "rm -f $npm_package_name-*.zip && cd .. && zip -r $npm_package_name/$npm_package_name-$npm_package_version.zip $npm_package_name -x **phpcs-report.txt **pbs-rules-set.xml **composer.lock **composer.json **package-lock.json **package.json **.md **.gitignore **.git/\\* **node_modules/\\* **vendor/\\* **frontend/\\* && cd $npm_package_name"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aztemi/solana-pay-for-woocommerce.git"
+    "url": "git+https://github.com/aztemi/wc-solana-pay.git"
   },
   "keywords": [
     "Solana",
@@ -28,7 +28,7 @@
     "Payment"
   ],
   "bugs": {
-    "url": "https://github.com/aztemi/solana-pay-for-woocommerce/issues"
+    "url": "https://github.com/aztemi/wc-solana-pay/issues"
   },
-  "homepage": "https://github.com/aztemi/solana-pay-for-woocommerce#readme"
+  "homepage": "https://github.com/aztemi/wc-solana-pay#readme"
 }

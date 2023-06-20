@@ -53,9 +53,9 @@
 <svelte:window on:openmodal={openModal} />
 
 {#if showModal}
-  <div class="spfwc_overlay">
-    <div class="spfwc_modal spfwc_popup_shadow">
-      <div class="spfwc_header">
+  <div class="pwspfwc_overlay">
+    <div class="pwspfwc_modal pwspfwc_popup_shadow">
+      <div class="pwspfwc_header">
         <img src={`${baseurl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
         <button class="closeBtn" on:click={closeModal}><span class="dashicons dashicons-no-alt" /></button>
       </div>
@@ -76,7 +76,7 @@
     --popup_border_shadow_color rgb(0 0 0 / 20%)
     --popup_li_back_color #fafafa
 
-  .spfwc_overlay
+  .pwspfwc_overlay
     position fixed
     z-index 1000
     left 0
@@ -88,7 +88,7 @@
     justify-content center
     overflow hidden
     background-color var(--overlay_back_color)
-    .spfwc_modal
+    .pwspfwc_modal
       position relative
       overflow-y auto
       max-width 90vw
@@ -96,7 +96,7 @@
       border-radius 0.5rem
       border 1px solid var(--modal_border_color)
       background-color var(--modal_back_color)
-      .spfwc_header
+      .pwspfwc_header
         padding 0.7rem 1rem 0 1rem
         display flex
         align-items center
@@ -115,9 +115,9 @@
           justify-content center
 
   :global
-    .spfwc_popup_shadow
+    .pwspfwc_popup_shadow
       box-shadow 0 4px 24px 0 var(--popup_border_shadow_color)
-    .solana_pay_for_wc_place_order
+    .wc_solana_pay_place_order
       display flex
       align-items center
       justify-content center

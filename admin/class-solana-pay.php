@@ -2,10 +2,10 @@
 /**
  * Wrapper class for Solana on chain logics.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -44,7 +44,7 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	protected const RPC_ENDPOINT_DEVNET = 'https://spfwc.juxdan.io/v1/rpc-devnet/';
+	protected const RPC_ENDPOINT_DEVNET = 'https://wc-solana-pay.juxdan.io/v1/rpc-devnet/';
 
 
 	/**
@@ -52,7 +52,7 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	protected const RPC_ENDPOINT_MAINNET_BETA = 'https://spfwc.juxdan.io/v1/rpc/';
+	protected const RPC_ENDPOINT_MAINNET_BETA = 'https://wc-solana-pay.juxdan.io/v1/rpc/';
 
 
 	/**
@@ -60,7 +60,7 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	protected const TRANSACTION_ENDPOINT = 'https://spfwc.juxdan.io/v1/txn/';
+	protected const TRANSACTION_ENDPOINT = 'https://wc-solana-pay.juxdan.io/v1/txn/';
 
 
 	/**
@@ -74,7 +74,7 @@ class Solana_Pay {
 	/**
 	 * Handle instance of the payment gateway class.
 	 *
-	 * @var Solana_Pay_GW
+	 * @var WC_Solana_Pay_Payment_Gateway
 	 */
 	protected $hGateway;
 
@@ -146,7 +146,7 @@ class Solana_Pay {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			wc_add_notice( __( 'Connection to RPC failed', 'solana-pay-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Connection to RPC failed', 'wc-solana-pay' ), 'error' );
 		} else {
 			$response_code = wp_remote_retrieve_response_code( $response );
 
@@ -157,7 +157,7 @@ class Solana_Pay {
 				$rtn = ( array_key_exists( 'result', $response ) ? $response['result'] : array() );
 			} else {
 				/* translators: %d: rpc call response code error, e.g. 404 */
-				wc_add_notice( sprintf( __( 'RPC remote call failed with code %d', 'solana-pay-for-woocommerce' ), $response_code ), 'error' );
+				wc_add_notice( sprintf( __( 'RPC remote call failed with code %d', 'wc-solana-pay' ), $response_code ), 'error' );
 			}
 		}
 
@@ -188,7 +188,7 @@ class Solana_Pay {
 
 		// Payment transaction not found, return false
 		if ( ! count( $txn ) ) {
-			wc_add_notice( __( 'Payment transaction not found. Please try again.', 'solana-pay-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Payment transaction not found. Please try again.', 'wc-solana-pay' ), 'error' );
 			return false;
 		}
 
@@ -229,7 +229,7 @@ class Solana_Pay {
 
 		// Return false if unable to confirm transaction details
 		if ( ! count( $txn_data ) ) {
-			wc_add_notice( __( 'Unable to confirm payment transaction details. Please try again.', 'solana-pay-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Unable to confirm payment transaction details. Please try again.', 'wc-solana-pay' ), 'error' );
 			return false;
 		}
 
@@ -253,7 +253,7 @@ class Solana_Pay {
 
 		// Return false if payment currency is not part of our supported tokens
 		if ( ! array_key_exists( $token_id, $tokens ) ) {
-			$order->add_order_note( __( 'Payment currency not in supported Solana tokens list.', 'solana-pay-for-woocommerce' ) );
+			$order->add_order_note( __( 'Payment currency not in supported Solana tokens list.', 'wc-solana-pay' ) );
 			return false;
 		}
 
@@ -455,7 +455,7 @@ class Solana_Pay {
 		$this->hGateway->set_order_payment_meta( $order, $meta );
 
 		// Complete payment and return true
-		$order->add_order_note( __( 'Solana Pay payment completed', 'solana-pay-for-woocommerce' ) );
+		$order->add_order_note( __( 'Solana Pay payment completed', 'wc-solana-pay' ) );
 		$order->payment_complete( $txn_id );
 
 		return true;

@@ -3,10 +3,10 @@
  * The plugin core class.
  * It validates plugin dependencies and proceeds to load the payment gateway if all dependencies are available.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 
-class Solana_Pay_For_WooCommerce {
+class WC_Solana_Pay {
 
 	public function __construct() {
 
@@ -57,13 +57,13 @@ class Solana_Pay_For_WooCommerce {
 
 		// check if WooCommerce is installed and activated
 		if ( ! is_woocommerce_activated() ) {
-			show_error_notice( __( '<b>Solana Pay for WooCommerce</b> is an extension for <b>WooCommerce</b>. Please install and activate <b>WooCommerce</b> plugin.', 'solana-pay-for-woocommerce' ) );
+			show_error_notice( __( '<b>Pay with Solana Pay for WooCommerce</b> is an extension for <b>WooCommerce</b>. Please install and activate <b>WooCommerce</b> plugin.', 'wc-solana-pay' ) );
 			$available = false;
 		}
 
 		// check if BC Math extension for bignumbers handling is installed
 		if ( ! is_bcmath_installed() ) {
-			show_error_notice( __( '<b>Solana Pay for WooCommerce</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP.', 'solana-pay-for-woocommerce' ) );
+			show_error_notice( __( '<b>Pay with Solana Pay for WooCommerce</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP.', 'wc-solana-pay' ) );
 			$available = false;
 		}
 
@@ -77,7 +77,7 @@ class Solana_Pay_For_WooCommerce {
 	 */
 	public function load_textdomain() {
 
-		load_plugin_textdomain( 'solana-pay-for-woocommerce', false, dirname( PLUGIN_BASENAME ) . '/languages' );
+		load_plugin_textdomain( 'wc-solana-pay', false, dirname( PLUGIN_BASENAME ) . '/languages' );
 
 	}
 
@@ -93,8 +93,8 @@ class Solana_Pay_For_WooCommerce {
 		}
 
 		// load admin class and initialize its instance
-		require_once PLUGIN_DIR . '/admin/class-solana-pay-for-woocommerce-admin.php';
-		new Solana_Pay_For_WooCommerce_Admin();
+		require_once PLUGIN_DIR . '/admin/class-wc-solana-pay-admin.php';
+		new WC_Solana_Pay_Admin();
 
 	}
 

@@ -1,5 +1,5 @@
-# Copyright (C) 2023 solana-pay-for-woocommerce
-# This file is distributed under the same license as the solana-pay-for-woocommerce package.
+# Copyright (C) 2023 wc-solana-pay
+# This file is distributed under the same license as the wc-solana-pay package.
 msgid ""
 msgstr ""
 "Project-Id-Version: undefined\n"
@@ -30,8 +30,8 @@ msgid "Solana Pay for WooCommerce"
 msgstr "Solana Pay for WooCommerce"
 
 #. Plugin URI of the plugin
-msgid "https://github.com/aztemi/solana-pay-for-woocommerce"
-msgstr "https://github.com/aztemi/solana-pay-for-woocommerce"
+msgid "https://github.com/aztemi/wc-solana-pay"
+msgstr "https://github.com/aztemi/wc-solana-pay"
 
 #. Description of the plugin
 msgid ""
@@ -49,7 +49,7 @@ msgstr "AZTemi"
 msgid "https://www.aztemi.com"
 msgstr "https://www.aztemi.com"
 
-#: admin/class-solana-pay-for-woocommerce-admin.php:88
+#: admin/class-wc-solana-pay-admin.php:88
 msgid "Settings"
 msgstr "Ayarlar"
 
@@ -267,7 +267,7 @@ msgstr "Önizleme"
 msgid "Solana Tokens"
 msgstr "Solana Jetonları"
 
-#: includes/class-solana-pay-for-woocommerce.php:60
+#: includes/class-wc-solana-pay.php:60
 msgid ""
 "<b>Solana Pay for WooCommerce</b> is an extension for <b>WooCommerce</b>. "
 "Please install and activate <b>WooCommerce</b> plugin."
@@ -275,7 +275,7 @@ msgstr ""
 "<b>WooCommerce for Solana Pay</b>, <b>WooCommerce</b> için bir uzantıdır. "
 "Lütfen <b>WooCommerce</b> eklentisini (plugin) yükleyin ve etkinleştirin."
 
-#: includes/class-solana-pay-for-woocommerce.php:66
+#: includes/class-wc-solana-pay.php:66
 msgid ""
 "<b>Solana Pay for WooCommerce</b> requires <b>BC Math</b>. Please install "
 "<b>BC Math</b> extension for PHP."
@@ -283,18 +283,18 @@ msgstr ""
 "<b>WooCommerce for Solana Pay</b>, <b>BC Math</b> gerektirir. Lütfen <b>BC "
 "Math</b> PHP uzantısını yükleyin."
 
-#: public/class-solana-pay-for-woocommerce-public.php:87
+#: public/class-wc-solana-pay-public.php:87
 msgid "Pay with Browser Wallet"
 msgstr "Tarayıcı Uzantılı Cüzdanı ile Öde"
 
-#: public/class-solana-pay-for-woocommerce-public.php:88
+#: public/class-wc-solana-pay-public.php:88
 msgid "OR"
 msgstr "VEYA"
 
-#: public/class-solana-pay-for-woocommerce-public.php:89
+#: public/class-wc-solana-pay-public.php:89
 msgid "Scan QR Code with Mobile Wallet"
 msgstr "Mobil Cüzdan ile QR Kodunu Tarayın"
 
-#: public/class-solana-pay-for-woocommerce-public.php:133
+#: public/class-wc-solana-pay-public.php:133
 msgid "Some inputs are not valid. Please fill all required fields."
 msgstr "Bazı girişler geçerli değil. Lütfen tüm gerekli alanları doldurun."

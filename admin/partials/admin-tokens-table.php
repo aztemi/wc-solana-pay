@@ -2,10 +2,10 @@
 /**
  * HTML partial for token details on admin settings page.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -60,12 +60,12 @@ function get_input( $name, $value, $style = '', $type = 'text' ) {
 function get_tokens_table_header( $show_currency ) {
 
 	$header = '<tr>'
-		. get_th( __( 'Accept', 'solana-pay-for-woocommerce' ), 'text-align:center;max-width:6rem' )
-		. get_th( __( 'Token', 'solana-pay-for-woocommerce' ), 'min-width:10rem' )
-		. get_th( __( 'Label', 'solana-pay-for-woocommerce' ) )
-		. get_th( __( 'Exchange Rate', 'solana-pay-for-woocommerce' ), '', 3 )
-		. get_th( __( '% Commission', 'solana-pay-for-woocommerce' ), '' )
-		. get_th( sprintf( '%s: 1.00 %s =', __( 'Preview', 'solana-pay-for-woocommerce' ), $show_currency ), 'text-align:center;min-width:8rem' )
+		. get_th( __( 'Accept', 'wc-solana-pay' ), 'text-align:center;max-width:6rem' )
+		. get_th( __( 'Token', 'wc-solana-pay' ), 'min-width:10rem' )
+		. get_th( __( 'Label', 'wc-solana-pay' ) )
+		. get_th( __( 'Exchange Rate', 'wc-solana-pay' ), '', 3 )
+		. get_th( __( '% Commission', 'wc-solana-pay' ), '' )
+		. get_th( sprintf( '%s: 1.00 %s =', __( 'Preview', 'wc-solana-pay' ), $show_currency ), 'text-align:center;min-width:8rem' )
 		. '</tr>';
 
 	return $header;
@@ -124,11 +124,11 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		}
 
 		// input element name fields
-		$id      = "spfwc_id[$i]";
-		$fee     = "spfwc_fee[$i]";
-		$rate    = "spfwc_rate[$i]";
-		$label   = "spfwc_label[$i]";
-		$enabled = "spfwc_enabled[$i]";
+		$id      = "pwspfwc_id[$i]";
+		$fee     = "pwspfwc_fee[$i]";
+		$rate    = "pwspfwc_rate[$i]";
+		$label   = "pwspfwc_label[$i]";
+		$enabled = "pwspfwc_enabled[$i]";
 
 		// token icon & name
 		$token_icon = '<img src="' . PLUGIN_URL . '/' . $v['icon'] . '" alt="' . $v['name'] . ' icon" style="width:1.5rem;border-radius:50%">';

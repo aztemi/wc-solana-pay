@@ -1,7 +1,6 @@
 {
-  "name": "solana-pay-for-woocommerce-frontend",
+  "name": "wc-solana-pay-frontend",
   "private": true,
-  "version": "1.1.0",
   "author": "aztemi",
   "license": "GPL-3.0-or-later",
   "type": "module",

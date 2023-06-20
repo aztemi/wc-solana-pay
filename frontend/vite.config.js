@@ -4,7 +4,7 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 let input = [];
 switch (process.env.PACKAGE_NAME) {
   case "modal":
-    input = ["src/solana_pay.js"];
+    input = ["src/wc_solana_pay.js"];
     break;
   case "button":
     input = ["src/public_place_order_button.js"];

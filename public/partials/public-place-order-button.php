@@ -6,10 +6,10 @@
  * - "Pay with Solana Pay" express checkout button when our Solana Pay payment method is selected and
  * - default "Place Order" button when other payment methods are selected.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -23,7 +23,7 @@ function get_button_classname() {
 }
 
 $img_src = PLUGIN_URL . '/assets/img/solana_pay_white_gradient.svg';
-$img_alt = __( 'Solana Pay', 'solana-pay-for-woocommerce' );
+$img_alt = __( 'Solana Pay', 'wc-solana-pay' );
 ?>
 
 <span id="place_order_btn_wrapper"></span>
@@ -31,7 +31,7 @@ $img_alt = __( 'Solana Pay', 'solana-pay-for-woocommerce' );
 	<?php echo wp_kses_post( $button ); ?>
 </template>
 <template id="template_our_btn">
-	<button type="submit" id="place_order" class="solana_pay_for_wc_place_order button alt <?php echo esc_attr( get_button_classname() ); ?>" style="display:flex;align-items:center;justify-content:center">
+	<button type="submit" id="place_order" class="wc_solana_pay_place_order button alt <?php echo esc_attr( get_button_classname() ); ?>" style="display:flex;align-items:center;justify-content:center">
 		<img src="<?php echo esc_url( $img_src ); ?>" alt="<?php echo esc_attr( $img_alt ); ?>" />
 	</button>
 </template>
