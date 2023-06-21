@@ -239,12 +239,12 @@ class Solana_Pay {
 
 
 	/**
-	 * Get paid balance of a payment transaction.
+	 * Get received balance of a payment transaction.
 	 *
 	 * @param  \WC_Order $order    Order object.
 	 * @param  array     $txn_data Parsed transaction details.
 	 * @param  string    $token_id Solana Token ID.
-	 * @param  array     $balance  Paid balance as output.
+	 * @param  array     $balance  Received balance as output.
 	 * @return bool                true if successful, false otherwise.
 	 */
 	private function get_transaction_balance( $order, $txn_data, $token_id, &$balance ) {
@@ -282,7 +282,7 @@ class Solana_Pay {
 	 *
 	 * @param  array  $txn_data  Parsed transaction details.
 	 * @param  string $account58 Receiver wallet address.
-	 * @return array             Pre and Post Paid balances in SOL.
+	 * @return array             Pre and Post balances in SOL.
 	 */
 	private function get_transaction_received_sol( $txn_data, $account58 ) {
 
@@ -307,7 +307,7 @@ class Solana_Pay {
 	 * @param  array  $txn_data  Parsed transaction details.
 	 * @param  string $account58 Receiver wallet address.
 	 * @param  string $spltoken  SPL token mint address.
-	 * @return array             Pre and Post Paid balances in specified SPL token.
+	 * @return array             Pre and Post balances in specified SPL token.
 	 */
 	private function get_transaction_received_spltoken( $txn_data, $account58, $spltoken ) {
 
@@ -376,19 +376,19 @@ class Solana_Pay {
 	/**
 	 * Validates if an expected amount is fully paid or not.
 	 *
-	 * @param  string $amount  Expected amount to be paid.
-	 * @param  array  $balance Balance paid.
-	 * @param  string $paid    Amount paid in a formatted string for the UI.
-	 * @return bool            true if paid amount is greater than or equal to expected amount, false otherwise.
+	 * @param  string $amount   Expected amount to be paid.
+	 * @param  array  $balance  Balance received.
+	 * @param  string $received Amount received in a formatted string for the UI.
+	 * @return bool             true if received amount is greater than or equal to expected amount, false otherwise.
 	 */
-	private function validate_payment_amount( $amount, $balance, &$paid ) {
+	private function validate_payment_amount( $amount, $balance, &$received ) {
 
 		list( 'pre' => $pre, 'post' => $post, 'decimals' => $decimals ) = $balance;
 
 		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
 
-		$paid = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
-		$paid = rtrim( $paid, '0' ) . ' ' . $balance['symbol'];
+		$received = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
+		$received = rtrim( $received, '0' ) . ' ' . $balance['symbol'];
 
 		// compensate for endpoint usage fee already deducted in transaction
 		$percent_fee = self::endpoints_usage_fee();
@@ -417,7 +417,7 @@ class Solana_Pay {
 	 */
 	public function confirm_payment_onchain( $order, $amount, $token_id ) {
 
-		$paid = '';
+		$received = '';
 		$txn_id = '';
 		$txn_data = array();
 		$balance = array();
@@ -442,14 +442,14 @@ class Solana_Pay {
 		}
 
 		// Validate payment amount. Return false if payment is missing or not up to expected amount
-		if ( ! $this->validate_payment_amount( $token_amount, $balance, $paid ) ) {
+		if ( ! $this->validate_payment_amount( $token_amount, $balance, $received ) ) {
 			return false;
 		}
 
-		// Add transaction url, payer and amount paid to order meta info
+		// Add transaction url, payer and amount received to order meta info
 		$meta['url'] = $this->get_explorer_url( $txn_id );
 		$meta['payer'] = $this->get_transaction_payer( $txn_data );
-		$meta['paid'] = $paid;
+		$meta['received'] = $received;
 
 		// update order meta info
 		$this->hGateway->set_order_payment_meta( $order, $meta );

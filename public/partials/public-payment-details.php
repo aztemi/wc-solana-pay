@@ -33,8 +33,7 @@ function echo_tr( $key, $value, $url = '' ) {
 <?php
 	echo_tr( __( 'Transaction ID', 'wc-solana-pay' ), $short_txn, $url );
 	echo_tr( __( 'Customer Wallet', 'wc-solana-pay' ), $payer );
-	echo_tr( __( 'Payment Amount', 'wc-solana-pay' ), $paid );
-	echo_tr( __( 'Reference Account', 'wc-solana-pay' ), $reference );
+	echo_tr( __( 'Received Amount', 'wc-solana-pay' ), $received );
 ?>
 	</tbody>
 </table>
