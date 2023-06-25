@@ -13,7 +13,7 @@
   let name, splAmount, icon, symbol;
 
   const { baseurl, pay_page, wallet_msg, or_msg, qrcode_msg } = solana_pay_for_wc;
-  const { reference, label, message, amount, currency, endpoint, link, tokens } = $order;
+  const { reference, label, message, amount, currency, endpoint, link, poll, tokens } = $order;
   const dropdownRequired = Object.keys(tokens).length > 1;
 
   $: {
@@ -36,7 +36,7 @@
   }
 
   onMount(() => {
-    stopFunc = pollForTransaction(endpoint, reference);
+    stopFunc = pollForTransaction(poll, reference);
   });
 
   onDestroy(() => {
