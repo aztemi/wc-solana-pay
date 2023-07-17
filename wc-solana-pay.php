@@ -3,7 +3,7 @@
  * Plugin Name: Pay with Solana Pay for WooCommerce
  * Plugin URI:  https://github.com/aztemi/wc-solana-pay
  * Description: A payment gateway for accepting crypto payments in SOL, USDC, USDT and more in your WooCommerce store.
- * Version:     1.1.0
+ * Version:     2.0.0
  * Author:      AZTemi
  * Author URI:  https://www.aztemi.com
  * License:     GPLv3 or later
