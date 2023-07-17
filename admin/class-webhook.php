@@ -45,8 +45,14 @@ class Webhook {
 	 */
 	private function register_hooks() {
 
+		// webhook GET endpoint for frontend to get transaction details
 		add_action( 'woocommerce_api_' . PLUGIN_ID, array( $this, 'handle_webhook_request' ) );
+
+		// webhook GET & POST endpoints for receiving payment transactions according to Solana Pay Spec
 		add_action( 'woocommerce_api_' . PLUGIN_ID . '_txn', array( $this, 'handle_transaction_request' ) );
+
+		// webhook GET & POST endpoints for checking and setting (by RPC backend) transaction confirmation status
+		add_action( 'woocommerce_api_' . PLUGIN_ID . '_stat', array( $this, 'handle_status_request' ) );
 
 	}
 
@@ -66,7 +72,7 @@ class Webhook {
 			$data['reference'] = $prev_data['reference'];
 		}
 
-		$data['memo'] = "OrderId#{$order_id}";
+		$data['memo'] = "Order#{$order_id}";
 		$data['amount'] = (float) $order->get_total();
 		$data['currency'] = $order->get_currency();
 		$data['order_id'] = $order_id;
@@ -120,11 +126,13 @@ class Webhook {
 		$data = array(
 			'amount'    => 0,
 			'reference' => $ref,
+			'home'      => esc_url( home_url() ),
+			'link'      => PLUGIN_ID . '_txn',
+			'poll'      => PLUGIN_ID . '_stat',
 			'testmode'  => $this->hGateway->get_testmode(),
 			'recipient' => $this->hGateway->get_merchant_wallet_address(),
 			'endpoint'  => $this->hGateway->get_rpc_endpoint(),
 			'suffix'    => Solana_Tokens::get_store_currency_key_suffix(),
-			'link'      => esc_url( home_url( '/?wc-api=' . PLUGIN_ID . '_txn' ) ),
 			'label'     => esc_html( $this->hGateway->get_brand_name() ),
 			'message'   => esc_html__( 'Thank you for your order', 'wc-solana-pay' ),
 		);
@@ -141,9 +149,6 @@ class Webhook {
 			die();
 
 		}
-
-		// prepend memo with the brand name
-		$data['memo'] = $data['label'] . ' - ' . $data['memo'];
 
 		// validate amount
 		$amount = $data['amount'];
@@ -226,6 +231,52 @@ class Webhook {
 		// send response
 		header( 'HTTP/1.1 200 OK' );
 		wp_send_json( $data, 200 );
+		die();
+
+	}
+
+
+	/**
+	 * Handle Transaction confirmation status check and notification from the RPC backend.
+	 */
+	public function handle_status_request() {
+
+		// validate incoming params
+		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
+		$ref = isset( $_GET['ref'] ) ? trim( wc_clean( wp_unslash( $_GET['ref'] ) ) ) : '';
+
+		if ( empty( $id ) || empty( $ref ) ) {
+			wp_send_json_error( 'Bad Request', 400 );
+			die();
+		}
+
+		// get request body
+		$is_get = true;
+		$body = @file_get_contents('php://input');
+		if ( ! empty( $body ) ) {
+			$body = json_decode( $body, true );
+			$is_get = ! is_array( $body );
+		}
+
+		if ( $is_get ) {
+			// handle GET request
+			header( 'HTTP/1.1 200 OK' );
+			$option_key = PLUGIN_ID . '_' . $id;
+			$signature = get_option( $option_key, array() );
+			wp_send_json( $signature, 200 );
+
+		} else {
+			// handle POST request
+			foreach ( $body as $v ) {
+				$option_key = PLUGIN_ID . '_' . $v['id'];
+				$signature = array(
+					'signature' => trim( wc_clean( wp_unslash( $v['signature'] ) ) )
+				);
+				update_option( $option_key, $signature );
+			}
+
+		}
+
 		die();
 
 	}

@@ -1,18 +1,21 @@
-// Find a specified transaction on chain through polling
+// Poll status of payment transaction from the backend
 
-import { Connection } from "@solana/web3.js";
-import { findReference, FindReferenceError } from "@solana/pay";
 import { order } from "../store/order.js";
 
-const POLLING_DELAY = 2000; // Delay in ms between polling intervals for confirming transaction on chain
+const POLLING_DELAY = 10000; // Delay in ms between polling intervals
 
+/**
+ * @param {string} endpoint
+ * @param {import("@solana/web3.js").PublicKey} reference
+ */
 export function pollForTransaction(endpoint, reference) {
   let pollingInterval = null;
+  const url = `${endpoint}&ref=${reference.toBase58()}`;
 
-  const connection = new Connection(endpoint, "confirmed");
   startPolling();
 
   function startPolling() {
+    if (pollingInterval) return;
     pollingInterval = setInterval(confirmPaymentTxn, POLLING_DELAY);
   }
 
@@ -26,10 +29,10 @@ export function pollForTransaction(endpoint, reference) {
   // Confirm transaction on chain
   async function confirmPaymentTxn() {
     try {
-      const signatureInfo = await findReference(connection, reference);
-      if (signatureInfo?.signature) order.confirmPayment(signatureInfo.signature);
+      const json = await fetch(url).then(r => r.json());
+      if (json?.signature) order.confirmPayment(json.signature);
     } catch (error) {
-      if (!(error instanceof FindReferenceError)) console.error(error);
+      console.error(error);
     }
   }
 

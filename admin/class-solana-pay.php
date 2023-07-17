@@ -176,6 +176,7 @@ class Solana_Pay {
 	private function get_transaction_id( &$meta, &$txn_id ) {
 
 		$data = $this->hSession->get_data();
+		$id = $data['id'];
 		$reference = $data['reference'];
 
 		$params = array( $reference, array( 'commitment' => 'confirmed' ) );
@@ -194,6 +195,7 @@ class Solana_Pay {
 
 		$txn_id = $txn[0]['signature'];
 		$meta = array(
+			'id' => $id,
 			'reference' => $reference,
 			'transaction' => $txn_id,
 		);
@@ -457,6 +459,10 @@ class Solana_Pay {
 		// Complete payment and return true
 		$order->add_order_note( __( 'Solana Pay payment completed', 'wc-solana-pay' ) );
 		$order->payment_complete( $txn_id );
+
+		// remove transaction option key
+		$option_key = PLUGIN_ID . '_' . $meta['id'];
+		delete_option( $option_key );
 
 		return true;
 

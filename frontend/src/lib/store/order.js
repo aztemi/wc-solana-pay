@@ -14,6 +14,7 @@ const emptyOrder = {
   currency: "",
   endpoint: "", // RPC endpoint
   link: "", // `link` param in Solana Pay spec
+  poll: "", // endpoint to poll transaction status
   tokens: {},
   activeToken: "",
   label: "",
@@ -36,7 +37,7 @@ function createOrderStore() {
 
     setOrder: order =>
       update(old => {
-        let { id, recipient, reference, amount, testmode, tokens, suffix, endpoint, link } = order;
+        let { id, recipient, reference, amount, testmode, tokens, suffix, endpoint, home, link, poll } = order;
 
         recipient = new PublicKey(recipient);
         reference = new PublicKey(reference);
@@ -64,7 +65,8 @@ function createOrderStore() {
           amount,
           activeToken,
           endpoint: `${endpoint}${id}/`,
-          link: `${link}&id=${id}`,
+          link: `${home}?wc-api=${link}&id=${id}`,
+          poll: `${home}?wc-api=${poll}&id=${id}`,
           tokens: paymentTokens
         });
       })
