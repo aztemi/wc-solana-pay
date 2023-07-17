@@ -2,10 +2,10 @@
 /**
  * The main admin class of the plugin.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 
-class Solana_Pay_For_WooCommerce_Admin {
+class WC_Solana_Pay_Admin {
 
 	public function __construct() {
 
@@ -54,7 +54,7 @@ class Solana_Pay_For_WooCommerce_Admin {
 	 */
 	public function load_payment_gateway_class() {
 
-		require_once PLUGIN_DIR . '/admin/class-solana-pay-payment-gateway.php';
+		require_once PLUGIN_DIR . '/admin/class-wc-solana-pay-payment-gateway.php';
 
 	}
 
@@ -67,7 +67,7 @@ class Solana_Pay_For_WooCommerce_Admin {
 	 */
 	public function register_payment_gateway_class( $gateways = [] ) {
 
-		$gateways[] = __NAMESPACE__ . '\Solana_Pay_GW';
+		$gateways[] = __NAMESPACE__ . '\WC_Solana_Pay_Payment_Gateway';
 		return $gateways;
 
 	}
@@ -85,7 +85,7 @@ class Solana_Pay_For_WooCommerce_Admin {
 			$settings_link = sprintf(
 													'<a href="%1$s">%2$s</a>',
 													admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . PLUGIN_ID ),
-													__( 'Settings', 'solana-pay-for-woocommerce' )
+													__( 'Settings', 'wc-solana-pay' )
 											 );
 
 			array_unshift( $links, $settings_link );

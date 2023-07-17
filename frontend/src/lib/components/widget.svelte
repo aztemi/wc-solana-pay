@@ -26,11 +26,11 @@
 
       // add selected payment token to an hidden field of the checkout form
       const form = jQuery(pay_page ? "form#order_review" : "form.checkout");
-      const input = form.find("input[name='spfwc_payment_token']");
+      const input = form.find("input[name='pwspfwc_payment_token']");
       if (input.length) {
         input.val(key);
       } else {
-        form.append(`<input type="hidden" name="spfwc_payment_token" value="${key}" />`);
+        form.append(`<input type="hidden" name="pwspfwc_payment_token" value="${key}" />`);
       }
     }
   }

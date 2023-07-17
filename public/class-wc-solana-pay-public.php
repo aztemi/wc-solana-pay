@@ -2,10 +2,10 @@
 /**
  * The public-facing functionalities of the plugin.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 
-class Solana_Pay_For_WooCommerce_Public {
+class WC_Solana_Pay_Public {
 
 	/**
 	 * Handle of enqueued main js.
@@ -75,7 +75,7 @@ class Solana_Pay_For_WooCommerce_Public {
 		}
 
 		// Enqueue Solana Pay overlay modal script
-		$modaljs = get_script_path( '/assets/script/solana_pay*.js', PLUGIN_URL );
+		$modaljs = get_script_path( '/assets/script/wc_solana_pay*.js', PLUGIN_URL );
 		if ( $modaljs ) {
 			$this->handle_js = PLUGIN_ID . '_modaljs';
 
@@ -84,9 +84,9 @@ class Solana_Pay_For_WooCommerce_Public {
 				'baseurl'    => PLUGIN_URL,
 				'pay_page'   => is_checkout_pay_page(),
 				'order_id'   => $order_id,
-				'wallet_msg' => __( 'Pay with Browser Wallet', 'solana-pay-for-woocommerce' ),
-				'or_msg'     => __( 'OR', 'solana-pay-for-woocommerce' ),
-				'qrcode_msg' => __( 'Scan QR Code with Mobile Wallet', 'solana-pay-for-woocommerce' ),
+				'wallet_msg' => __( 'Pay with Browser Wallet', 'wc-solana-pay' ),
+				'or_msg'     => __( 'OR', 'wc-solana-pay' ),
+				'qrcode_msg' => __( 'Scan QR Code with Mobile Wallet', 'wc-solana-pay' ),
 			);
 
 			wp_enqueue_script( $this->handle_js, $modaljs, ['jquery'], null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Filename already has version added by JS bundler.
@@ -117,7 +117,7 @@ class Solana_Pay_For_WooCommerce_Public {
 	 */
 	public function add_modal_placeholder() {
 
-		echo '<div id="solana_pay_for_wc_svelte_target"></div>';
+		echo '<div id="wc_solana_pay_svelte_target"></div>';
 
 	}
 
@@ -130,7 +130,7 @@ class Solana_Pay_For_WooCommerce_Public {
 		$buttonjs = get_script_path('/assets/script/public_place_order_button*.js');
 
 		if ( $buttonjs ) {
-			$error_msg = esc_html__( 'Some inputs are not valid. Please fill all required fields.', 'solana-pay-for-woocommerce' );
+			$error_msg = esc_html__( 'Some inputs are not valid. Please fill all required fields.', 'wc-solana-pay' );
 
 			$script = get_partial_file_html(
 				$buttonjs,

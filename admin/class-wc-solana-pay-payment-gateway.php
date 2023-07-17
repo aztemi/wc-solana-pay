@@ -2,10 +2,10 @@
 /**
  * The gateway extension class that handles payment logic based on WC specs.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -18,14 +18,14 @@ if ( ! class_exists( '\WC_Payment_Gateway' ) ) {
 	return;
 }
 
-class Solana_Pay_GW extends \WC_Payment_Gateway {
+class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 	/**
 	 * Unique Key to store payment info in an order metadata.
 	 *
 	 * @var string
 	 */
-	protected const ORDER_META_KEY = 'spfwc_payment';
+	protected const ORDER_META_KEY = 'pwspfwc_payment';
 
 
 	/**
@@ -33,7 +33,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	 *
 	 * @var string
 	 */
-	protected const TOKENS_OPTION_KEY = 'spfwc_tokens';
+	protected const TOKENS_OPTION_KEY = 'pwspfwc_tokens';
 
 
 	/**
@@ -115,13 +115,13 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		$this->hSolanapay = new Solana_Pay( $this, $this->hSession );
 
 		// load webhook class for handling incoming GET request
-		require_once PLUGIN_DIR . '/admin/class-solana-pay-payment-webhook.php';
+		require_once PLUGIN_DIR . '/admin/class-webhook.php';
 		new Webhook( $this, $this->hSession );
 
 		// load public class if on checkout or pay order page
 		if ( is_checkout() || is_checkout_pay_page() ) {
-			require_once PLUGIN_DIR . '/public/class-solana-pay-for-woocommerce-public.php';
-			new Solana_Pay_For_WooCommerce_Public();
+			require_once PLUGIN_DIR . '/public/class-wc-solana-pay-public.php';
+			new WC_Solana_Pay_Public();
 		}
 
 	}
@@ -136,9 +136,9 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		$this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
 		$this->has_fields         = false;
 		$this->supports           = array( 'products' );
-		$this->title              = __( 'Solana Pay', 'solana-pay-for-woocommerce' );
+		$this->title              = __( 'Pay with Solana Pay', 'wc-solana-pay' );
 		$this->method_title       = $this->title;
-		$this->method_description = __( 'Accept payments in SOL, USDC, USDT and more with Solana Pay.', 'solana-pay-for-woocommerce' );
+		$this->method_description = __( 'Accept payments in SOL, USDC, USDT and more with Solana Pay.', 'wc-solana-pay' );
 
 	}
 
@@ -161,7 +161,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		// update settings that depend on testmode status
 		if ( $this->is_testmode ) {
-			$testmode_msg = ' <b>(' . esc_html__( 'Test Mode enabled. Devnet in use', 'solana-pay-for-woocommerce' ) . ')</b>';
+			$testmode_msg = ' <b>(' . esc_html__( 'Test Mode enabled. Devnet in use', 'wc-solana-pay' ) . ')</b>';
 			$this->method_description .= $testmode_msg;
 			$this->description .= $testmode_msg;
 		}
@@ -201,7 +201,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		$rtn = true;
 		// Return false if merchant wallet is not configured
 		if ( empty( $this->merchant_wallet ) ) {
-			\WC_Admin_Settings::add_error( esc_html__( 'Solana Pay setup is not complete. Please set Merchant Wallet Address', 'solana-pay-for-woocommerce' ) );
+			\WC_Admin_Settings::add_error( esc_html__( 'Solana Pay setup is not complete. Please set Merchant Wallet Address', 'wc-solana-pay' ) );
 			$rtn = false;
 		}
 
@@ -213,7 +213,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 			}
 		}
 		if ( ! $token_enabled ) {
-			\WC_Admin_Settings::add_error( esc_html__( 'Solana Pay setup is not complete. Please enable at least 1 Solana Token.', 'solana-pay-for-woocommerce' ) );
+			\WC_Admin_Settings::add_error( esc_html__( 'Solana Pay setup is not complete. Please enable at least 1 Solana Token.', 'wc-solana-pay' ) );
 			$rtn = false;
 		}
 
@@ -243,7 +243,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 	public function validate_merchant_wallet_field( $key, $value ) {
 
 		if ( ! preg_match( '/^[1-9A-HJ-NP-Za-km-z]{32,44}$/', $value ) ) {
-			\WC_Admin_Settings::add_error( esc_html__( 'Invalid Solana Wallet Address', 'solana-pay-for-woocommerce' ) );
+			\WC_Admin_Settings::add_error( esc_html__( 'Invalid Solana Wallet Address', 'wc-solana-pay' ) );
 			$value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
 		}
 
@@ -268,8 +268,8 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 		if ( $tablejs ) {
 			$base_currency = Solana_Tokens::get_store_currency('edit');
 			$show_currency = Solana_Tokens::get_store_currency();
-			$auto_refresh = __( 'Auto refresh exchange rate', 'solana-pay-for-woocommerce' );
-			$alert_msg = esc_html__( 'Update currently not available. Please check your connection and reload.', 'solana-pay-for-woocommerce' );
+			$auto_refresh = __( 'Auto refresh exchange rate', 'wc-solana-pay' );
+			$alert_msg = esc_html__( 'Update currently not available. Please check your connection and reload.', 'wc-solana-pay' );
 
 			$script = get_partial_file_html(
 				$tablejs,
@@ -309,15 +309,15 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verification already handled in WC_Admin_Settings::save()
 		if (
-			isset( $_POST['spfwc_id'] ) &&
-			isset( $_POST['spfwc_label'] ) &&
-			isset( $_POST['spfwc_rate'] ) &&
-			isset( $_POST['spfwc_fee'] )
+			isset( $_POST['pwspfwc_id'] ) &&
+			isset( $_POST['pwspfwc_label'] ) &&
+			isset( $_POST['pwspfwc_rate'] ) &&
+			isset( $_POST['pwspfwc_fee'] )
 		) {
-			$ids    = wc_clean( wp_unslash( $_POST['spfwc_id'] ) );
-			$labels = wc_clean( wp_unslash( $_POST['spfwc_label'] ) );
-			$rates  = wc_clean( wp_unslash( $_POST['spfwc_rate'] ) );
-			$fees   = wc_clean( wp_unslash( $_POST['spfwc_fee'] ) );
+			$ids    = wc_clean( wp_unslash( $_POST['pwspfwc_id'] ) );
+			$labels = wc_clean( wp_unslash( $_POST['pwspfwc_label'] ) );
+			$rates  = wc_clean( wp_unslash( $_POST['pwspfwc_rate'] ) );
+			$fees   = wc_clean( wp_unslash( $_POST['pwspfwc_fee'] ) );
 
 			foreach ( $ids as $i => $id ) {
 				if ( ! isset( $ids[ $i ] ) ) {
@@ -329,7 +329,7 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 					'label'   => $labels[ $i ],
 					'rate'    => $rates[ $i ],
 					'fee'     => $fees[ $i ],
-					'enabled' => isset( $_POST['spfwc_enabled'][ $i ] ) ? true : false,
+					'enabled' => isset( $_POST['pwspfwc_enabled'][ $i ] ) ? true : false,
 				);
 			}
 		}
@@ -351,10 +351,10 @@ class Solana_Pay_GW extends \WC_Payment_Gateway {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verification already handled in WC_Checkout::process_checkout() and WC_Form_Handler::pay_action()
 		// return if the hidden field containing payment token is missing
-		if ( ! isset( $_POST['spfwc_payment_token'] ) ) {
+		if ( ! isset( $_POST['pwspfwc_payment_token'] ) ) {
 			return array();
 		}
-		$payment_token = wc_clean( wp_unslash( $_POST['spfwc_payment_token'] ) );
+		$payment_token = wc_clean( wp_unslash( $_POST['pwspfwc_payment_token'] ) );
 		// phpcs:enable
 
 		// get order info and pending amount

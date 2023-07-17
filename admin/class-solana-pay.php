@@ -2,10 +2,10 @@
 /**
  * Wrapper class for Solana on chain logics.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -44,7 +44,7 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	protected const RPC_ENDPOINT_DEVNET = 'https://spfwc.juxdan.io/v1/rpc-devnet/';
+	protected const RPC_ENDPOINT_DEVNET = 'https://wc-solana-pay.juxdan.io/v1/rpc-devnet/';
 
 
 	/**
@@ -52,7 +52,7 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	protected const RPC_ENDPOINT_MAINNET_BETA = 'https://spfwc.juxdan.io/v1/rpc/';
+	protected const RPC_ENDPOINT_MAINNET_BETA = 'https://wc-solana-pay.juxdan.io/v1/rpc/';
 
 
 	/**
@@ -60,7 +60,7 @@ class Solana_Pay {
 	 *
 	 * @var string
 	 */
-	protected const TRANSACTION_ENDPOINT = 'https://spfwc.juxdan.io/v1/txn/';
+	protected const TRANSACTION_ENDPOINT = 'https://wc-solana-pay.juxdan.io/v1/txn/';
 
 
 	/**
@@ -74,7 +74,7 @@ class Solana_Pay {
 	/**
 	 * Handle instance of the payment gateway class.
 	 *
-	 * @var Solana_Pay_GW
+	 * @var WC_Solana_Pay_Payment_Gateway
 	 */
 	protected $hGateway;
 
@@ -146,7 +146,7 @@ class Solana_Pay {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			wc_add_notice( __( 'Connection to RPC failed', 'solana-pay-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Connection to RPC failed', 'wc-solana-pay' ), 'error' );
 		} else {
 			$response_code = wp_remote_retrieve_response_code( $response );
 
@@ -157,7 +157,7 @@ class Solana_Pay {
 				$rtn = ( array_key_exists( 'result', $response ) ? $response['result'] : array() );
 			} else {
 				/* translators: %d: rpc call response code error, e.g. 404 */
-				wc_add_notice( sprintf( __( 'RPC remote call failed with code %d', 'solana-pay-for-woocommerce' ), $response_code ), 'error' );
+				wc_add_notice( sprintf( __( 'RPC remote call failed with code %d', 'wc-solana-pay' ), $response_code ), 'error' );
 			}
 		}
 
@@ -188,7 +188,7 @@ class Solana_Pay {
 
 		// Payment transaction not found, return false
 		if ( ! count( $txn ) ) {
-			wc_add_notice( __( 'Payment transaction not found. Please try again.', 'solana-pay-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Payment transaction not found. Please try again.', 'wc-solana-pay' ), 'error' );
 			return false;
 		}
 
@@ -229,7 +229,7 @@ class Solana_Pay {
 
 		// Return false if unable to confirm transaction details
 		if ( ! count( $txn_data ) ) {
-			wc_add_notice( __( 'Unable to confirm payment transaction details. Please try again.', 'solana-pay-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Unable to confirm payment transaction details. Please try again.', 'wc-solana-pay' ), 'error' );
 			return false;
 		}
 
@@ -239,12 +239,12 @@ class Solana_Pay {
 
 
 	/**
-	 * Get paid balance of a payment transaction.
+	 * Get received balance of a payment transaction.
 	 *
 	 * @param  \WC_Order $order    Order object.
 	 * @param  array     $txn_data Parsed transaction details.
 	 * @param  string    $token_id Solana Token ID.
-	 * @param  array     $balance  Paid balance as output.
+	 * @param  array     $balance  Received balance as output.
 	 * @return bool                true if successful, false otherwise.
 	 */
 	private function get_transaction_balance( $order, $txn_data, $token_id, &$balance ) {
@@ -253,7 +253,7 @@ class Solana_Pay {
 
 		// Return false if payment currency is not part of our supported tokens
 		if ( ! array_key_exists( $token_id, $tokens ) ) {
-			$order->add_order_note( __( 'Payment currency not in supported Solana tokens list.', 'solana-pay-for-woocommerce' ) );
+			$order->add_order_note( __( 'Payment currency not in supported Solana tokens list.', 'wc-solana-pay' ) );
 			return false;
 		}
 
@@ -282,7 +282,7 @@ class Solana_Pay {
 	 *
 	 * @param  array  $txn_data  Parsed transaction details.
 	 * @param  string $account58 Receiver wallet address.
-	 * @return array             Pre and Post Paid balances in SOL.
+	 * @return array             Pre and Post balances in SOL.
 	 */
 	private function get_transaction_received_sol( $txn_data, $account58 ) {
 
@@ -307,7 +307,7 @@ class Solana_Pay {
 	 * @param  array  $txn_data  Parsed transaction details.
 	 * @param  string $account58 Receiver wallet address.
 	 * @param  string $spltoken  SPL token mint address.
-	 * @return array             Pre and Post Paid balances in specified SPL token.
+	 * @return array             Pre and Post balances in specified SPL token.
 	 */
 	private function get_transaction_received_spltoken( $txn_data, $account58, $spltoken ) {
 
@@ -376,19 +376,19 @@ class Solana_Pay {
 	/**
 	 * Validates if an expected amount is fully paid or not.
 	 *
-	 * @param  string $amount  Expected amount to be paid.
-	 * @param  array  $balance Balance paid.
-	 * @param  string $paid    Amount paid in a formatted string for the UI.
-	 * @return bool            true if paid amount is greater than or equal to expected amount, false otherwise.
+	 * @param  string $amount   Expected amount to be paid.
+	 * @param  array  $balance  Balance received.
+	 * @param  string $received Amount received in a formatted string for the UI.
+	 * @return bool             true if received amount is greater than or equal to expected amount, false otherwise.
 	 */
-	private function validate_payment_amount( $amount, $balance, &$paid ) {
+	private function validate_payment_amount( $amount, $balance, &$received ) {
 
 		list( 'pre' => $pre, 'post' => $post, 'decimals' => $decimals ) = $balance;
 
 		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
 
-		$paid = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
-		$paid = rtrim( $paid, '0' ) . ' ' . $balance['symbol'];
+		$received = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
+		$received = rtrim( $received, '0' ) . ' ' . $balance['symbol'];
 
 		// compensate for endpoint usage fee already deducted in transaction
 		$percent_fee = self::endpoints_usage_fee();
@@ -417,7 +417,7 @@ class Solana_Pay {
 	 */
 	public function confirm_payment_onchain( $order, $amount, $token_id ) {
 
-		$paid = '';
+		$received = '';
 		$txn_id = '';
 		$txn_data = array();
 		$balance = array();
@@ -442,20 +442,20 @@ class Solana_Pay {
 		}
 
 		// Validate payment amount. Return false if payment is missing or not up to expected amount
-		if ( ! $this->validate_payment_amount( $token_amount, $balance, $paid ) ) {
+		if ( ! $this->validate_payment_amount( $token_amount, $balance, $received ) ) {
 			return false;
 		}
 
-		// Add transaction url, payer and amount paid to order meta info
+		// Add transaction url, payer and amount received to order meta info
 		$meta['url'] = $this->get_explorer_url( $txn_id );
 		$meta['payer'] = $this->get_transaction_payer( $txn_data );
-		$meta['paid'] = $paid;
+		$meta['received'] = $received;
 
 		// update order meta info
 		$this->hGateway->set_order_payment_meta( $order, $meta );
 
 		// Complete payment and return true
-		$order->add_order_note( __( 'Solana Pay payment completed', 'solana-pay-for-woocommerce' ) );
+		$order->add_order_note( __( 'Solana Pay payment completed', 'wc-solana-pay' ) );
 		$order->payment_complete( $txn_id );
 
 		return true;

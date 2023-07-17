@@ -2,10 +2,10 @@
 /**
  * Backend webhook for handling payment info with the frontend.
  *
- * @package AZTemi\Solana_Pay_for_WC
+ * @package AZTemi\WC_Solana_Pay
  */
 
-namespace AZTemi\Solana_Pay_for_WC;
+namespace AZTemi\WC_Solana_Pay;
 
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
@@ -18,7 +18,7 @@ class Webhook {
 	/**
 	 * Handle instance of the payment gateway class.
 	 *
-	 * @var Solana_Pay_GW
+	 * @var WC_Solana_Pay_Payment_Gateway
 	 */
 	protected $hGateway;
 
@@ -126,7 +126,7 @@ class Webhook {
 			'suffix'    => Solana_Tokens::get_store_currency_key_suffix(),
 			'link'      => esc_url( home_url( '/?wc-api=' . PLUGIN_ID . '_txn' ) ),
 			'label'     => esc_html( $this->hGateway->get_brand_name() ),
-			'message'   => esc_html__( 'Thank you for your order', 'solana-pay-for-woocommerce' ),
+			'message'   => esc_html__( 'Thank you for your order', 'wc-solana-pay' ),
 		);
 
 		// Add order or checkout cart details that are useful for payment in the frontend
@@ -218,7 +218,7 @@ class Webhook {
 			}
 
 			$data = array(
-				'message'     => esc_html__( 'Thank you for your order', 'solana-pay-for-woocommerce' ),
+				'message'     => esc_html__( 'Thank you for your order', 'wc-solana-pay' ),
 				'transaction' => trim( wc_clean( wp_unslash( $txn_base64 ) ) ),
 			);
 		}

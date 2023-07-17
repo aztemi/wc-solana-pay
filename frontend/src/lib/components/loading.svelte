@@ -4,7 +4,7 @@
   let loadingP = null;
 
   onMount(() => {
-    loadingP = jQuery("#spfwc_loading");
+    loadingP = jQuery("#pwspfwc_loading");
     loadingP.block({
       message: null,
       overlayCSS: {
@@ -19,7 +19,7 @@
   });
 </script>
 
-<p id="spfwc_loading">loading...</p>
+<p id="pwspfwc_loading">loading...</p>
 
 <style lang="stylus">
   p
