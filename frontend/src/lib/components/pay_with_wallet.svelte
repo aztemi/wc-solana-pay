@@ -75,4 +75,10 @@
 
 <ConnectionProvider network={endpoint} />
 <WalletProvider {localStorageKey} {wallets} />
-<WalletMultiButton />
+
+<span>Pay with Browser Wallet</span>
+<div>
+  {#key link}
+    <WalletMultiButton />
+  {/key}
+</div>
