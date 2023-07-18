@@ -4,16 +4,11 @@
 
 <button class={$$props.class} {disabled} on:click>
   {#if $$slots["start-icon"]}
-    <i class="start-icon">
+    <i>
       <slot name="start-icon" />
     </i>
   {/if}
   <slot />
-  {#if $$slots["end-icon"]}
-    <i class="end-icon">
-      <slot name="end-icon" />
-    </i>
-  {/if}
 </button>
 
 <style lang="stylus">
@@ -29,11 +24,6 @@
       justify-content center
       height 1.5rem
       width 1.5rem
-
-    .start-icon
       margin-right 0.7rem
-
-    .end-icon
-      margin-left 0.7rem
 
 </style>
