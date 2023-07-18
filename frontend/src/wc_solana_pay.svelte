@@ -1,6 +1,7 @@
 <script>
   import { Buffer } from "buffer";
   import { onMount } from "svelte";
+  import IconsList from "./lib/components/icons/icons_list.svelte";
 
   let SolanaPayModal = null;
 
@@ -10,6 +11,7 @@
   });
 </script>
 
+<IconsList />
 {#if SolanaPayModal}
   <svelte:component this={SolanaPayModal} />
 {/if}

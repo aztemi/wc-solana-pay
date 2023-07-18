@@ -3,6 +3,7 @@
   import { order } from "../store/order.js";
   import Widget from "./widget.svelte";
   import Loading from "./loading.svelte";
+  import Icon from "./icons/icon.svelte";
 
   let showModal = false;
   const { id, baseurl, pay_page, order_id } = solana_pay_for_wc;
@@ -57,7 +58,7 @@
     <div class="pwspfwc_modal pwspfwc_popup_shadow">
       <div class="pwspfwc_header">
         <img src={`${baseurl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
-        <button class="closeBtn" on:click={closeModal}><span class="dashicons dashicons-no-alt" /></button>
+        <button class="closeBtn" on:click={closeModal}><Icon name="close" title="Close" /></button>
       </div>
       {#if $order.updated}
         <Widget />
@@ -108,11 +109,6 @@
         cursor pointer
         background-color transparent
         color currentcolor
-        .dashicons
-          font-size 3rem
-          display flex
-          align-items center
-          justify-content center
 
   :global
     .pwspfwc_popup_shadow
