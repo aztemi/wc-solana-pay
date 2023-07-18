@@ -54,11 +54,11 @@
 <svelte:window on:openmodal={openModal} />
 
 {#if showModal}
-  <div class="pwspfwc_overlay">
-    <div class="pwspfwc_modal pwspfwc_popup_shadow">
-      <div class="pwspfwc_header">
+  <div class="overlay">
+    <div class="pwspfwc_popup_shadow modal">
+      <div class="header">
         <img src={`${baseurl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
-        <button class="closeBtn" on:click={closeModal}><Icon name="close" title="Close" /></button>
+        <button class="pwspfwc_icon_button" on:click={closeModal}><Icon name="close" title="Close" /></button>
       </div>
       {#if $order.updated}
         <Widget />
@@ -70,16 +70,9 @@
 {/if}
 
 <style lang="stylus">
-  :root
-    --overlay_back_color alpha(#000, 0.7)
-    --modal_back_color #fff
-    --modal_border_color #000
-    --popup_border_shadow_color rgb(0 0 0 / 20%)
-    --popup_li_back_color #fafafa
-
-  .pwspfwc_overlay
+  .overlay
     position fixed
-    z-index 1000
+    z-index var(--layer_overlay)
     left 0
     top 0
     width 100%
@@ -89,7 +82,7 @@
     justify-content center
     overflow hidden
     background-color var(--overlay_back_color)
-    .pwspfwc_modal
+    .modal
       position relative
       overflow-y auto
       max-width 90vw
@@ -97,34 +90,10 @@
       border-radius 0.5rem
       border 1px solid var(--modal_border_color)
       background-color var(--modal_back_color)
-      .pwspfwc_header
+      .header
         padding 0.7rem 1rem 0 1rem
         display flex
         align-items center
         justify-content space-between
-      .closeBtn
-        border 0
-        line-height 1
-        text-align center
-        cursor pointer
-        background-color transparent
-        color currentcolor
-
-  :global
-    .pwspfwc_popup_shadow
-      box-shadow 0 4px 24px 0 var(--popup_border_shadow_color)
-    .wc_solana_pay_place_order
-      display flex
-      align-items center
-      justify-content center
-      span
-        padding 0
-        margin 0
-        margin-right 0.5em
-      img
-        display inline-block
-        padding 0
-        border 0
-        max-height 1.2em
 
 </style>

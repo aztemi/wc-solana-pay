@@ -167,7 +167,7 @@
           white-space nowrap
       .dropdown
         position relative
-        z-index 2000
+        z-index var(--layer_dropdown_list)
         ul
           list-style-type none
           position absolute
