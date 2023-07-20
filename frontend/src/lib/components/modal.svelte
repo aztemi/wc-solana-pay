@@ -1,18 +1,17 @@
 <script>
   import { Keypair } from "@solana/web3.js";
   import { order } from "../store/order.js";
+  import { submitCheckoutForm, getCheckoutOrderDetails } from "../utils/backend_proxy.js";
   import Header from "./header.svelte";
   import Loading from "./loading.svelte";
   import PaymentWidget from "./payment_widget.svelte";
 
   let showModal = false;
-  const { id, pay_page, order_id } = solana_pay_for_wc;
 
   $: {
     if ($order.paymentSignature) {
       // submit form and close popup modal. This will inform the backend to confirm payment
-      const form = jQuery(pay_page ? "form#order_review" : "form.checkout");
-      form.submit();
+      submitCheckoutForm();
       closeModal();
     }
   }
@@ -30,18 +29,7 @@
   // query payment details from the backend
   async function getCheckoutOrder() {
     const ref = new Keypair().publicKey;
-    let url = `?wc-api=${id}&ref=${ref.toBase58()}&`;
-
-    if (pay_page) {
-      // pay order page
-      url += `order_id=${order_id}`;
-    } else {
-      // checkout page
-      const cartCreated = sessionStorage.getItem("wc_cart_created");
-      url += `cart_created=${cartCreated}`;
-    }
-
-    const jsonOrder = await fetch(url).then(r => r.json());
+    const jsonOrder = await getCheckoutOrderDetails(ref.toBase58());
     order.setOrder(jsonOrder);
   }
 </script>

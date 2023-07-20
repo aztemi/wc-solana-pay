@@ -1,5 +1,6 @@
 <script>
   import { order } from "../store/order.js";
+  import { baseurl, addTokenToCheckoutForm } from "../utils/backend_proxy.js";
   import IconButton from "./buttons/icon_button.svelte";
   import DropdownButton from "./buttons/dropdown_button.svelte";
   import MenuList from "./popup_menu/menu_list.svelte";
@@ -8,7 +9,6 @@
   let dropdownVisible = false;
   let name, amount, icon, symbol;
 
-  const { baseurl, pay_page } = solana_pay_for_wc;
   const { tokens } = $order;
   const dropdownRequired = Object.keys(tokens).length > 1;
 
@@ -18,13 +18,7 @@
       ({ name, amount, icon, symbol } = tokens[key]);
 
       // add selected payment token to an hidden field of the checkout form
-      const form = jQuery(pay_page ? "form#order_review" : "form.checkout");
-      const input = form.find("input[name='pwspfwc_payment_token']");
-      if (input.length) {
-        input.val(key);
-      } else {
-        form.append(`<input type="hidden" name="pwspfwc_payment_token" value="${key}" />`);
-      }
+      addTokenToCheckoutForm(key);
     }
   }
 

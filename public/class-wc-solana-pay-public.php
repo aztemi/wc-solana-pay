@@ -80,13 +80,10 @@ class WC_Solana_Pay_Public {
 			$this->handle_js = PLUGIN_ID . '_modaljs';
 
 			$payload = array(
-				'id'         => PLUGIN_ID,
-				'baseurl'    => PLUGIN_URL,
-				'pay_page'   => is_checkout_pay_page(),
-				'order_id'   => $order_id,
-				'wallet_msg' => __( 'Pay with Browser Wallet', 'wc-solana-pay' ),
-				'or_msg'     => __( 'OR', 'wc-solana-pay' ),
-				'qrcode_msg' => __( 'Scan QR Code with Mobile Wallet', 'wc-solana-pay' ),
+				'id'       => PLUGIN_ID,
+				'baseurl'  => PLUGIN_URL,
+				'pay_page' => is_checkout_pay_page(),
+				'order_id' => $order_id,
 			);
 
 			wp_enqueue_script( $this->handle_js, $modaljs, ['jquery'], null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Filename already has version added by JS bundler.

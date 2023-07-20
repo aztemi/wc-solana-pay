@@ -1,9 +1,9 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import { baseurl } from "../utils/backend_proxy";
   import Icon from "./icons/icon.svelte";
 
   const dispatch = createEventDispatcher();
-  const { baseurl } = solana_pay_for_wc;
 </script>
 
 <div>
