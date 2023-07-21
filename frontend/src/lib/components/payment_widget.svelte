@@ -1,7 +1,7 @@
 <script>
-  import { onMount, onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
   import { order } from "../store/order.js";
-  import { pollForTransaction } from "../utils/poll_for_transaction.js";
+  import { stopPolling } from "../utils/poll_for_transaction.js";
   import FiatPrice from "./fiat_price.svelte";
   import CryptoPrice from "./crypto_price.svelte";
   import PayWithWallet from "./pay_with_wallet.svelte";
@@ -9,8 +9,7 @@
   import PayWithQrcode from "./pay_with_qrcode.svelte";
 
   let specLink;
-  let stopFunc = null;
-  const { reference, amount, currency, endpoint, link, poll } = $order;
+  const { amount, currency, endpoint, link } = $order;
 
   $: {
     if ($order.activeToken) {
@@ -20,15 +19,8 @@
     }
   }
 
-  onMount(() => {
-    stopFunc = pollForTransaction(poll, reference);
-  });
-
   onDestroy(() => {
-    if (stopFunc) {
-      stopFunc();
-      stopFunc = null;
-    }
+    stopPolling();
   });
 </script>
 

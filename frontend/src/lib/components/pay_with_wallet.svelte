@@ -4,6 +4,7 @@
   import { Connection, Transaction } from "@solana/web3.js";
   import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
   import { ConnectionProvider, WalletProvider } from "@svelte-on-solana/wallet-adapter-ui";
+  import { startPolling } from "../utils/poll_for_transaction";
   import WalletSplitMultiButton from "./buttons/wallet_split_multi_button.svelte";
 
   export let link;
@@ -60,6 +61,9 @@
         // send the transaction
         const connection = new Connection(endpoint, "confirmed");
         await $walletStore.sendTransaction(tx, connection);
+
+        // poll for transaction result
+        startPolling();
       } catch (error) {
         console.error(error);
       }

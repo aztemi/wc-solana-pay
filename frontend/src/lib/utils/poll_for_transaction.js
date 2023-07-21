@@ -1,40 +1,32 @@
 // Poll status of payment transaction from the backend
 
+import { get } from "svelte/store";
 import { order } from "../store/order.js";
 
-const POLLING_DELAY = 10000; // Delay in ms between polling intervals
+const POLLING_DELAY = 5000; // Delay in ms between polling intervals
 
-/**
- * @param {string} endpoint
- * @param {import("@solana/web3.js").PublicKey} reference
- */
-export function pollForTransaction(endpoint, reference) {
-  let pollingInterval = null;
-  const url = `${endpoint}&ref=${reference.toBase58()}`;
+let endpoint = "";
+let pollingInterval = null;
 
-  startPolling();
+export function startPolling() {
+  if (pollingInterval) return;
 
-  function startPolling() {
-    if (pollingInterval) return;
-    pollingInterval = setInterval(confirmPaymentTxn, POLLING_DELAY);
+  const { reference, poll } = get(order);
+  endpoint = `${poll}&ref=${reference.toBase58()}`;
+  pollingInterval = setInterval(confirmPaymentTxn, POLLING_DELAY);
+}
+
+export function stopPolling() {
+  if (pollingInterval) clearInterval(pollingInterval);
+  pollingInterval = null;
+}
+
+// Confirm transaction on chain
+async function confirmPaymentTxn() {
+  try {
+    const json = await fetch(endpoint).then(r => r.json());
+    if (json?.signature) order.confirmPayment(json.signature);
+  } catch (error) {
+    console.error(error);
   }
-
-  function stopPolling() {
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      pollingInterval = null;
-    }
-  }
-
-  // Confirm transaction on chain
-  async function confirmPaymentTxn() {
-    try {
-      const json = await fetch(url).then(r => r.json());
-      if (json?.signature) order.confirmPayment(json.signature);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  return stopPolling;
 }
