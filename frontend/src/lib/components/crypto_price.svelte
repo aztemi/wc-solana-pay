@@ -39,7 +39,7 @@
         <span class="token_symbol">{symbol}</span>
       </DropdownButton>
     {:else}
-      <IconButton class="nopointer">
+      <IconButton class="pwspfwc_nopointer">
         <img slot="start-icon" src={`${baseurl}/${icon}`} alt={name} />
         <span class="token_symbol">{symbol}</span>
       </IconButton>
@@ -75,9 +75,6 @@
       display inline-block
 
       :global
-        .nopointer
-          cursor auto !important
-
         button
           line-height 1
           border 0

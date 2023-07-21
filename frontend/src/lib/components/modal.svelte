@@ -37,8 +37,8 @@
 <svelte:window on:openmodal={openModal} />
 
 {#if showModal}
-  <div class="overlay">
-    <div class="pwspfwc_popup_shadow modal">
+  <div class="pwspfwc_popup_overlay">
+    <div class="pwspfwc_popup_shadow pwspfwc_popup_modal">
       <Header on:close={closeModal} />
       {#if $order.updated}
         <PaymentWidget />
@@ -50,7 +50,7 @@
 {/if}
 
 <style lang="stylus">
-  .overlay
+  .pwspfwc_popup_overlay
     position fixed
     z-index var(--layer_overlay)
     left 0
@@ -62,8 +62,9 @@
     justify-content center
     overflow hidden
     background-color var(--overlay_back_color)
-    .modal
+    .pwspfwc_popup_modal
       position relative
+      display block
       overflow-y auto
       max-width 90vw
       max-height 90%
