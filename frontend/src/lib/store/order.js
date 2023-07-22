@@ -8,6 +8,7 @@ const DP = 4; // default decimal places
 
 const emptyOrder = {
   updated: false,
+  timedOut: false,
   recipient: null,
   reference: null,
   amount: new BigNumber(0),
@@ -30,6 +31,8 @@ function createOrderStore() {
     subscribe,
 
     reset: () => update(_ => Object.assign({}, emptyOrder)),
+
+    timeout: () => update(old => Object.assign({}, old, { timedOut: true })),
 
     confirmPayment: paymentSignature => update(old => Object.assign({}, old, { paymentSignature })),
 

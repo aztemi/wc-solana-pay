@@ -9,9 +9,9 @@
   let showModal = false;
 
   $: {
-    if ($order.paymentSignature) {
+    if ($order.paymentSignature || $order.timedOut) {
       // submit form and close popup modal. This will inform the backend to confirm payment
-      submitCheckoutForm();
+      if ($order.paymentSignature) submitCheckoutForm();
       closeModal();
     }
   }

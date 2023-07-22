@@ -2,15 +2,19 @@
   import { createEventDispatcher } from "svelte";
   import { baseurl } from "../utils/backend_proxy";
   import Icon from "./icons/icon.svelte";
+  import CountdownTimer from "./countdown_timer.svelte";
 
   const dispatch = createEventDispatcher();
 </script>
 
 <div>
   <img src={`${baseurl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
-  <button class="pwspfwc_icon_button" on:click={() => dispatch("close")}>
-    <Icon name="close" title="Close" />
-  </button>
+  <span>
+    <CountdownTimer />
+    <button class="pwspfwc_icon_button" on:click={() => dispatch("close")}>
+      <Icon name="close" title="Close" />
+    </button>
+  </span>
 </div>
 
 <style lang="stylus">
@@ -19,5 +23,9 @@
     display flex
     align-items center
     justify-content space-between
+
+    span
+      display flex
+      align-items center
 
 </style>
