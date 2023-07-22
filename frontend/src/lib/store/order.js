@@ -9,7 +9,6 @@ const DP = 4; // default decimal places
 const emptyOrder = {
   updated: false,
   timedOut: false,
-  recipient: null,
   reference: null,
   amount: new BigNumber(0),
   currency: "",
@@ -40,9 +39,8 @@ function createOrderStore() {
 
     setOrder: order =>
       update(old => {
-        let { id, recipient, reference, amount, testmode, tokens, suffix, endpoint, home, link, poll } = order;
+        let { id, reference, amount, testmode, tokens, suffix, endpoint, home, link, poll } = order;
 
-        recipient = new PublicKey(recipient);
         reference = new PublicKey(reference);
         amount = new BigNumber(amount);
 
@@ -63,7 +61,6 @@ function createOrderStore() {
 
         return Object.assign({}, old, order, {
           updated: true,
-          recipient,
           reference,
           amount,
           activeToken,

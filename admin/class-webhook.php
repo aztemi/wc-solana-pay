@@ -175,6 +175,9 @@ class Webhook {
 		// store the data in user session for later use during payment processing
 		$this->hSession->set_data( $data );
 
+		// remove unused info; share only necessary data with the frontend
+		unset( $data['recipient'] );
+
 		// send response
 		header( 'HTTP/1.1 200 OK' );
 		wp_send_json( $data, 200 );
