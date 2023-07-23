@@ -1,18 +1,17 @@
 <script>
   import { Keypair } from "@solana/web3.js";
   import { order } from "../store/order.js";
-  import Widget from "./widget.svelte";
+  import { submitCheckoutForm, getCheckoutOrderDetails } from "../utils/backend_proxy.js";
+  import Header from "./header.svelte";
   import Loading from "./loading.svelte";
+  import PaymentWidget from "./payment_widget.svelte";
 
   let showModal = false;
-  const { id, baseurl, pay_page, order_id } = solana_pay_for_wc;
 
   $: {
-    if ($order.paymentSignature) {
-      // console.log("Payment confirmed on client side. Txn: ", $order.paymentSignature);
+    if ($order.paymentSignature || $order.timedOut) {
       // submit form and close popup modal. This will inform the backend to confirm payment
-      const form = jQuery(pay_page ? "form#order_review" : "form.checkout");
-      form.submit();
+      if ($order.paymentSignature) submitCheckoutForm();
       closeModal();
     }
   }
@@ -29,38 +28,20 @@
 
   // query payment details from the backend
   async function getCheckoutOrder() {
-    try {
-      const ref = new Keypair().publicKey;
-      let url = `?wc-api=${id}&ref=${ref.toBase58()}&`;
-
-      if (pay_page) {
-        // pay order page
-        url += `order_id=${order_id}`;
-      } else {
-        // checkout page
-        const cartCreated = sessionStorage.getItem("wc_cart_created");
-        url += `cart_created=${cartCreated}`;
-      }
-
-      const jsonOrder = await fetch(url).then(r => r.json());
-      order.setOrder(jsonOrder);
-    } finally {
-      // do nothing
-    }
+    const ref = new Keypair().publicKey;
+    const jsonOrder = await getCheckoutOrderDetails(ref.toBase58());
+    order.setOrder(jsonOrder);
   }
 </script>
 
 <svelte:window on:openmodal={openModal} />
 
 {#if showModal}
-  <div class="pwspfwc_overlay">
-    <div class="pwspfwc_modal pwspfwc_popup_shadow">
-      <div class="pwspfwc_header">
-        <img src={`${baseurl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
-        <button class="closeBtn" on:click={closeModal}><span class="dashicons dashicons-no-alt" /></button>
-      </div>
+  <div class="pwspfwc_popup_overlay">
+    <div class="pwspfwc_popup_shadow pwspfwc_popup_modal">
+      <Header on:close={closeModal} />
       {#if $order.updated}
-        <Widget />
+        <PaymentWidget />
       {:else}
         <Loading />
       {/if}
@@ -69,16 +50,9 @@
 {/if}
 
 <style lang="stylus">
-  :root
-    --overlay_back_color alpha(#000, 0.7)
-    --modal_back_color #fff
-    --modal_border_color #000
-    --popup_border_shadow_color rgb(0 0 0 / 20%)
-    --popup_li_back_color #fafafa
-
-  .pwspfwc_overlay
+  .pwspfwc_popup_overlay
     position fixed
-    z-index 1000
+    z-index var(--layer_overlay)
     left 0
     top 0
     width 100%
@@ -88,47 +62,14 @@
     justify-content center
     overflow hidden
     background-color var(--overlay_back_color)
-    .pwspfwc_modal
+    .pwspfwc_popup_modal
       position relative
+      display block
       overflow-y auto
       max-width 90vw
       max-height 90%
       border-radius 0.5rem
       border 1px solid var(--modal_border_color)
       background-color var(--modal_back_color)
-      .pwspfwc_header
-        padding 0.7rem 1rem 0 1rem
-        display flex
-        align-items center
-        justify-content space-between
-      .closeBtn
-        border 0
-        line-height 1
-        text-align center
-        cursor pointer
-        background-color transparent
-        color currentcolor
-        .dashicons
-          font-size 3rem
-          display flex
-          align-items center
-          justify-content center
-
-  :global
-    .pwspfwc_popup_shadow
-      box-shadow 0 4px 24px 0 var(--popup_border_shadow_color)
-    .wc_solana_pay_place_order
-      display flex
-      align-items center
-      justify-content center
-      span
-        padding 0
-        margin 0
-        margin-right 0.5em
-      img
-        display inline-block
-        padding 0
-        border 0
-        max-height 1.2em
 
 </style>

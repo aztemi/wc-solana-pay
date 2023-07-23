@@ -3,19 +3,16 @@
   import { Buffer } from "buffer";
   import { Connection, Transaction } from "@solana/web3.js";
   import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
-  import { ConnectionProvider, WalletProvider, WalletMultiButton } from "@svelte-on-solana/wallet-adapter-ui";
+  import { ConnectionProvider, WalletProvider } from "@svelte-on-solana/wallet-adapter-ui";
+  import { startPolling } from "../utils/poll_for_transaction";
+  import WalletSplitMultiButton from "./buttons/wallet_split_multi_button.svelte";
 
   export let link;
   export let endpoint;
 
-  const localStorageKey = "SolanaWalletAdapter";
   let wallets = [];
-
-  $: {
-    if ($walletStore?.connected && !$walletStore?.connecting && !$walletStore?.disconnecting) {
-      payWithConnectedWallet($walletStore.publicKey);
-    }
-  }
+  let loading = false;
+  const localStorageKey = "SolanaWalletAdapter";
 
   onMount(async () => {
     const {
@@ -35,12 +32,10 @@
     ];
   });
 
-  /**
-   * @param {import("@solana/web3.js").PublicKey} payer
-   */
-  async function payWithConnectedWallet(payer) {
+  async function payWithConnectedWallet() {
     if ($walletStore?.connected) {
       try {
+        loading = true;
         // fetch the transaction
         const { transaction } = await fetch(link, {
           method: "POST",
@@ -48,7 +43,7 @@
             Accept: "application/json",
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ account: payer.toBase58() })
+          body: JSON.stringify({ account: $walletStore.publicKey.toBase58() })
         })
           .then(res => {
             if (!res.ok) {
@@ -66,13 +61,30 @@
         // send the transaction
         const connection = new Connection(endpoint, "confirmed");
         await $walletStore.sendTransaction(tx, connection);
+
+        // poll for transaction result
+        startPolling();
       } catch (error) {
         console.error(error);
       }
+      loading = false;
     }
   }
 </script>
 
 <ConnectionProvider network={endpoint} />
-<WalletProvider {localStorageKey} {wallets} />
-<WalletMultiButton />
+<WalletProvider {localStorageKey} {wallets} autoConnect={true} />
+
+<span>Pay with Browser Wallet</span>
+<div>
+  {#key link}
+    <WalletSplitMultiButton {loading} on:payclick={payWithConnectedWallet} />
+  {/key}
+</div>
+
+<style lang="stylus">
+  div
+    padding-top 0.5rem
+    text-align center
+
+</style>

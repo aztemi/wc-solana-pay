@@ -8,12 +8,13 @@ const DP = 4; // default decimal places
 
 const emptyOrder = {
   updated: false,
-  recipient: null,
+  timedOut: false,
   reference: null,
   amount: new BigNumber(0),
   currency: "",
   endpoint: "", // RPC endpoint
   link: "", // `link` param in Solana Pay spec
+  poll: "", // endpoint to poll transaction status
   tokens: {},
   activeToken: "",
   label: "",
@@ -30,15 +31,16 @@ function createOrderStore() {
 
     reset: () => update(_ => Object.assign({}, emptyOrder)),
 
+    timeout: () => update(old => Object.assign({}, old, { timedOut: true })),
+
     confirmPayment: paymentSignature => update(old => Object.assign({}, old, { paymentSignature })),
 
     setActiveToken: key => update(old => Object.assign({}, old, { activeToken: key })),
 
     setOrder: order =>
       update(old => {
-        let { id, recipient, reference, amount, testmode, tokens, suffix, endpoint, link } = order;
+        let { id, reference, amount, testmode, tokens, suffix, endpoint, home, link, poll } = order;
 
-        recipient = new PublicKey(recipient);
         reference = new PublicKey(reference);
         amount = new BigNumber(amount);
 
@@ -59,12 +61,12 @@ function createOrderStore() {
 
         return Object.assign({}, old, order, {
           updated: true,
-          recipient,
           reference,
           amount,
           activeToken,
           endpoint: `${endpoint}${id}/`,
-          link: `${link}&id=${id}`,
+          link: `${home}?wc-api=${link}&id=${id}`,
+          poll: `${home}?wc-api=${poll}&id=${id}`,
           tokens: paymentTokens
         });
       })

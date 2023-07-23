@@ -1,21 +1,16 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  import { blockElement } from "../utils/backend_proxy";
 
-  let loadingP = null;
+  let unblock = null;
 
   onMount(() => {
-    loadingP = jQuery("#pwspfwc_loading");
-    loadingP.block({
-      message: null,
-      overlayCSS: {
-        background: "var(--modal_back_color)",
-        opacity: 0.6
-      }
-    });
+    unblock = blockElement("#pwspfwc_loading", "var(--modal_back_color)");
   });
 
   onDestroy(() => {
-    if (loadingP) loadingP.unblock();
+    if (unblock) unblock();
+    unblock = null;
   });
 </script>
 

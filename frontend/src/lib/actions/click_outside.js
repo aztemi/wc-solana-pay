@@ -1,6 +1,13 @@
+/**
+ * @param {HTMLElement} node
+ * @param {() => void} callback
+ */
 export function clickOutside(node, callback) {
   document.addEventListener("click", handleClick, true);
 
+  /**
+   * @param {MouseEvent} event
+   */
   function handleClick(event) {
     if (node && !node.contains(event.target) && !event.defaultPrevented) {
       callback();
@@ -10,9 +17,13 @@ export function clickOutside(node, callback) {
   }
 
   return {
+    /**
+     * @param {() => void} newCallback
+     */
     update(newCallback) {
       callback = newCallback;
     },
+
     destroy() {
       document.removeEventListener("click", handleClick, true);
     }
