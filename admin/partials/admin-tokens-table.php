@@ -191,8 +191,6 @@ $body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $b
 				<tbody><?php echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></tbody>
 			</table>
 		</div>
-		<script>
-			<?php echo $script; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		</script>
+		<?php wp_print_inline_script_tag( $script ); ?>
 	</td>
 </tr>

@@ -36,6 +36,4 @@ $img_alt = __( 'Solana Pay', 'wc-solana-pay' );
 	</button>
 </template>
 
-<script type="text/javascript">
-	<?php echo $script; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-</script>
+<?php wp_print_inline_script_tag( $script ); ?>
