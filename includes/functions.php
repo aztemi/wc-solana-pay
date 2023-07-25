@@ -47,7 +47,7 @@ function show_error_notice( $notice ) {
 	add_action(
 		'admin_notices',
 		function() use( $notice ) {
-			echo '<div class="notice notice-error"><p>' . wp_kses_post( $notice ) . '</p></div>';
+			echo wp_kses_post( '<div class="notice notice-error"><p>' . $notice . '</p></div>'  );
 		}
 	);
 

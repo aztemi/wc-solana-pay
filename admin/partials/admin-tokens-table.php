@@ -176,19 +176,47 @@ function get_coingecko_supported_currencies() {
 
 }
 
+
+function get_allowed_tags() {
+
+	$allowed_tags = wp_kses_allowed_html( 'post' );
+
+	// safe css attributes
+	add_filter( 'safe_style_css', function( $styles ) {
+		$styles[] = 'display';
+		$styles[] = 'text-decoration-line';
+		return $styles;
+	} );
+
+	// form input field
+	$allowed_tags['input'] = array(
+		'id'      => true,
+		'class'   => true,
+		'name'    => true,
+		'value'   => true,
+		'type'    => true,
+		'style'   => true,
+		'checked' => true,
+	);
+
+	return $allowed_tags;
+
+}
+
+$allowed_tags = get_allowed_tags();
 $header = get_tokens_table_header( $show_currency );
 $body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency, $auto_refresh );
 ?>
 
 <tr valign="top">
 	<th scope="row" class="titledesc">
-		<label><?php echo esc_html( $title ); ?><?php echo wc_help_tip( $tip, true ); ?></label>
+		<label><?php echo esc_html( $title ); ?><?php echo wp_kses_post( wc_help_tip( $tip, true ) ); ?></label>
 	</th>
 	<td class="forminp">
 		<div class="wc_input_table_wrapper">
 			<table class="wc_gateways widefat" style="min-width:60rem;max-width:75rem" cellspacing="0" cellpadding="0">
 				<thead><?php echo wp_kses_post( $header ); ?></thead>
-				<tbody><?php echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></tbody>
+				<tbody><?php echo wp_kses( $body, $allowed_tags ); ?></tbody>
 			</table>
 		</div>
 		<?php wp_print_inline_script_tag( $script ); ?>
