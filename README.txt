@@ -1,10 +1,10 @@
 === Pay with Solana Pay for WooCommerce ===
-Contributors: aztemi
-Donate link: https://www.aztemi.com
+Contributors: aztemi, t4top
+Donate link: https://apps.aztemi.com/wc-solana-pay
 Tags: solana pay, solana, woocommerce, payment, web3, crypto, cryptocurrency, sol, usdc, usdt, wallet
 Requires at least: 5.2
 Tested up to: 6.2.2
-Stable tag: trunk
+Stable tag: 2.1.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -16,6 +16,10 @@ Pay with Solana Pay for WooCommerce. Decentralized, permissionless, and fast pay
 Accept crypto payments in SOL, USDC, USDT and more in your WooCommerce store. This plugin supports payments via **QR Code** and through all major Solana wallets, including Phantom, Solflare and Backpack.
 
 This is a quick and easy way to add crypto payments via Solana Pay to your website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
+
+= Demo =
+
+* [Solana Pay Demo](https://solana-pay-demo.juxdan.io/)
 
 = Released Features =
 
@@ -33,31 +37,25 @@ This is a quick and easy way to add crypto payments via Solana Pay to your websi
 
 == Installation ==
 
-= Requirements =
-
-To install **Pay with Solana Pay for WooCommerce**, you need:
-
-* WordPress Version 5.2 or newer (installed)
-* WooCommerce Version 3.0 or newer (installed and activated)
-* PHP Version 7.2 or newer
-* BCMath extension for PHP installed
-
-= Instructions =
-
-1. Log in to WordPress admin.
-2. Go to **Plugins > Add New**.
-3. Search for the **Pay with Solana Pay for WooCommerce** plugin.
-4. Click on **Install Now** and wait until the plugin is installed successfully.
-5. Click on **Activate**. (You can also activate on the **Plugins > Installed Plugins** page).
+1. In your WordPress dashboard, choose **Plugins > Add New**.
+2. Search for the **Pay with Solana Pay for WooCommerce** plugin.
+3. Click on **Install Now** and wait until the plugin is installed successfully.
+4. Click on **Activate**. (You can also activate on the **Plugins > Installed Plugins** page).
 
 = Setup Configurations =
 
-1. After you have activated the plugin, go to **WooCommerce > Settings**. Click the **Payments** tab. Click on **Pay with Solana Pay**.
-2. Click the **Enable Pay with Solana Pay** checkbox.
-3. Add your wallet address to the **Merchant Wallet Address** field.
+1. After activating the plugin, go to **WooCommerce > Settings**. Choose **Payments** tab and select **Pay with Solana Pay**.
+2. Select **Enable Pay with Solana Pay** checkbox.
+3. Add your Solana wallet address to the **Merchant Wallet Address** field.
 4. Choose **Solana Network**. Try first in Test Mode by selecting **Devnet**. Select **Mainnet-Beta** for the Production Mode.
-5. Enable Solana Tokens you will like to accept and adjust the **Exchange Rate** column to the appropriate rates you prefer.
+5. Enable Solana Tokens you want to accept. Adjust their **Exchange Rate** fields to appropriate rates you prefer. You can also update their "% Commission" to compensate for fluctuations in tokens prices.
 6. Click **Save changes**.
+
+= Minimum Requirements =
+
+* WordPress 5.2
+* WooCommerce 3.0
+* PHP 7.2 with BCMath extension installed
 
 == Frequently Asked Questions ==
 
@@ -78,10 +76,17 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 == Changelog ==
 
+= 2.1.0 =
+* Fix review comments from the WP Plugin Review team.
+
 = 2.0.0 =
-Initial public release to the WordPress plugins repository
+* Initial release to the WordPress plugins repository for listing.
+* Change plugin name to **Pay with Solana Pay for WooCommerce**.
+
+= 1.0.0 =
+* Initial private release
 
 == Upgrade Notice ==
 
-= 2.0.0 =
-No further actions required - first public release
+= 2.1.0 =
+First public listing on the WordPress plugins repository - No further actions required

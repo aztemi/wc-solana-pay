@@ -5,13 +5,13 @@
  * - "Pay with Solana Pay" express checkout button when our Solana Pay payment method is selected and
  * - default "Place Order" button when other payment methods are selected.
  *
- * This script is loaded and the <?php ?> placeholders are replaced from PHP code side.
+ * This script is loaded from the backend PHP code.
  */
+
+import { id, pay_page as isPayPage } from "./lib/utils/backend_proxy.js";
+
 (function ($$) {
   let ourBtn, theirBtn;
-  const id = "<?php echo $id ?>".trim();
-  const errorMsg = "<?php echo $error_msg ?>".trim();
-  const isPayPage = "<?php echo $pay_page ?>".trim();
   const previousOnload = window.onload;
   const previousOnchange = window.onchange;
 
@@ -26,7 +26,7 @@
     const invalidFields = form.find(".validate-required.woocommerce-invalid:visible").length;
     const notChecked = form.find(".validate-required:visible :input[type='checkbox']:visible:not(:checked)").length;
     if (invalidFields || notChecked) {
-      msg += `<li>${errorMsg}</li>`;
+      msg += `<li>Some inputs are not valid. Please fill all required fields.</li>`;
     }
 
     $$(".woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message").remove();
