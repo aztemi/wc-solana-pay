@@ -4,7 +4,7 @@ Donate link: https://apps.aztemi.com/wc-solana-pay
 Tags: solana pay, solana, woocommerce, payment, web3, crypto, cryptocurrency, sol, usdc, usdt, wallet
 Requires at least: 5.2
 Tested up to: 6.2.2
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -76,6 +76,9 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 == Changelog ==
 
+= 2.1.0 =
+* Fix review comments from the WP Plugin Review team.
+
 = 2.0.0 =
 * Initial release to the WordPress plugins repository for listing.
 * Change plugin name to **Pay with Solana Pay for WooCommerce**.
@@ -85,5 +88,5 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 == Upgrade Notice ==
 
-= 2.0.0 =
-No further actions required - first public release
+= 2.1.0 =
+First public listing on the WordPress plugins repository - No further actions required
