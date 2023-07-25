@@ -1,15 +1,14 @@
 /**
  * <script> tag logic for Currencies table on WC Payments Admin Settings page
  *
- * This script is loaded and the <?php ?> placeholders are replaced from PHP code side.
+ * This script is loaded and the <?php ?> placeholder is replaced from PHP code side.
  */
 import BigNumber from "bignumber.js";
 
 (function ($$) {
   const DP = 6; // default decimal places
   let updateAvailable = false;
-  const storeCurrency = "<?php echo $base_currency ?>".toLowerCase();
-  const updateNotAvailableMsg = "<?php echo $alert_msg ?>".trim();
+  const storeCurrency = "<?php echo esc_attr( $show_currency ) ?>".toLowerCase();
 
   async function fetchRequest(url) {
     return fetch(url)
@@ -54,7 +53,7 @@ import BigNumber from "bignumber.js";
       const tr = $$(this);
       tr.on("click", ".dashicons-update", async function () {
         if (!updateAvailable) {
-          return alert(updateNotAvailableMsg);
+          return alert("Update currently not available. Please check your connection and reload.");
         }
         const icon = $$(this);
         const coingecko = icon.data("coingecko");

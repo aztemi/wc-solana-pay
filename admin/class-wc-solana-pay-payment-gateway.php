@@ -185,6 +185,9 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		add_filter( 'woocommerce_admin_order_data_after_order_details', array( $this, 'add_payment_details_to_admin_order_page' ) );
 		add_filter( 'woocommerce_order_details_after_order_table', array( $this, 'add_payment_details_to_public_order_page' ) );
 
+		// export global JS variables
+		add_action( 'wp_head', array( $this, 'export_global_js_variables' ) );
+
 	}
 
 
@@ -253,6 +256,31 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
+	 * Export global JS variables common for both admin and public pages.
+	 */
+	public function export_global_js_variables() {
+
+		// Get order-id if on Order Pay page
+		$pay_page = is_checkout_pay_page();
+		$order_id = '';
+		if ( $pay_page ) {
+			$order_id = absint( get_query_var( 'order-pay' ) );
+		}
+
+		$payload = array(
+			'id'       => PLUGIN_ID,
+			'baseurl'  => PLUGIN_URL,
+			'pay_page' => $pay_page,
+			'order_id' => $order_id,
+		);
+
+		$script = 'var SOLANA_PAY_FOR_WC = ' . wp_json_encode( $payload );
+		wp_print_inline_script_tag( $script );
+
+	}
+
+
+	/**
 	 * Generate html for tokens table.
 	 * This is called from WC to generate the custom table for currency selection on Admin Settings page.
 	 *
@@ -269,13 +297,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 			$base_currency = Solana_Tokens::get_store_currency('edit');
 			$show_currency = Solana_Tokens::get_store_currency();
 			$auto_refresh = __( 'Auto refresh exchange rate', 'wc-solana-pay' );
-			$alert_msg = esc_html__( 'Update currently not available. Please check your connection and reload.', 'wc-solana-pay' );
-
 			$script = get_partial_file_html(
 				$tablejs,
 				array(
-					'alert_msg'     => $alert_msg,
-					'base_currency' => $show_currency,
+					'show_currency' => $show_currency,
 				)
 			);
 
