@@ -47,7 +47,11 @@ class WC_Solana_Pay_Admin {
 		// Add 'Settings' link to the Installed Plugins page after plugin activation
 		add_filter( 'plugin_action_links_' . PLUGIN_BASENAME, array( $this, 'add_action_links' ) );
 
+		// register an endpoint for handling REST calls
+		add_action( 'rest_api_init', array( $this, 'register_rest_endpoint' ) );
+
 	}
+
 
 	/**
 	 * Load payment gateway class
@@ -92,6 +96,41 @@ class WC_Solana_Pay_Admin {
 		}
 
 		return $links;
+
+	}
+
+
+	/**
+	 * Action callback for registering REST API endpoint
+	 */
+	public function register_rest_endpoint() {
+
+		register_rest_route( PLUGIN_ID . '/v1', '/api', array(
+			'methods'  => 'GET, POST',
+			'callback' => array( $this, 'handle_api_request' )
+		));
+
+	}
+
+
+	/**
+	 * A handler for incoming /api endpoint request
+	 *
+	 * @param  WP_REST_Request  $request Incoming Request object
+	 */
+	public function handle_api_request( $request ) {
+
+		$action = trim( wc_clean( wp_unslash( $request->get_param('action') ) ) );
+		if ( $action ) {
+			/**
+			 * Action hook fired to handle incoming REST request.
+			 *
+			 * @since 2.1.1
+			 */
+			do_action( PLUGIN_ID . '_' . $action, $request );
+		} else {
+			wp_send_json_error( 'Bad Request', 400 );
+		}
 
 	}
 
