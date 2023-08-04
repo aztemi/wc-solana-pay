@@ -3,7 +3,7 @@
 import { get } from "svelte/store";
 import { order } from "../store/order.js";
 
-const POLLING_DELAY = 5000; // Delay in ms between polling intervals
+const POLLING_DELAY = 10000; // Delay in ms between polling intervals
 
 let endpoint = "";
 let pollingInterval = null;
