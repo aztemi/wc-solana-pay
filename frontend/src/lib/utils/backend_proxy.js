@@ -4,7 +4,7 @@
 const $$ = jQuery;
 
 // localized JS objects from PHP
-export const { id, baseurl, pay_page, order_id } = SOLANA_PAY_FOR_WC;
+export const { id, baseurl, pay_page, order_id } = WC_SOLANA_PAY;
 
 function getCheckoutForm() {
   return $$(pay_page ? "form#order_review" : "form.checkout");
