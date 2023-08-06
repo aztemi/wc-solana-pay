@@ -169,14 +169,12 @@ class Solana_Pay {
 	/**
 	 * Find confirmed payment transaction by reference from the Solana network.
 	 *
-	 * @param  array  $meta   List of metadata about the transaction as output.
 	 * @param  string $txn_id Found transaction ID as output.
 	 * @return bool           true if transaction is found, false otherwise.
 	 */
-	private function get_transaction_id( &$meta, &$txn_id ) {
+	private function get_transaction_id( &$txn_id ) {
 
 		$data = $this->hSession->get_data();
-		$id = $data['id'];
 		$reference = $data['reference'];
 
 		$params = array( $reference, array( 'commitment' => 'confirmed' ) );
@@ -194,11 +192,6 @@ class Solana_Pay {
 		}
 
 		$txn_id = $txn[0]['signature'];
-		$meta = array(
-			'id' => $id,
-			'reference' => $reference,
-			'transaction' => $txn_id,
-		);
 
 		return true;
 
@@ -262,17 +255,22 @@ class Solana_Pay {
 		$currency = $tokens[ $token_id ];
 		$currency_mint = $currency['mint'];
 		$currency_symbol = $currency['symbol'];
-		$expected_receiver = $this->hGateway->get_merchant_wallet_address();
+		$receiver = $this->hGateway->get_merchant_wallet_address();
+		$payer = $this->get_transaction_payer( $txn_data );
 
 		if ( 'SOL' === $currency_symbol ) {
-			$balance = $this->get_transaction_received_sol( $txn_data, $expected_receiver );
+			$balance['received'] = $this->get_transaction_received_sol( $txn_data, $receiver );
+			$balance['paid'] = $this->get_transaction_received_sol( $txn_data, $payer );
 		} else {
-			$balance = $this->get_transaction_received_spltoken( $txn_data, $expected_receiver, $currency_mint );
+			$balance['received'] = $this->get_transaction_received_spltoken( $txn_data, $receiver, $currency_mint );
+			$balance['paid'] = $this->get_transaction_received_spltoken( $txn_data, $payer, $currency_mint );
 		}
 
 		// Add token number of decimals & symbol
 		$balance['decimals'] = $currency['decimals'];
 		$balance['symbol'] = $currency_symbol;
+		$balance['receiver'] = $receiver;
+		$balance['payer'] = $payer;
 
 		return true;
 
@@ -379,18 +377,15 @@ class Solana_Pay {
 	 * Validates if an expected amount is fully paid or not.
 	 *
 	 * @param  string $amount   Expected amount to be paid.
-	 * @param  array  $balance  Balance received.
-	 * @param  string $received Amount received in a formatted string for the UI.
+	 * @param  array  $balance  Payment transaction balance info.
 	 * @return bool             true if received amount is greater than or equal to expected amount, false otherwise.
 	 */
-	private function validate_payment_amount( $amount, $balance, &$received ) {
+	private function validate_payment_amount( $amount, $balance ) {
 
-		list( 'pre' => $pre, 'post' => $post, 'decimals' => $decimals ) = $balance;
+		$decimals = $balance['decimals'];
+		list( 'pre' => $pre, 'post' => $post ) = $balance['received'];
 
 		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
-
-		$received = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
-		$received = rtrim( $received, '0' ) . ' ' . $balance['symbol'];
 
 		// compensate for endpoint usage fee already deducted in transaction
 		$percent_fee = self::endpoints_usage_fee();
@@ -410,6 +405,46 @@ class Solana_Pay {
 
 
 	/**
+	 * Get metadata from a payment transaction details.
+	 *
+	 * @param  string $txn_id   Transaction ID.
+	 * @param  array  $balance  Payment transaction balance info.
+	 * @return array            List of metadata of the payment transaction details.
+	 */
+	private function get_payment_meta( $txn_id, $balance ) {
+
+		$data = $this->hSession->get_data();
+		$symbol = $balance['symbol'];
+		$decimals = $balance['decimals'];
+		$meta = array(
+			'id'          => $data['id'],
+			'transaction' => $txn_id,
+			'reference'   => $data['reference'],
+			'payer'       => $balance['payer'],
+			'receiver'    => $balance['receiver'],
+			'url'         => $this->get_explorer_url( $txn_id ),
+		);
+
+		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
+
+		// crypto amount paid by customer
+		list( 'pre' => $post, 'post' => $pre ) = $balance['paid']; // post & pre swapped since it's an outgoing balance diff
+		$paid = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
+		$meta['paid'] = rtrim( $paid, '0' ) . ' ' . $symbol;
+
+		// crypto amount received by merchant after fee is deducted
+		list( 'pre' => $pre, 'post' => $post ) = $balance['received'];
+		$received = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
+		$meta['received'] = rtrim( $received, '0' ) . ' ' . $symbol;
+
+		bcscale( $old_scale ); // reset back to old scale
+
+		return $meta;
+
+	}
+
+
+	/**
 	 * Validate payment transaction on Solana network.
 	 *
 	 * @param  \WC_Order $order    Order object.
@@ -419,11 +454,9 @@ class Solana_Pay {
 	 */
 	public function confirm_payment_onchain( $order, $amount, $token_id ) {
 
-		$received = '';
 		$txn_id = '';
 		$txn_data = array();
 		$balance = array();
-		$meta = array();
 
 		// get expected payment amount in Solana token
 		$token_amount = $this->get_payment_token_amount( $amount, $token_id );
@@ -434,7 +467,7 @@ class Solana_Pay {
 
 		// Get payment transaction details from Solana chain
 		$rtn =
-			$this->get_transaction_id( $meta, $txn_id ) &&
+			$this->get_transaction_id( $txn_id ) &&
 			$this->get_transaction_details( $txn_id, $txn_data ) &&
 			$this->get_transaction_balance( $order, $txn_data, $token_id, $balance );
 
@@ -444,16 +477,12 @@ class Solana_Pay {
 		}
 
 		// Validate payment amount. Return false if payment is missing or not up to expected amount
-		if ( ! $this->validate_payment_amount( $token_amount, $balance, $received ) ) {
+		if ( ! $this->validate_payment_amount( $token_amount, $balance ) ) {
 			return false;
 		}
 
-		// Add transaction url, payer and amount received to order meta info
-		$meta['url'] = $this->get_explorer_url( $txn_id );
-		$meta['payer'] = $this->get_transaction_payer( $txn_data );
-		$meta['received'] = $received;
-
 		// update order meta info
+		$meta = $this->get_payment_meta( $txn_id, $balance );
 		$this->hGateway->set_order_payment_meta( $order, $meta );
 
 		// Complete payment and return true
