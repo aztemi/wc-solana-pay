@@ -274,7 +274,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 			'order_id' => $order_id,
 		);
 
-		$script = 'var SOLANA_PAY_FOR_WC = ' . wp_json_encode( $payload );
+		$script = 'var WC_SOLANA_PAY = ' . wp_json_encode( $payload );
 		wp_print_inline_script_tag( $script );
 
 	}

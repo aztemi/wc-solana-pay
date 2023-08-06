@@ -41,6 +41,9 @@ function createOrderStore() {
       update(old => {
         let { id, reference, amount, testmode, tokens, suffix, endpoint, home, link, poll } = order;
 
+        let homeUrl = new URL(home);
+        homeUrl.searchParams.set("id", id);
+
         reference = new PublicKey(reference);
         amount = new BigNumber(amount);
 
@@ -65,8 +68,8 @@ function createOrderStore() {
           amount,
           activeToken,
           endpoint: `${endpoint}${id}/`,
-          link: `${home}?wc-api=${link}&id=${id}`,
-          poll: `${home}?wc-api=${poll}&id=${id}`,
+          link: `${homeUrl.toString()}&action=${link}`,
+          poll: `${homeUrl.toString()}&action=${poll}`,
           tokens: paymentTokens
         });
       })

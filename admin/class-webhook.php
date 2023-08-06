@@ -45,14 +45,14 @@ class Webhook {
 	 */
 	private function register_hooks() {
 
-		// webhook GET endpoint for frontend to get transaction details
-		add_action( 'woocommerce_api_' . PLUGIN_ID, array( $this, 'handle_webhook_request' ) );
+		// webhook GET endpoint for frontend to get order details
+		add_action( 'woocommerce_api_' . PLUGIN_ID, array( $this, 'handle_order_request' ) );
 
 		// webhook GET & POST endpoints for receiving payment transactions according to Solana Pay Spec
-		add_action( 'woocommerce_api_' . PLUGIN_ID . '_txn', array( $this, 'handle_transaction_request' ) );
+		add_action( PLUGIN_ID . '_txn', array( $this, 'handle_transaction_request' ) );
 
 		// webhook GET & POST endpoints for checking and setting (by RPC backend) transaction confirmation status
-		add_action( 'woocommerce_api_' . PLUGIN_ID . '_stat', array( $this, 'handle_status_request' ) );
+		add_action( PLUGIN_ID . '_stat', array( $this, 'handle_status_request' ) );
 
 	}
 
@@ -63,7 +63,7 @@ class Webhook {
 	private function get_order_details( $order_id, &$data ) {
 
 		$order = wc_get_order( $order_id );
-		if ( ! $order || ! current_user_can( 'pay_for_order', $order_id ) ) {
+		if ( ! $order ) {
 			return;
 		}
 
@@ -108,9 +108,9 @@ class Webhook {
 
 
 	/**
-	 * Handle incoming webhook GET request.
+	 * Handle incoming webhook GET order request.
 	 */
-	public function handle_webhook_request() {
+	public function handle_order_request() {
 
 		// validate incoming params
 		$ref = isset( $_GET['ref'] ) ? trim( wc_clean( wp_unslash( $_GET['ref'] ) ) ) : '';
@@ -119,16 +119,15 @@ class Webhook {
 
 		if ( empty( $ref ) ) {
 			wp_send_json_error( 'Bad Request', 400 );
-			die();
 		}
 
 		// default return data
 		$data = array(
 			'amount'    => 0,
 			'reference' => $ref,
-			'home'      => esc_url( home_url() ),
-			'link'      => PLUGIN_ID . '_txn',
-			'poll'      => PLUGIN_ID . '_stat',
+			'home'      => esc_url( get_rest_url( null, PLUGIN_ID . '/v1/api' ) ),
+			'link'      => 'txn',
+			'poll'      => 'stat',
 			'testmode'  => $this->hGateway->get_testmode(),
 			'recipient' => $this->hGateway->get_merchant_wallet_address(),
 			'endpoint'  => $this->hGateway->get_rpc_endpoint(),
@@ -146,7 +145,6 @@ class Webhook {
 
 		} else {
 			wp_send_json_error( 'Bad Request', 400 );
-			die();
 
 		}
 
@@ -154,7 +152,6 @@ class Webhook {
 		$amount = $data['amount'];
 		if ( $amount <= 0 ) {
 			wp_send_json_error( 'Not Found', 404 );
-			die();
 		}
 
 		// Add acceptable Solana tokens options for payment and their rates
@@ -169,7 +166,6 @@ class Webhook {
 		$testmode = $this->hGateway->get_testmode();
 		if ( null === Solana_Pay::register_payment_details( $hash, $data, $testmode ) ) {
 			wp_send_json_error( 'Internal Server Error', 500 );
-			die();
 		}
 
 		// store the data in user session for later use during payment processing
@@ -179,9 +175,7 @@ class Webhook {
 		unset( $data['recipient'] );
 
 		// send response
-		header( 'HTTP/1.1 200 OK' );
 		wp_send_json( $data, 200 );
-		die();
 
 	}
 
@@ -189,7 +183,7 @@ class Webhook {
 	/**
 	 * Handle incoming Transaction request based on Solana Pay Spec.
 	 */
-	public function handle_transaction_request() {
+	public function handle_transaction_request( $request ) {
 
 		// validate incoming params
 		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
@@ -197,44 +191,67 @@ class Webhook {
 
 		if ( empty( $id ) || empty( $token ) ) {
 			wp_send_json_error( 'Bad Request', 400 );
-			die();
 		}
 
-		// get account from payload body
-		$account = '';
-		$body = @file_get_contents('php://input');
-		if ( ! empty( $body ) ) {
-			$body = json_decode( $body, true );
-			$account = array_key_exists( 'account', $body ) ? trim( wc_clean( wp_unslash( $body['account'] ) ) ) : '';
-		}
+		// request method
+		$method = $request->get_method();
 
-		if ( empty( $account ) ) {
-			// respond to GET request
-			header('Cache-Control: max-age=86400');
+		// respond to GET request
+		if ( 'GET' === $method ) {
+			// client should cache response for 1 day
+			header( 'Cache-Control: max-age=86400' );
+
+			// send response
 			$data = array(
 				'label' => esc_html( $this->hGateway->get_brand_name() ),
 				'icon'  => esc_attr( $this->hGateway->icon ),
 			);
-		} else {
-			// respond to POST request
-			$testmode = $this->hGateway->get_testmode();
-			$txn_base64 = Solana_Pay::get_payment_transaction( $id, $account, $token, $testmode );
+			wp_send_json( $data, 200 );
+		}
 
-			if ( empty( $txn_base64 ) ) {
-				wp_send_json_error( 'Not Found', 404 );
-				die();
+		// respond to POST request
+		if ( 'POST' === $method ) {
+
+			// validate json body
+			$request_json = $request->get_json_params();
+			$schema = array(
+				'type' => 'object',
+				'properties' => array(
+					'account' => array(
+						'type' => 'string',
+						'required' => true
+					),
+				),
+			);
+			$result = rest_validate_value_from_schema( $request_json, $schema );
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( 'Bad Request', 400 );
 			}
 
+			// sanitize & get account from the json body
+			$request_json = rest_sanitize_value_from_schema( $request_json, $schema );
+			$account = trim( wc_clean( wp_unslash( $request_json['account'] ) ) );
+
+			// return if account is empty
+			if ( empty( $account ) ) {
+				wp_send_json_error( 'Bad Request', 400 );
+			}
+
+			// get transaction from remote
+			$testmode = $this->hGateway->get_testmode();
+			$txn_base64 = Solana_Pay::get_payment_transaction( $id, $account, $token, $testmode );
+			if ( empty( $txn_base64 ) ) {
+				wp_send_json_error( 'Not Found', 404 );
+			}
+
+			// send response
 			$data = array(
 				'message'     => esc_html__( 'Thank you for your order', 'wc-solana-pay' ),
 				'transaction' => trim( wc_clean( wp_unslash( $txn_base64 ) ) ),
 			);
-		}
+			wp_send_json( $data, 200 );
 
-		// send response
-		header( 'HTTP/1.1 200 OK' );
-		wp_send_json( $data, 200 );
-		die();
+		}
 
 	}
 
@@ -242,7 +259,7 @@ class Webhook {
 	/**
 	 * Handle Transaction confirmation status check and notification from the RPC backend.
 	 */
-	public function handle_status_request() {
+	public function handle_status_request( $request ) {
 
 		// validate incoming params
 		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
@@ -250,37 +267,67 @@ class Webhook {
 
 		if ( empty( $id ) || empty( $ref ) ) {
 			wp_send_json_error( 'Bad Request', 400 );
-			die();
 		}
 
-		// get request body
-		$is_get = true;
-		$body = @file_get_contents('php://input');
-		if ( ! empty( $body ) ) {
-			$body = json_decode( $body, true );
-			$is_get = ! is_array( $body );
-		}
+		// request method
+		$method = $request->get_method();
 
-		if ( $is_get ) {
-			// handle GET request
-			header( 'HTTP/1.1 200 OK' );
+		// respond to GET request
+		if ( 'GET' === $method ) {
 			$option_key = PLUGIN_ID . '_' . $id;
 			$signature = get_option( $option_key, array() );
 			wp_send_json( $signature, 200 );
+		}
 
-		} else {
-			// handle POST request
-			foreach ( $body as $v ) {
-				$option_key = PLUGIN_ID . '_' . $v['id'];
-				$signature = array(
-					'signature' => trim( wc_clean( wp_unslash( $v['signature'] ) ) )
-				);
+		// respond to POST request
+		if ( 'POST' === $method ) {
+
+			// validate json body
+			$request_json = $request->get_json_params();
+			$schema = array(
+				'type' => 'array',
+				'minItems' => 1,
+				'items' => array(
+					'type' => 'object',
+					'properties' => array(
+						'id' => array(
+							'type' => 'string',
+							'required' => true
+						),
+						'signature' => array(
+							'type' => 'string',
+							'required' => true
+						),
+					),
+				),
+			);
+			$result = rest_validate_value_from_schema( $request_json, $schema );
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( 'Bad Request', 400 );
+			}
+
+			// sanitize the json body
+			$request_json = rest_sanitize_value_from_schema( $request_json, $schema );
+
+			// add signature to the option table
+			foreach ( $request_json as $v ) {
+				$id = trim( wc_clean( wp_unslash( $v['id'] ) ) );
+				$signature = trim( wc_clean( wp_unslash( $v['signature'] ) ) );
+
+				// return if id or signature is not specified
+				if ( empty( $id ) || empty( $signature ) ) {
+					wp_send_json_error( 'Bad Request', 400 );
+				}
+
+				$option_key = PLUGIN_ID . '_' . $id;
+				$signature = array(	'signature' => $signature );
 				update_option( $option_key, $signature );
 			}
 
-		}
+			// send ok response
+			wp_send_json_success();
 
-		die();
+		}
 
 	}
 
