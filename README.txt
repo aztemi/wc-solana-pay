@@ -76,6 +76,9 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 == Changelog ==
 
+= 2.1.1 =
+* Handle REST requests and sanitize their payloads using WP APIs.
+
 = 2.1.0 =
 * Fix review comments from the WP Plugin Review team.
 
@@ -88,5 +91,5 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 == Upgrade Notice ==
 
-= 2.1.0 =
+= 2.1.1 =
 First public listing on the WordPress plugins repository - No further actions required
