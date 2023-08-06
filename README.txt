@@ -4,7 +4,7 @@ Donate link: https://apps.aztemi.com/wc-solana-pay
 Tags: solana pay, solana, woocommerce, payment, web3, crypto, cryptocurrency, sol, usdc, usdt, wallet
 Requires at least: 5.2
 Tested up to: 6.2.2
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html

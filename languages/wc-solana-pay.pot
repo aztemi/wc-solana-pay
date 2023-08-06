@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Pay with Solana Pay for WooCommerce 2.1.0\n"
+"Project-Id-Version: Pay with Solana Pay for WooCommerce 2.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-solana-pay\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-07-25T14:30:36+00:00\n"
+"POT-Creation-Date: 2023-08-06T12:16:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wc-solana-pay\n"
@@ -19,7 +19,7 @@ msgid "Pay with Solana Pay for WooCommerce"
 msgstr ""
 
 #. Plugin URI of the plugin
-msgid "https://github.com/aztemi/wc-solana-pay"
+msgid "https://apps.aztemi.com/wc-solana-pay"
 msgstr ""
 
 #. Description of the plugin
@@ -43,23 +43,23 @@ msgstr ""
 msgid "RPC remote call failed with code %d"
 msgstr ""
 
-#: admin/class-solana-pay.php:192
+#: admin/class-solana-pay.php:190
 msgid "Payment transaction not found. Please try again."
 msgstr ""
 
-#: admin/class-solana-pay.php:234
+#: admin/class-solana-pay.php:227
 msgid "Unable to confirm payment transaction details. Please try again."
 msgstr ""
 
-#: admin/class-solana-pay.php:258
+#: admin/class-solana-pay.php:251
 msgid "Payment currency not in supported Solana tokens list."
 msgstr ""
 
-#: admin/class-solana-pay.php:460
+#: admin/class-solana-pay.php:489
 msgid "Solana Pay payment completed"
 msgstr ""
 
-#: admin/class-wc-solana-pay-admin.php:88
+#: admin/class-wc-solana-pay-admin.php:92
 msgid "Settings"
 msgstr ""
 
@@ -91,8 +91,8 @@ msgstr ""
 msgid "Auto refresh exchange rate"
 msgstr ""
 
-#: admin/class-webhook.php:137
-#: admin/class-webhook.php:229
+#: admin/class-webhook.php:136
+#: admin/class-webhook.php:249
 msgid "Thank you for your order"
 msgstr ""
 
@@ -107,13 +107,16 @@ msgid "Transaction ID"
 msgstr ""
 
 #: admin/partials/admin-payment-details.php:35
-#: public/partials/public-payment-details.php:35
 msgid "Customer Wallet"
 msgstr ""
 
 #: admin/partials/admin-payment-details.php:36
 #: public/partials/public-payment-details.php:36
-msgid "Received Amount"
+msgid "Amount"
+msgstr ""
+
+#: admin/partials/admin-payment-details.php:37
+msgid "Net Amount after fees"
 msgstr ""
 
 #: admin/partials/admin-settings.php:18
@@ -210,6 +213,10 @@ msgstr ""
 
 #: includes/class-wc-solana-pay.php:66
 msgid "<b>Pay with Solana Pay for WooCommerce</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP."
+msgstr ""
+
+#: public/partials/public-payment-details.php:35
+msgid "Wallet Address"
 msgstr ""
 
 #: public/partials/public-place-order-button.php:26
