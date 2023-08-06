@@ -211,14 +211,28 @@ class Webhook {
 
 		// respond to POST request
 		if ( 'POST' === $method ) {
-			// get account from request body
-			$account = '';
+
+			// validate json body
 			$request_json = $request->get_json_params();
-			if ( is_array( $request_json ) && array_key_exists( 'account', $request_json ) ) {
-				$account = trim( wc_clean( wp_unslash( $request_json['account'] ) ) );
+			$schema = array(
+				'type' => 'object',
+				'properties' => array(
+					'account' => array(
+						'type' => 'string',
+						'required' => true
+					),
+				),
+			);
+			$result = rest_validate_value_from_schema( $request_json, $schema );
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( 'Bad Request', 400 );
 			}
 
-			// return if account is invalid
+			// sanitize & get account from the json body
+			$request_json = rest_sanitize_value_from_schema( $request_json, $schema );
+			$account = trim( wc_clean( wp_unslash( $request_json['account'] ) ) );
+
+			// return if account is empty
 			if ( empty( $account ) ) {
 				wp_send_json_error( 'Bad Request', 400 );
 			}
@@ -236,6 +250,7 @@ class Webhook {
 				'transaction' => trim( wc_clean( wp_unslash( $txn_base64 ) ) ),
 			);
 			wp_send_json( $data, 200 );
+
 		}
 
 	}
@@ -266,22 +281,52 @@ class Webhook {
 
 		// respond to POST request
 		if ( 'POST' === $method ) {
-			// get request body
+
+			// validate json body
 			$request_json = $request->get_json_params();
-			if ( ! is_array( $request_json ) ) {
+			$schema = array(
+				'type' => 'array',
+				'minItems' => 1,
+				'items' => array(
+					'type' => 'object',
+					'properties' => array(
+						'id' => array(
+							'type' => 'string',
+							'required' => true
+						),
+						'signature' => array(
+							'type' => 'string',
+							'required' => true
+						),
+					),
+				),
+			);
+			$result = rest_validate_value_from_schema( $request_json, $schema );
+			if ( is_wp_error( $result ) ) {
 				wp_send_json_error( 'Bad Request', 400 );
 			}
 
+			// sanitize the json body
+			$request_json = rest_sanitize_value_from_schema( $request_json, $schema );
+
+			// add signature to the option table
 			foreach ( $request_json as $v ) {
-				$option_key = PLUGIN_ID . '_' . $v['id'];
-				$signature = array(
-					'signature' => trim( wc_clean( wp_unslash( $v['signature'] ) ) )
-				);
+				$id = trim( wc_clean( wp_unslash( $v['id'] ) ) );
+				$signature = trim( wc_clean( wp_unslash( $v['signature'] ) ) );
+
+				// return if id or signature is not specified
+				if ( empty( $id ) || empty( $signature ) ) {
+					wp_send_json_error( 'Bad Request', 400 );
+				}
+
+				$option_key = PLUGIN_ID . '_' . $id;
+				$signature = array(	'signature' => $signature );
 				update_option( $option_key, $signature );
 			}
 
 			// send ok response
 			wp_send_json_success();
+
 		}
 
 	}
