@@ -18,7 +18,7 @@ class Solana_Pay {
 	/**
 	 * Default scale precision for bc math functions.
 	 *
-	 * @var string
+	 * @var int
 	 */
 	private const BC_MATH_SCALE = 10;
 
@@ -40,27 +40,19 @@ class Solana_Pay {
 
 
 	/**
-	 * Default RPC node endpoint for Solana Devnet.
+	 * Remote endpoint for Testmode payment transactions.
 	 *
 	 * @var string
 	 */
-	protected const RPC_ENDPOINT_DEVNET = 'https://wc-solana-pay.juxdan.io/v1/rpc-devnet/';
+	protected const ENDPOINT_TESTMODE = 'https://wc-solana-pay-staging.juxdan.io/api/v1/';
 
 
 	/**
-	 * Default RPC node endpoint for Solana Mainnet-Beta.
+	 * Remote endpoint for Production payment transactions.
 	 *
 	 * @var string
 	 */
-	protected const RPC_ENDPOINT_MAINNET_BETA = 'https://wc-solana-pay.juxdan.io/v1/rpc/';
-
-
-	/**
-	 * Default endpoint for remote Solana transactions handling.
-	 *
-	 * @var string
-	 */
-	protected const TRANSACTION_ENDPOINT = 'https://wc-solana-pay.juxdan.io/v1/txn/';
+	protected const ENDPOINT_PRODUCTION = 'https://wc-solana-pay.juxdan.io/api/v1/';
 
 
 	/**
@@ -112,61 +104,6 @@ class Solana_Pay {
 
 
 	/**
-	 * Send remote call to a RPC endpoint.
-	 *
-	 * @param  string $method Remote RPC method that will be called.
-	 * @param  array  $params List of attributes for the RPC method.
-	 * @param  string $url    RPC endpoint URL.
-	 * @return mixed          Result array in RPC response if request succeeds or false otherwise.
-	 */
-	private function rpc_remote_post( $method, $params, $url ) {
-
-		$rtn = false;
-
-		$data = $this->hSession->get_data();
-		$id = $data['id'];
-		$url .= $id . '/';
-
-		$body = wp_json_encode(
-			array(
-				'jsonrpc' => '2.0',
-				'id'      => 1,
-				'method'  => $method,
-				'params'  => $params,
-			)
-		);
-
-		$response = wp_remote_post( $url, array(
-			'method'      => 'POST',
-			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-			'timeout'     => 45,
-			'body'        => $body,
-			'data_format' => 'body',
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
-			wc_add_notice( __( 'Connection to RPC failed', 'wc-solana-pay' ), 'error' );
-		} else {
-			$response_code = wp_remote_retrieve_response_code( $response );
-
-			if ( 200 === $response_code ) {
-				$response_body = wp_remote_retrieve_body( $response );
-				$response = json_decode( $response_body, true );
-
-				$rtn = ( array_key_exists( 'result', $response ) ? $response['result'] : array() );
-			} else {
-				/* translators: %d: rpc call response code error, e.g. 404 */
-				wc_add_notice( sprintf( __( 'RPC remote call failed with code %d', 'wc-solana-pay' ), $response_code ), 'error' );
-			}
-		}
-
-		return $rtn;
-
-	}
-
-
-	/**
 	 * Find confirmed payment transaction by reference from the Solana network.
 	 *
 	 * @param  string $txn_id Found transaction ID as output.
@@ -176,9 +113,10 @@ class Solana_Pay {
 
 		$data = $this->hSession->get_data();
 		$reference = $data['reference'];
+		$url = self::endpoint_url( $data['id'], 'rpc', $this->hGateway->get_testmode() );
 
 		$params = array( $reference, array( 'commitment' => 'confirmed' ) );
-		$txn = $this->rpc_remote_post( 'getSignaturesForAddress', $params, $this->hGateway->get_rpc_endpoint() );
+		$txn = self::rpc_remote_post( 'getSignaturesForAddress', $params, $url );
 
 		// Return false in case of error in post request
 		if ( ! is_array( $txn ) ) {
@@ -207,6 +145,9 @@ class Solana_Pay {
 	 */
 	private function get_transaction_details( $txn_id, &$txn_data ) {
 
+		$data = $this->hSession->get_data();
+		$url = self::endpoint_url( $data['id'], 'rpc', $this->hGateway->get_testmode() );
+
 		$params = array(
 			$txn_id,
 			array(
@@ -215,7 +156,7 @@ class Solana_Pay {
 				'maxSupportedTransactionVersion' => 0,
 			)
 		);
-		$txn_data = $this->rpc_remote_post( 'getTransaction', $params, $this->hGateway->get_rpc_endpoint() );
+		$txn_data = self::rpc_remote_post( 'getTransaction', $params, $url );
 
 		// Return false in case of error in post request
 		if ( ! is_array( $txn_data ) ) {
@@ -388,7 +329,7 @@ class Solana_Pay {
 		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
 
 		// compensate for endpoint usage fee already deducted in transaction
-		$percent_fee = self::endpoints_usage_fee();
+		$percent_fee = self::endpoint_usage_fee();
 		$rpc_fee = bcdiv( bcmul( $percent_fee, $amount ), 100 );
 		$expected_amount = bcsub( $amount, $rpc_fee );
 
@@ -500,7 +441,6 @@ class Solana_Pay {
 
 	/**
 	 * Get Solana tokens available for payments and calculate how much the cost of the order in each token.
-	 * Developer Commission for RPC usage is separated out if merchant own RPC is not provided.
 	 *
 	 * @param  string $amount Order amount in the store base currency.
 	 * @return array          List of payment options and their cost values.
@@ -553,24 +493,29 @@ class Solana_Pay {
 
 
 	/**
-	 * RPC endpoint based on testmode.
+	 * Get remote endpoint full URL path.
 	 *
+	 * @param  string $ref_id   Remote session reference ID
+	 * @param  string $action   Remote route action type. It can either be 'rpc' or 'txn' for RPC and Transaction handling respectively.
 	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
 	 * @return string
 	 */
-	public static function rpc_endpoint( $testmode ) {
+	public static function endpoint_url( $ref_id, $action, $testmode ) {
 
-		return $testmode ? self::RPC_ENDPOINT_DEVNET : self::RPC_ENDPOINT_MAINNET_BETA;
+		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
+		$endpoint = $testmode ? self::ENDPOINT_TESTMODE : self::ENDPOINT_PRODUCTION;
+		$url = sprintf( '%s%s/%s/?network=%s', $endpoint, $action, $ref_id, $network );
+		return $url;
 
 	}
 
 
 	/**
-	 * Get RPC and Transaction Endpoints usage fee.
+	 * Get RPC and transactions endpoint usage fee.
 	 *
 	 * @return string
 	 */
-	public static function endpoints_usage_fee() {
+	public static function endpoint_usage_fee() {
 
 		return self::ENDPOINT_USAGE_FEE;
 
@@ -588,8 +533,7 @@ class Solana_Pay {
 	public static function register_payment_details( $ref_id, $data, $testmode ) {
 
 		$rtn = null;
-		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
-		$url = sprintf( '%s%s/?network=%s', self::TRANSACTION_ENDPOINT, $ref_id, $network );
+		$url = self::endpoint_url( $ref_id, 'txn', $testmode );
 
 		$response = wp_remote_post( $url, array(
 			'method'      => 'POST',
@@ -622,8 +566,8 @@ class Solana_Pay {
 	public static function get_payment_transaction( $ref_id, $address, $token_id, $testmode ) {
 
 		$txn = '';
-		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
-		$url = sprintf( '%s%s/?account=%s&token=%s&network=%s', self::TRANSACTION_ENDPOINT, $ref_id, $address, $token_id, $network );
+		$url = self::endpoint_url( $ref_id, 'txn', $testmode );
+		$url = sprintf( '%s&account=%s&token=%s', $url, $address, $token_id );
 		$response = wp_remote_get( $url, array(
 			'method'      => 'GET',
 			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
@@ -633,10 +577,86 @@ class Solana_Pay {
 		if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
 			$response_body = wp_remote_retrieve_body( $response );
 			$response_array = json_decode( $response_body, true );
-			$txn = array_key_exists( 'txn', $response_array ) ? $response_array['txn'] : '';
+			$txn = array_key_exists( 'transaction', $response_array ) ? $response_array['transaction'] : '';
 		}
 
 		return $txn;
+
+	}
+
+
+	/**
+	 * Send payment transaction to the remote RPC server.
+	 *
+	 * @param  string $ref_id   Remote session reference ID.
+	 * @param  string $txn      Base64 serialized transaction.
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return array|null
+	 */
+	public static function send_payment_transaction( $ref_id, $txn, $testmode ) {
+
+		$params = array(
+			$txn,
+			array(
+				'encoding' => 'base64',
+				'skipPreflight' => true
+			)
+		);
+		$url = self::endpoint_url( $ref_id, 'rpc', $testmode );
+		$txn_id = self::rpc_remote_post( 'sendTransaction', $params, $url );
+		$rtn = $txn_id ? $txn_id : null;
+
+		return $rtn;
+
+	}
+
+
+	/**
+	 * Send remote call to a Solana RPC endpoint.
+	 *
+	 * @param  string $method Remote RPC method that will be called.
+	 * @param  array  $params List of attributes for the RPC method.
+	 * @param  string $url    RPC endpoint URL.
+	 * @return mixed          RPC response array or string if request succeeds or false otherwise.
+	 */
+	public static function rpc_remote_post( $method, $params, $url ) {
+
+		$rtn = false;
+		$body = wp_json_encode(
+			array(
+				'jsonrpc' => '2.0',
+				'id'      => 1,
+				'method'  => $method,
+				'params'  => $params,
+			)
+		);
+
+		$response = wp_remote_post( $url, array(
+			'method'      => 'POST',
+			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
+			'timeout'     => 45,
+			'body'        => $body,
+			'data_format' => 'body',
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			wc_add_notice( __( 'Connection to RPC failed', 'wc-solana-pay' ), 'error' );
+		} else {
+			$response_code = wp_remote_retrieve_response_code( $response );
+
+			if ( 200 === $response_code ) {
+				$response_body = wp_remote_retrieve_body( $response );
+				$response = json_decode( $response_body, true );
+
+				$rtn = ( array_key_exists( 'result', $response ) ? $response['result'] : array() );
+			} else {
+				/* translators: %d: rpc call response code error, e.g. 404 */
+				wc_add_notice( sprintf( __( 'RPC remote call failed with code %d', 'wc-solana-pay' ), $response_code ), 'error' );
+			}
+		}
+
+		return $rtn;
 
 	}
 

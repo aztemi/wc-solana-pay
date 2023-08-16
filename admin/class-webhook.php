@@ -54,6 +54,9 @@ class Webhook {
 		// webhook GET & POST endpoints for checking and setting (by RPC backend) transaction confirmation status
 		add_action( PLUGIN_ID . '_stat', array( $this, 'handle_status_request' ) );
 
+		// webhook POST endpoint for sending signed transactions to the remote RPC node
+		add_action( PLUGIN_ID . '_rpc', array( $this, 'send_rpc_request' ) );
+
 	}
 
 
@@ -128,9 +131,9 @@ class Webhook {
 			'home'      => esc_url( get_rest_url( null, PLUGIN_ID . '/v1/api' ) ),
 			'link'      => 'txn',
 			'poll'      => 'stat',
+			'rpc'       => 'rpc',
 			'testmode'  => $this->hGateway->get_testmode(),
 			'recipient' => $this->hGateway->get_merchant_wallet_address(),
-			'endpoint'  => $this->hGateway->get_rpc_endpoint(),
 			'suffix'    => Solana_Tokens::get_store_currency_key_suffix(),
 			'label'     => esc_html( $this->hGateway->get_brand_name() ),
 			'message'   => esc_html__( 'Thank you for your order', 'wc-solana-pay' ),
@@ -322,6 +325,60 @@ class Webhook {
 				$option_key = PLUGIN_ID . '_' . $id;
 				$signature = array(	'signature' => $signature );
 				update_option( $option_key, $signature );
+			}
+
+			// send ok response
+			wp_send_json_success();
+
+		}
+
+	}
+
+
+	/**
+	 * Send signed transaction request to remote RPC node.
+	 */
+	public function send_rpc_request( $request ) {
+
+		// validate incoming params
+		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
+
+		if ( empty( $id ) ) {
+			wp_send_json_error( 'Bad Request', 400 );
+		}
+
+		// handle POST request
+		if ( 'POST' === $request->get_method() ) {
+
+			// validate json body
+			$request_json = $request->get_json_params();
+			$schema = array(
+				'type' => 'object',
+				'properties' => array(
+					'transaction' => array(
+						'type' => 'string',
+						'required' => true
+					),
+				),
+			);
+			$result = rest_validate_value_from_schema( $request_json, $schema );
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( 'Bad Request', 400 );
+			}
+
+			// sanitize & get transaction from the json body
+			$request_json = rest_sanitize_value_from_schema( $request_json, $schema );
+			$transaction = trim( wc_clean( wp_unslash( $request_json['transaction'] ) ) );
+
+			// return if transaction is empty
+			if ( empty( $transaction ) ) {
+				wp_send_json_error( 'Bad Request', 400 );
+			}
+
+			// send transaction to remote
+			$testmode = $this->hGateway->get_testmode();
+			if ( null === Solana_Pay::send_payment_transaction( $id, $transaction, $testmode ) ) {
+				wp_send_json_error( 'Internal Server Error', 500 );
 			}
 
 			// send ok response

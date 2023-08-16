@@ -12,7 +12,7 @@ const emptyOrder = {
   reference: null,
   amount: new BigNumber(0),
   currency: "",
-  endpoint: "", // RPC endpoint
+  rpc: "", // RPC endpoint
   link: "", // `link` param in Solana Pay spec
   poll: "", // endpoint to poll transaction status
   tokens: {},
@@ -39,7 +39,7 @@ function createOrderStore() {
 
     setOrder: order =>
       update(old => {
-        let { id, reference, amount, testmode, tokens, suffix, endpoint, home, link, poll } = order;
+        let { id, reference, amount, testmode, tokens, suffix, rpc, home, link, poll } = order;
 
         let homeUrl = new URL(home);
         homeUrl.searchParams.set("id", id);
@@ -67,7 +67,7 @@ function createOrderStore() {
           reference,
           amount,
           activeToken,
-          endpoint: `${endpoint}${id}/`,
+          rpc: `${homeUrl.toString()}&action=${rpc}`,
           link: `${homeUrl.toString()}&action=${link}`,
           poll: `${homeUrl.toString()}&action=${poll}`,
           tokens: paymentTokens
