@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 
-function get_th( $value, $style = '', $colspan = '' ) {
+function get_th( $value, $style = '', $colspan = '', $tip = '' ) {
 
 	if ( $style ) {
 		$style = sprintf( ' style="%s"', $style );
@@ -22,7 +22,7 @@ function get_th( $value, $style = '', $colspan = '' ) {
 		$colspan = sprintf( ' colspan="%s"', $colspan );
 	}
 
-	$th = sprintf( '<th%s%s>%s</th>', $style, $colspan, esc_html( $value ) );
+	$th = sprintf( '<th%s%s>%s%s</th>', $style, $colspan, esc_html( $value ), $tip );
 
 	return $th;
 
@@ -40,7 +40,7 @@ function get_td( $value, $style = '' ) {
 
 }
 
-function get_input( $name, $value, $style = '', $type = 'text' ) {
+function get_input( $name, $value, $style = '', $type = 'text', $readonly = false ) {
 
 	if ( $style ) {
 		$style = sprintf( ' style="%s"', $style );
@@ -50,8 +50,9 @@ function get_input( $name, $value, $style = '', $type = 'text' ) {
 	} else {
 		$value = ' value="' . esc_attr( $value ) . '"';
 	}
+	$readonly = $readonly ? ' readonly="readonly" class="disabled"' : '';
 
-	$input = sprintf( '<input type="%s" name="%s"%s%s />', $type, $name, $value, $style );
+	$input = sprintf( '<input type="%s" name="%s"%s%s%s />', $type, $name, $value, $style, $readonly );
 
 	return $input;
 
@@ -60,9 +61,9 @@ function get_input( $name, $value, $style = '', $type = 'text' ) {
 function get_tokens_table_header( $show_currency ) {
 
 	$header = '<tr>'
-		. get_th( __( 'Accept', 'wc-solana-pay' ), 'text-align:center;max-width:6rem' )
-		. get_th( __( 'Token', 'wc-solana-pay' ), 'min-width:10rem' )
-		. get_th( __( 'Label', 'wc-solana-pay' ) )
+		. get_th( __( 'Enabled', 'wc-solana-pay' ), 'text-align:center;max-width:6rem' )
+		. get_th( __( 'Token', 'wc-solana-pay' ), 'min-width:15rem' )
+		. get_th( __( 'Auto Refresh', 'wc-solana-pay' ), 'text-align:center;min-width:9rem;max-width:12rem', '', wp_kses_post( wc_help_tip( __( 'Auto refresh exchange rate every hour if checked.', 'wc-solana-pay' ), true ) ) )
 		. get_th( __( 'Exchange Rate', 'wc-solana-pay' ), '', 3 )
 		. get_th( __( '% Commission', 'wc-solana-pay' ), '' )
 		. get_th( sprintf( '%s: 1.00 %s =', __( 'Preview', 'wc-solana-pay' ), $show_currency ), 'text-align:center;min-width:8rem' )
@@ -72,7 +73,7 @@ function get_tokens_table_header( $show_currency ) {
 
 }
 
-function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency, $auto_refresh ) {
+function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency ) {
 
 	$rows = '';
 
@@ -94,10 +95,10 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 
 		// default settings
 		$table = array(
-			'label'   => $v['symbol'],
-			'rate'    => '1.00',
-			'fee'     => Solana_Pay::endpoints_usage_fee(),
-			'enabled' => !! $in_testmode, // enable testmode tokens by default
+			'rate'        => '1.00',
+			'fee'         => Solana_Pay::endpoints_usage_fee(),
+			'enabled'     => !! $in_testmode, // enable testmode tokens by default
+			'autorefresh' => true,
 		);
 
 		// merge saved settings into table
@@ -106,7 +107,8 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		}
 
 		// Rate Update icon button
-		$update_icon = '<span class="button-link dashicons dashicons-update" style="text-decoration-line:none" title="' . esc_attr( $auto_refresh ) . '" data-symbol="' . esc_attr( $v['symbol'] ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
+		$auto_refresh = __( 'Click to refresh exchange rate', 'wc-solana-pay' );
+		$update_icon = '<span class="button-link dashicons dashicons-update" style="text-decoration-line:none" title="' . esc_attr( $auto_refresh ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
 
 		// Remove Rate Update button if token or stable coin is similar to store base currency
 		$stablecoin = array_key_exists( 'stablecoin', $v ) ? strtoupper( $v['stablecoin'] ) : '';
@@ -121,15 +123,15 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		}
 
 		// input element name fields
-		$id      = "pwspfwc_id[$i]";
-		$fee     = "pwspfwc_fee[$i]";
-		$rate    = "pwspfwc_rate[$i]";
-		$label   = "pwspfwc_label[$i]";
-		$enabled = "pwspfwc_enabled[$i]";
+		$id          = "pwspfwc_id[$i]";
+		$fee         = "pwspfwc_fee[$i]";
+		$rate        = "pwspfwc_rate[$i]";
+		$enabled     = "pwspfwc_enabled[$i]";
+		$autorefresh = "pwspfwc_autorefresh[$i]";
 
 		// token icon & name
 		$token_icon = '<img src="' . PLUGIN_URL . '/' . $v['icon'] . '" alt="' . $v['name'] . ' icon" style="width:1.5rem;border-radius:50%">';
-		$token_name = '<span style="padding-left:0.3rem">' . esc_html( $v['name'] ) . '</span>';
+		$token_name = '<span style="padding-left:0.3rem">' . esc_html( $v['symbol'] ) . ' (' . esc_html( $v['name'] ) . ')</span>';
 		$token_div = '<div style="display:flex;align-items:center">' . $token_icon . $token_name . '</div>';
 
 		// fee input & percent
@@ -137,12 +139,12 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		$percent = '<span style="padding-left:0.3rem"><strong>%</strong></span>';
 		$fee_div = '<div style="display:flex;align-items:center">' . $fee_input . $percent . '</div>';
 
-		$tr = '<tr class="' . $class . '" data-decimals="' . esc_attr( $v['decimals'] ) . '">'
+		$tr = '<tr class="' . $class . '" data-symbol="' . esc_attr( $v['symbol'] ) . '">'
 			. get_td( get_input( $id, $k, '', 'hidden' ) . get_input( $enabled, $table['enabled'], '', 'checkbox' ), 'text-align:center' )
 			. get_td( $token_div, 'padding-left:0.5rem' )
-			. get_td( get_input( $label, $table['label'], 'max-width:7rem' ), '' )
+			. get_td( get_input( $autorefresh, $table['autorefresh'], '', 'checkbox' ), 'text-align:center' )
 			. get_td( $update_icon, 'text-align:right;padding-right:0 !important;vertical-align:bottom' )
-			. get_td( get_input( $rate, $table['rate'], 'max-width:7rem' ), '' )
+			. get_td( get_input( $rate, $table['rate'], 'max-width:7rem', 'text', $table['autorefresh'] ), '' )
 			. get_td( '<strong>+</strong>', 'text-align:center;vertical-align:middle' )
 			. get_td( $fee_div, '' )
 			. get_td( '<span class="token_preview"></span>', 'text-align:right;padding-right:0.5rem' )
@@ -167,13 +169,14 @@ function get_allowed_tags() {
 
 	// form input field
 	$allowed_tags['input'] = array(
-		'id'      => true,
-		'class'   => true,
-		'name'    => true,
-		'value'   => true,
-		'type'    => true,
-		'style'   => true,
-		'checked' => true,
+		'id'       => true,
+		'class'    => true,
+		'name'     => true,
+		'value'    => true,
+		'type'     => true,
+		'style'    => true,
+		'checked'  => true,
+		'readonly' => true,
 	);
 
 	return $allowed_tags;
@@ -182,7 +185,7 @@ function get_allowed_tags() {
 
 $allowed_tags = get_allowed_tags();
 $header = get_tokens_table_header( $show_currency );
-$body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency, $auto_refresh );
+$body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency );
 ?>
 
 <tr valign="top">
@@ -191,7 +194,7 @@ $body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $b
 	</th>
 	<td class="forminp">
 		<div class="wc_input_table_wrapper">
-			<table class="wc_gateways widefat" style="min-width:60rem;max-width:75rem" cellspacing="0" cellpadding="0">
+			<table class="wc_gateways widefat" style="min-width:70rem;max-width:85rem" cellspacing="0" cellpadding="0">
 				<thead><?php echo wp_kses_post( $header ); ?></thead>
 				<tbody><?php echo wp_kses( $body, $allowed_tags ); ?></tbody>
 			</table>

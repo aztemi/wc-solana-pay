@@ -289,7 +289,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		if ( $tablejs ) {
 			$base_currency = Solana_Tokens::get_store_currency('edit');
 			$show_currency = Solana_Tokens::get_store_currency();
-			$auto_refresh = __( 'Auto refresh exchange rate', 'wc-solana-pay' );
 			$script = get_partial_file_html(
 				$tablejs,
 				array(
@@ -303,7 +302,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 					'tip'             => $data['desc_tip'],
 					'title'           => $data['title'],
 					'script'          => $script,
-					'auto_refresh'    => $auto_refresh,
 					'base_currency'   => $base_currency,
 					'show_currency'   => $show_currency,
 					'tokens_table'    => $this->tokens_table,
@@ -328,12 +326,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verification already handled in WC_Admin_Settings::save()
 		if (
 			isset( $_POST['pwspfwc_id'] ) &&
-			isset( $_POST['pwspfwc_label'] ) &&
 			isset( $_POST['pwspfwc_rate'] ) &&
 			isset( $_POST['pwspfwc_fee'] )
 		) {
 			$ids    = wc_clean( wp_unslash( $_POST['pwspfwc_id'] ) );
-			$labels = wc_clean( wp_unslash( $_POST['pwspfwc_label'] ) );
 			$rates  = wc_clean( wp_unslash( $_POST['pwspfwc_rate'] ) );
 			$fees   = wc_clean( wp_unslash( $_POST['pwspfwc_fee'] ) );
 
@@ -343,11 +339,11 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 				}
 
 				$tokens[ $ids[ $i ] ] = array(
-					'id'      => $ids[ $i ],
-					'label'   => $labels[ $i ],
-					'rate'    => $rates[ $i ],
-					'fee'     => $fees[ $i ],
-					'enabled' => isset( $_POST['pwspfwc_enabled'][ $i ] ) ? true : false,
+					'id'          => $ids[ $i ],
+					'rate'        => $rates[ $i ],
+					'fee'         => $fees[ $i ],
+					'enabled'     => isset( $_POST['pwspfwc_enabled'][ $i ] ) ? true : false,
+					'autorefresh' => isset( $_POST['pwspfwc_autorefresh'][ $i ] ) ? true : false,
 				);
 			}
 		}

@@ -47,8 +47,8 @@ import BigNumber from "bignumber.js";
     return bigRate.plus(commission).decimalPlaces(DP, BigNumber.ROUND_CEIL).toNumber();
   }
 
-  // Update token rate handling
-  function handleUpdateClick() {
+  // Handle exchange rate update
+  function handleExchangeRate() {
     $$("tr.token").each(function () {
       const tr = $$(this);
       tr.on("click", ".dashicons-update", async function () {
@@ -65,11 +65,23 @@ import BigNumber from "bignumber.js";
           handleCurrencyPreview();
         }
       });
+
+      // AutoRefresh Checkbox handling
+      tr.on("change", "td input[name*=autorefresh]", function () {
+        const rateInput = tr.find("td input[name*=rate]");
+        if (this.checked) {
+          rateInput.prop("readonly", true);
+          rateInput.addClass("disabled");
+        } else {
+          rateInput.prop("readonly", false);
+          rateInput.removeClass("disabled");
+        }
+      });
     });
   }
 
-  // Enable Testmode checkbox handling
-  function handleTestmodeCheckbox() {
+  // Testmode Dropdown Select handling
+  function handleTestmodeDropdown() {
     if ("devnet" === $$("select[name*=_network] option").filter(":selected").val()) {
       $$("tr.live_only").hide();
       $$("tr.testmode_only").show();
@@ -85,21 +97,21 @@ import BigNumber from "bignumber.js";
       const tr = $$(this);
       const rate = tr.find("td input[name*=rate]").val();
       const fee = tr.find("td input[name*=fee]").val();
-      const label = tr.find("td input[name*=label]").val();
+      const symbol = tr.data("symbol");
       const val = getRateWithFee(rate, fee);
-      tr.find("span.token_preview").text(`${val} ${label}`);
+      tr.find("span.token_preview").text(`${val} ${symbol}`);
     });
   }
 
   function handleOnchange() {
-    handleTestmodeCheckbox();
+    handleTestmodeDropdown();
     handleCurrencyPreview();
   }
 
   function init() {
     window.onchange = handleOnchange;
     checkCoingeckoSupport();
-    handleUpdateClick();
+    handleExchangeRate();
     handleOnchange();
   }
 

@@ -315,7 +315,7 @@ class Solana_Tokens {
 		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
 
 		foreach ( $tokens_table as $token => $v ) {
-			if ( array_key_exists( $token, $supported_tokens ) ) {
+			if ( $v['autorefresh'] && array_key_exists( $token, $supported_tokens ) ) {
 				$token_coingecko = $supported_tokens[ $token ]['coingecko'];
 
 				if ( array_key_exists( $token_coingecko, $coingecko_prices ) ) {
