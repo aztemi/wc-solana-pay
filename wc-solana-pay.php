@@ -30,6 +30,7 @@ if ( ! defined( 'WPINC' ) ) {
 // define named constants
 define( __NAMESPACE__ . '\PLUGIN_ID', 'wc-solana-pay' );
 define( __NAMESPACE__ . '\PLUGIN_DIR', untrailingslashit( __DIR__ ) );
+define( __NAMESPACE__ . '\PLUGIN_FILE', untrailingslashit( __FILE__ ) );
 define( __NAMESPACE__ . '\PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( __NAMESPACE__ . '\PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 

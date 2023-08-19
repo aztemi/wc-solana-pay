@@ -76,9 +76,6 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 
 	$rows = '';
 
-	// Get currency exchange list supported by Coingecko API
-	$coingecko_currencies = get_coingecko_supported_currencies();
-
 	// Enqueue DashIcons
 	wp_enqueue_style( 'dashicons' );
 
@@ -118,8 +115,8 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 			$table['rate'] = '1.00';
 		}
 
-		// Remove Rate Update button if currency not in Coingecko supported list
-		if ( count( $coingecko_currencies ) && ! in_array( strtolower( $show_currency ), $coingecko_currencies ) ) {
+		// Remove Rate Update button if currency lookup is not supported list
+		if ( ! Solana_Tokens::is_rate_conversion_supported() ) {
 			$update_icon = '';
 		}
 
@@ -156,26 +153,6 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 	return $rows;
 
 }
-
-function get_coingecko_supported_currencies() {
-
-	$currencies_list = array();
-	$url = 'https://api.coingecko.com/api/v3/simple/supported_vs_currencies';
-	$response = wp_remote_get( $url, array(
-		'method'      => 'GET',
-		'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-		'timeout'     => 10,
-		)
-	);
-	if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
-		$response_body = wp_remote_retrieve_body( $response );
-		$currencies_list = json_decode( $response_body, true );
-	}
-
-	return $currencies_list;
-
-}
-
 
 function get_allowed_tags() {
 

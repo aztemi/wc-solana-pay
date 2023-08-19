@@ -25,15 +25,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 *
 	 * @var string
 	 */
-	protected const ORDER_META_KEY = 'pwspfwc_payment';
-
-
-	/**
-	 * Unique Key for storing tokens table settings in WP Option array.
-	 *
-	 * @var string
-	 */
-	protected const TOKENS_OPTION_KEY = 'pwspfwc_tokens';
+	protected const ORDER_META_KEY = PLUGIN_ID . '_payment';
 
 
 	/**
@@ -149,6 +141,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	private function get_settings() {
 
 		// load settings
+		Solana_Tokens::update_tokens_prices();
 		$this->init_form_fields();
 		$this->init_settings();
 
@@ -167,7 +160,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		// Get saved settings for the supported Solana tokens table
-		$this->tokens_table = get_option( self::TOKENS_OPTION_KEY, array() );
+		$this->tokens_table = get_option( Solana_Tokens::TOKENS_OPTION_KEY, array() );
 
 	}
 
@@ -360,7 +353,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 		// phpcs:enable
 
-		update_option( self::TOKENS_OPTION_KEY, $tokens );
+		update_option( Solana_Tokens::TOKENS_OPTION_KEY, $tokens );
 
 	}
 
