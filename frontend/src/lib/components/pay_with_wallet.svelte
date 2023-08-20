@@ -1,10 +1,11 @@
 <script>
   import { onMount } from "svelte";
   import { Buffer } from "buffer";
-  import { Connection, Transaction } from "@solana/web3.js";
+  import { Transaction } from "@solana/web3.js";
   import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
   import { ConnectionProvider, WalletProvider } from "@svelte-on-solana/wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
+  import { postRequest } from "../utils/post_request";
   import WalletSplitMultiButton from "./buttons/wallet_split_multi_button.svelte";
 
   export let link;
@@ -37,30 +38,17 @@
       try {
         loading = true;
         // fetch the transaction
-        const { transaction } = await fetch(link, {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ account: $walletStore.publicKey.toBase58() })
-        })
-          .then(res => {
-            if (!res.ok) {
-              throw new Error(`Fetch error! Status: ${res.status}`);
-            }
-
-            return res;
-          })
-          .then(res => res.json());
+        const { transaction } = await postRequest(link, { account: $walletStore.publicKey.toBase58() });
 
         // extract payment transaction created in backend
         const txBuf = Buffer.from(transaction, "base64");
         let tx = Transaction.from(txBuf);
 
-        // send the transaction
-        const connection = new Connection(endpoint, "confirmed");
-        await $walletStore.sendTransaction(tx, connection);
+        // sign the transaction
+        tx = await $walletStore.signTransaction(tx);
+
+        // send the transaction via backend RPC endpoint
+        await postRequest(endpoint, { transaction: tx.serialize().toString("base64") });
 
         // poll for transaction result
         startPolling();
