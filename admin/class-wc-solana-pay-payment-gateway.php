@@ -509,18 +509,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Get RPC endpoint
-	 *
-	 * @return string Current RPC endpoint
-	 */
-	public function get_rpc_endpoint() {
-
-		return Solana_Pay::rpc_endpoint( $this->is_testmode );
-
-	}
-
-
-	/**
 	 * Get Testmode
 	 *
 	 * @return bool

@@ -96,7 +96,7 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		// default settings
 		$table = array(
 			'rate'        => '1.00',
-			'fee'         => Solana_Pay::endpoints_usage_fee(),
+			'fee'         => Solana_Pay::endpoint_usage_fee(),
 			'enabled'     => !! $in_testmode, // enable testmode tokens by default
 			'autorefresh' => true,
 		);
