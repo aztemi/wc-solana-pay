@@ -154,9 +154,9 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		// update settings that depend on testmode status
 		if ( $this->is_testmode ) {
-			$testmode_msg = ' <b>(' . esc_html__( 'Test Mode enabled. Devnet in use', 'wc-solana-pay' ) . ')</b>';
+			$testmode_msg = ' <b>' . esc_html__( '(Test Mode enabled. Devnet in use).', 'wc-solana-pay' ) . '</b>';
 			$this->method_description .= $testmode_msg;
-			$this->description .= $testmode_msg;
+			$this->description .= $testmode_msg . Solana_Tokens::testmode_faucet_tip();
 		}
 
 		// Get saved settings for the supported Solana tokens table

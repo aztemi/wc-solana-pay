@@ -417,4 +417,19 @@ class Solana_Tokens {
 
 	}
 
+
+	/**
+	 * Get testmode faucet tip message.
+	 *
+	 * @return string
+	 */
+	public static function testmode_faucet_tip() {
+
+		$faucet_url = 'https://apps.aztemi.com/wc-solana-pay/faucet/';
+		$faucet_link = '<a href="' . $faucet_url . '" target="_blank" rel="noopener noreferrer"><b>' . esc_html__( 'Devnet Faucet', 'wc-solana-pay' ) . '</b></a>';
+		/* translators: %s: Devnet Faucet */
+		return '<p>' . sprintf( esc_html__( 'Get free tokens for testing from the %s.', 'wc-solana-pay' ), $faucet_link ) . '</p>';
+
+	}
+
 }

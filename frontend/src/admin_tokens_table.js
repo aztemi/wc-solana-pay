@@ -84,10 +84,10 @@ import BigNumber from "bignumber.js";
   function handleTestmodeDropdown() {
     if ("devnet" === $$("select[name*=_network] option").filter(":selected").val()) {
       $$("tr.live_only").hide();
-      $$("tr.testmode_only").show();
+      $$("tr.testmode_only,span.testmode_only").show();
     } else {
       $$("tr.live_only").show();
-      $$("tr.testmode_only").hide();
+      $$("tr.testmode_only,span.testmode_only").hide();
     }
   }
 

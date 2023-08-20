@@ -2,7 +2,7 @@
   "USDC": {
     "symbol": "USDC",
     "name": "Circle USD Coin",
-    "mint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr",
+    "mint": "9W81AjUS2hCPdXFuVpeqfyCzZyWdbFENG4fjRR2YmYZR",
     "decimals": 6,
     "icon": "assets/img/tokens/usdc.png",
     "coingecko": "usd-coin",
@@ -11,7 +11,7 @@
   "USDT": {
     "symbol": "USD₮",
     "name": "Tether USDt",
-    "mint": "EJwZgeZrdC8TXTQbQBoL6bfuAnFUUy1PVCMB4DYPzVaS",
+    "mint": "2wYLrR96yEn5wPHvMFs7uULvgRJk7pWhzeXsDREtqn75",
     "decimals": 6,
     "icon": "assets/img/tokens/usdt.png",
     "coingecko": "tether",

@@ -66,7 +66,7 @@ function get_tokens_table_header( $show_currency ) {
 		. get_th( __( 'Auto Refresh', 'wc-solana-pay' ), 'text-align:center;min-width:9rem;max-width:12rem', '', wp_kses_post( wc_help_tip( __( 'Auto refresh exchange rate every hour if checked.', 'wc-solana-pay' ), true ) ) )
 		. get_th( __( 'Exchange Rate', 'wc-solana-pay' ), '', 3 )
 		. get_th( __( '% Commission', 'wc-solana-pay' ), '' )
-		. get_th( sprintf( '%s: 1.00 %s =', __( 'Preview', 'wc-solana-pay' ), $show_currency ), 'text-align:center;min-width:8rem' )
+		. get_th( sprintf( '%s: 1.00 %s', __( 'Preview', 'wc-solana-pay' ), $show_currency ), 'text-align:right;min-width:8rem' )
 		. '</tr>';
 
 	return $header;
@@ -199,6 +199,7 @@ $body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $b
 				<tbody><?php echo wp_kses( $body, $allowed_tags ); ?></tbody>
 			</table>
 		</div>
+		<span class="testmode_only"><?php echo wp_kses_post( Solana_Tokens::testmode_faucet_tip() ); ?></span>
 		<?php wp_print_inline_script_tag( $script ); ?>
 	</td>
 </tr>
