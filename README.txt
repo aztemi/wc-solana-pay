@@ -48,7 +48,7 @@ This is a quick and easy way to add crypto payments via Solana Pay to your websi
 2. Select **Enable Pay with Solana Pay** checkbox.
 3. Add your Solana wallet address to the **Merchant Wallet Address** field.
 4. Choose **Solana Network**. Try first in Test Mode by selecting **Devnet**. Select **Mainnet-Beta** for the Production Mode.
-5. Enable Solana Tokens you want to accept. Adjust their **Exchange Rate** fields to appropriate rates you prefer. You can also update their "% Commission" to compensate for fluctuations in tokens prices.
+5. Enable Solana Tokens you want to accept. You can adjust their "% Commission" to compensate for fluctuations in tokens prices.
 6. Click **Save changes**.
 
 = Minimum Requirements =
