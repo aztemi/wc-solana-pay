@@ -1,14 +1,17 @@
 # wc-solana-pay
 
-Solana Pay payment gateway for WordPress and WooCommerce
+Solana Pay powered payment gateway for WordPress and WooCommerce.
 
 <img src="/assets/img/screenshot.png" alt="Pay with Solana Pay demo screenshot" width="240">
 
-It is a payment gateway for accepting crypto payments in SOL, USDC, USDT and more in online WooCommerce eCommerce stores. This project was originally created as an entry to the [Solana Grizzlython Hackathon](https://solana.com/grizzlython). It has evolved into a full-fledged project that is now available on the [WordPress Plugins](https://wordpress.org/plugins/) site for download and install.
+This is a decentralized, permissionless, and fast payment gateway powered by Solana blockchain.
+It supports payments in SOL, USDC, USDT and more via QR Code and through all major Solana wallets, including Phantom, Solflare and Backpack.
 
-## Demo Website
+It is a quick and easy way to add crypto payments to your WooCommerce store and WordPress website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
 
-Try it out for yourself. Below is an online store for the project.
+## Demo Store
+
+Below is an online store for the project. Get free tokens for testing from the [Devnet Faucet](https://apps.aztemi.com/wc-solana-pay/faucet/) and try out the store for yourself.
 
 - [https://solana-pay-demo.juxdan.io/](https://solana-pay-demo.juxdan.io/)
 
@@ -18,6 +21,7 @@ Below are some of the major features of this plugin.
 
 - Solana Pay smart button integrated with the Checkout page for express checkout without redirect.
 - Supports payments via QR Code scan and connection to browser wallets.
+- Fast transactions handling and direct payments into the Solana wallet address that you configure.
 - Supports payments in SOL, USDC, and USDT. More tokens can easily be added through configuration.
 - Customizable settings under WooCommerce Payment page.
 
