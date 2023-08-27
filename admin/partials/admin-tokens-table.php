@@ -110,9 +110,8 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		$auto_refresh = __( 'Click to refresh exchange rate', 'wc-solana-pay' );
 		$update_icon = '<span class="button-link dashicons dashicons-update" style="text-decoration-line:none" title="' . esc_attr( $auto_refresh ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
 
-		// Remove Rate Update button if token or stable coin is similar to store base currency
-		$stablecoin = array_key_exists( 'stablecoin', $v ) ? strtoupper( $v['stablecoin'] ) : '';
-		if ( ( $k === $base_currency ) || ( $stablecoin === $base_currency ) ) {
+		// Remove Rate Update button if token is the store base currency
+		if ( $k === $base_currency ) {
 			$update_icon = '';
 			$table['rate'] = '1.00';
 		}
