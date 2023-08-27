@@ -305,15 +305,28 @@ class Solana_Tokens {
 			return;
 		}
 
+		// get persisted tokens table settings
 		$tokens_table = get_option( self::TOKENS_OPTION_KEY, array() );
-
 		$supported_tokens = self::$supported_tokens;
+
+		// initialize table if empty
+		if ( ! count( $tokens_table ) ) {
+			foreach ( $supported_tokens as $k => $v ) {
+				$tokens_table[ $k ] = array(
+					'id'          => $k,
+					'autorefresh' => true,
+				);
+			}
+		}
+
+		// get current exchange prices
 		$store_currency = self::get_store_currency();
 		$coingecko_tokens = array_column( $supported_tokens, 'coingecko' );
 		$coingecko_prices = self::get_coingecko_tokens_prices( $coingecko_tokens, $store_currency );
 
 		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
 
+		// update exchange rates in table
 		foreach ( $tokens_table as $token => $v ) {
 			if ( $v['autorefresh'] && array_key_exists( $token, $supported_tokens ) ) {
 				$token_coingecko = $supported_tokens[ $token ]['coingecko'];

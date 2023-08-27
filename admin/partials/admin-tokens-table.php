@@ -80,6 +80,9 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 	// Enqueue DashIcons
 	wp_enqueue_style( 'dashicons' );
 
+	// check if exchange rate lookup is available for the store base currency
+	$rate_lookup_available = Solana_Tokens::is_rate_conversion_supported();
+
 	// Create Admin Settings table row for each supported token
 	$i = -1;
 	$supported_tokens = array_merge( $testmode_tokens, $live_tokens );
@@ -116,8 +119,8 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 			$table['rate'] = '1.00';
 		}
 
-		// Remove Rate Update button if currency lookup is not supported list
-		if ( ! Solana_Tokens::is_rate_conversion_supported() ) {
+		// Remove Rate Update button if currency lookup is not available
+		if ( ! $rate_lookup_available ) {
 			$update_icon = '';
 		}
 
