@@ -109,21 +109,6 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 			$table = array_merge( $table, $tokens_table[ $k ] );
 		}
 
-		// Rate Update icon button
-		$auto_refresh = __( 'Click to refresh exchange rate', 'wc-solana-pay' );
-		$update_icon = '<span class="button-link dashicons dashicons-update" style="text-decoration-line:none" title="' . esc_attr( $auto_refresh ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
-
-		// Remove Rate Update button if token is the store base currency
-		if ( $k === $base_currency ) {
-			$update_icon = '';
-			$table['rate'] = '1.00';
-		}
-
-		// Remove Rate Update button if currency lookup is not available
-		if ( ! $rate_lookup_available ) {
-			$update_icon = '';
-		}
-
 		// input element name fields
 		$id          = "pwspfwc_id[$i]";
 		$fee         = "pwspfwc_fee[$i]";
@@ -141,10 +126,35 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		$percent = '<span style="padding-left:0.3rem"><strong>%</strong></span>';
 		$fee_div = '<div style="display:flex;align-items:center">' . $fee_input . $percent . '</div>';
 
+		// rate refresh icon button
+		$title_attr = __( 'Click to refresh exchange rate', 'wc-solana-pay' );
+		$update_icon = '<span class="button-link dashicons dashicons-update" style="text-decoration-line:none" title="' . esc_attr( $title_attr ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
+
+		// rate auto-refresh input
+		if ( $rate_lookup_available ) {
+			// show checkbox if rate lookup is available
+			$rate_checkbox = get_input( $autorefresh, $table['autorefresh'], '', 'checkbox' );
+		} else {
+			// show 'Not Available' otherwise
+			$update_icon = '';
+			if ( $table['autorefresh'] ) {
+				$table['rate'] = '';
+				$table['autorefresh'] = false;
+			}
+			$title_attr = __( 'Not available for the store currency', 'wc-solana-pay' );
+			$rate_checkbox = '<span title="' . esc_attr( $title_attr ) . '">' . esc_html__( 'Not Available', 'wc-solana-pay' ) . '<span>';
+		}
+
+		// remove rate refresh button for the store base currency
+		if ( $k === $base_currency ) {
+			$update_icon = '';
+			$table['rate'] = '1.00';
+		}
+
 		$tr = '<tr class="' . $class . '" data-symbol="' . esc_attr( $v['symbol'] ) . '">'
 			. get_td( get_input( $id, $k, '', 'hidden' ) . get_input( $enabled, $table['enabled'], '', 'checkbox' ), 'text-align:center' )
 			. get_td( $token_div, 'padding-left:0.5rem' )
-			. get_td( get_input( $autorefresh, $table['autorefresh'], '', 'checkbox' ), 'text-align:center' )
+			. get_td( $rate_checkbox, 'text-align:center' )
 			. get_td( $update_icon, 'text-align:right;padding-right:0 !important;vertical-align:bottom' )
 			. get_td( get_input( $rate, $table['rate'], 'max-width:7rem', 'text', $table['autorefresh'] ), '' )
 			. get_td( '<strong>+</strong>', 'text-align:center;vertical-align:middle' )
