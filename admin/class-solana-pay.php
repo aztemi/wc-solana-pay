@@ -504,7 +504,8 @@ class Solana_Pay {
 
 		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
 		$endpoint = $testmode ? self::ENDPOINT_TESTMODE : self::ENDPOINT_PRODUCTION;
-		$url = sprintf( '%s%s/%s/?network=%s', $endpoint, $action, $ref_id, $network );
+		$ref_id = empty( $ref_id ) ? '' : '/' . $ref_id;
+		$url = sprintf( '%s%s%s/?network=%s', $endpoint, $action, $ref_id, $network );
 		return $url;
 
 	}
@@ -523,17 +524,16 @@ class Solana_Pay {
 
 
 	/**
-	 * Register payment transaction details with remote server.
+	 * Register payment order details with remote server.
 	 *
-	 * @param  string $ref_id   Remote reference ID of the transaction.
-	 * @param  string $data     Payment transaction details.
+	 * @param  string $data     Payment order details.
 	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
-	 * @return array|null
+	 * @return string Remote reference ID of the order.
 	 */
-	public static function register_payment_details( $ref_id, $data, $testmode ) {
+	public static function register_payment_details( $data, $testmode ) {
 
-		$rtn = null;
-		$url = self::endpoint_url( $ref_id, 'txn', $testmode );
+		$id = '';
+		$url = self::endpoint_url( '', 'order', $testmode );
 
 		$response = wp_remote_post( $url, array(
 			'method'      => 'POST',
@@ -546,10 +546,11 @@ class Solana_Pay {
 
 		if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
 			$response_body = wp_remote_retrieve_body( $response );
-			$rtn = json_decode( $response_body, true );
+			$response_array = json_decode( $response_body, true );
+			$id = array_key_exists( 'id', $response_array ) ? $response_array['id'] : '';
 		}
 
-		return $rtn;
+		return $id;
 
 	}
 

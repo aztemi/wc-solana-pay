@@ -161,17 +161,15 @@ class Webhook {
 		$options = $this->hGateway->get_accepted_solana_tokens_payment_options( $amount );
 		$data = array_merge( $data, $options );
 
-		// calculate payment details hash and use it as a unique reference id
-		$hash = md5( wp_json_encode( $data ) );
-		$data['id'] = $hash;
-
 		// register payment details with the remote backend
 		$testmode = $this->hGateway->get_testmode();
-		if ( null === Solana_Pay::register_payment_details( $hash, $data, $testmode ) ) {
+		$id = Solana_Pay::register_payment_details( $data, $testmode );
+		if ( empty( $id ) ) {
 			wp_send_json_error( 'Internal Server Error', 500 );
 		}
 
 		// store the data in user session for later use during payment processing
+		$data['id'] = $id;
 		$this->hSession->set_data( $data );
 
 		// remove unused info; share only necessary data with the frontend
