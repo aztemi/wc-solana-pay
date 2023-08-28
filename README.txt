@@ -17,7 +17,7 @@ This is a quick and easy way to add crypto payments to your WooCommerce store an
 
 = Demo Store =
 
-Below is an online demo store. Get free tokens for testing from the [Devnet Faucet](https://apps.aztemi.com/wc-solana-pay/faucet/) and try out the store for yourself.
+Below is a live demo store. Get free tokens for testing from the [Devnet Faucet](https://apps.aztemi.com/wc-solana-pay/faucet/) and try out the plugin for yourself.
 
 * [https://solana-pay-demo.juxdan.io/](https://solana-pay-demo.juxdan.io/)
 
@@ -64,7 +64,11 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 = Which Solana tokens can be accepted as payment? =
 
-**Pay with Solana Pay for WooCommerce** plugin currently supports payments in SOL, USDC and USDT. Support for more tokens are planned to be added in the future.
+We currently support payments in SOL, USDC and USDT. Support for more tokens are planned to be added in future releases.
+
+= How much does it cost to use? =
+
+**Pay with Solana Pay for WooCommerce** is free to install on your WordPress website. We charge a 0.5% fee per transaction. You only pay when you receive transactions. We make money only when you do.
 
 == Screenshots ==
 
@@ -72,6 +76,10 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 2. Payment popup dialog.
 3. Acceptable Solana tokens dropdown list.
 4. Admin settings page.
+
+== Source Code ==
+
+This plugin is an open source software with [GPLv3 or later](https://www.gnu.org/licenses/gpl-3.0.html) license. The code is available from our [repository on GitHub](https://github.com/aztemi/wc-solana-pay).
 
 == Changelog ==
 

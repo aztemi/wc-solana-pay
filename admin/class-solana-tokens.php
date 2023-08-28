@@ -298,23 +298,46 @@ class Solana_Tokens {
 			return;
 		}
 
-		// ensure time between execution is over 1 hour
 		$one_hour = 1 * 60 * 60;
-		$last_execution = get_option( self::TOKENS_RATE_UPDATE_HOOK, 0 );
-		if ( time() - $last_execution < $one_hour ) {
-			return;
+		$store_currency = self::get_store_currency();
+		$last_currency = $store_currency;
+
+		// ensure time between execution is over 1 hour when store currency is unchanged
+		$last_execution = get_option( self::TOKENS_RATE_UPDATE_HOOK );
+		if ( is_array( $last_execution ) ) {
+			$last_time = $last_execution['time'];
+			$last_currency = $last_execution['currency'];
+			if ( ( time() - $last_time < $one_hour ) && ( $store_currency === $last_currency ) ) {
+				return;
+			}
 		}
 
+		// get persisted tokens table settings
 		$tokens_table = get_option( self::TOKENS_OPTION_KEY, array() );
-
 		$supported_tokens = self::$supported_tokens;
-		$store_currency = self::get_store_currency();
+
+		// initialize table if empty
+		if ( ! count( $tokens_table ) ) {
+			foreach ( $supported_tokens as $k => $v ) {
+				$tokens_table[ $k ] = array(
+					'id'          => $k,
+					'autorefresh' => true,
+				);
+			}
+		}
+
+		// get current exchange prices
 		$coingecko_tokens = array_column( $supported_tokens, 'coingecko' );
 		$coingecko_prices = self::get_coingecko_tokens_prices( $coingecko_tokens, $store_currency );
 
 		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
 
+		// update exchange rates in table
 		foreach ( $tokens_table as $token => $v ) {
+			if ( $v['autorefresh'] && $store_currency != $last_currency ) {
+				$tokens_table[ $token ]['rate'] = '';
+			}
+
 			if ( $v['autorefresh'] && array_key_exists( $token, $supported_tokens ) ) {
 				$token_coingecko = $supported_tokens[ $token ]['coingecko'];
 
@@ -324,14 +347,17 @@ class Solana_Tokens {
 					$tokens_table[ $token ]['rate'] = rtrim( $rate, '0' );
 				}
 			}
-
 		}
 
 		bcscale( $old_scale ); // reset back to old scale
 
 		// update last successful execution
+		$last_execution = array(
+			'time'     => time(),
+			'currency' => $store_currency,
+		);
 		update_option( self::TOKENS_OPTION_KEY, $tokens_table );
-		update_option( self::TOKENS_RATE_UPDATE_HOOK, time() );
+		update_option( self::TOKENS_RATE_UPDATE_HOOK, $last_execution );
 
 	}
 

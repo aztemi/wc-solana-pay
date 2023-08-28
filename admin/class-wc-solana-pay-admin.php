@@ -107,7 +107,8 @@ class WC_Solana_Pay_Admin {
 
 		register_rest_route( PLUGIN_ID . '/v1', '/api', array(
 			'methods'  => 'GET, POST',
-			'callback' => array( $this, 'handle_api_request' )
+			'callback' => array( $this, 'handle_api_request' ),
+			'permission_callback' => '__return_true',
 		));
 
 	}

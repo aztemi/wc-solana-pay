@@ -5,8 +5,7 @@
     "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     "decimals": 6,
     "icon": "assets/img/tokens/usdc.png",
-    "coingecko": "usd-coin",
-    "stablecoin": "USD"
+    "coingecko": "usd-coin"
   },
   "USDT": {
     "symbol": "USD₮",
@@ -14,8 +13,7 @@
     "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
     "decimals": 6,
     "icon": "assets/img/tokens/usdt.png",
-    "coingecko": "tether",
-    "stablecoin": "USD"
+    "coingecko": "tether"
   },
   "SOL": {
     "symbol": "SOL",
