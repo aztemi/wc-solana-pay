@@ -3,8 +3,8 @@ Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay
 Tags: solana pay, solana, woocommerce, payment, web3, crypto, cryptocurrency, sol, usdc, usdt, wallet
 Requires at least: 5.2
-Tested up to: 6.2.2
-Stable tag: 2.1.1
+Tested up to: 6.3
+Stable tag: 2.2.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -83,6 +83,9 @@ This plugin is an open source software with [GPLv3 or later](https://www.gnu.org
 
 == Changelog ==
 
+= 2.2.0 =
+* Auto refresh exchange rates hourly, add Devnet Faucet and bug fixes.
+
 = 2.1.1 =
 * Handle REST requests and sanitize their payloads using WP APIs.
 
@@ -98,5 +101,5 @@ This plugin is an open source software with [GPLv3 or later](https://www.gnu.org
 
 == Upgrade Notice ==
 
-= 2.1.1 =
+= 2.2.0 =
 First public listing on the WordPress plugins repository - No further actions required
