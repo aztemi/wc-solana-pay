@@ -19,17 +19,23 @@
     const {
       PhantomWalletAdapter,
       SolflareWalletAdapter,
-      BackpackWalletAdapter,
-      SlopeWalletAdapter,
-      SolletExtensionWalletAdapter
+      CoinbaseWalletAdapter,
+      LedgerWalletAdapter,
+      SafePalWalletAdapter,
+      TrustWalletAdapter,
+      MathWalletAdapter,
+      TorusWalletAdapter
     } = await import("@solana/wallet-adapter-wallets");
 
     wallets = [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
-      new BackpackWalletAdapter(),
-      new SlopeWalletAdapter(),
-      new SolletExtensionWalletAdapter()
+      new CoinbaseWalletAdapter(),
+      new LedgerWalletAdapter(),
+      new SafePalWalletAdapter(),
+      new TrustWalletAdapter(),
+      new MathWalletAdapter(),
+      new TorusWalletAdapter()
     ];
   });
 
