@@ -2,8 +2,8 @@
   import { onMount } from "svelte";
   import { Buffer } from "buffer";
   import { Transaction } from "@solana/web3.js";
-  import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
-  import { ConnectionProvider, WalletProvider } from "@svelte-on-solana/wallet-adapter-ui";
+  import { walletStore } from "@aztemi/svelte-on-solana-wallet-adapter-core";
+  import { ConnectionProvider, WalletProvider } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
   import { postRequest } from "../utils/post_request";
   import WalletSplitMultiButton from "./buttons/wallet_split_multi_button.svelte";
