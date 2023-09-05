@@ -15,6 +15,8 @@ Accept crypto payments in SOL, USDC, USDT and more via QR Code and through all m
 
 This is a quick and easy way to add crypto payments to your WooCommerce store and WordPress website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
 
+[youtube https://www.youtube.com/watch?v=ArqS84jGjE0]
+
 = Demo Store =
 
 Below is a live demo store. Get free tokens for testing from the [Devnet Faucet](https://apps.aztemi.com/wc-solana-pay/faucet/) and try out the plugin for yourself.
@@ -72,10 +74,11 @@ We currently support payments in SOL, USDC and USDT. Support for more tokens are
 
 == Screenshots ==
 
-1. Solana Pay button on the checkout page.
+1. Express checkout button.
 2. Payment popup dialog.
-3. Acceptable Solana tokens dropdown list.
+3. Dropdown list of Solana tokens acceptable for payments.
 4. Admin settings page.
+5. Payment details on the backend Order page.
 
 == Source Code ==
 

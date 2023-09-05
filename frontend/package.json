@@ -20,12 +20,12 @@
     "vite": "^4.1.0"
   },
   "dependencies": {
+    "@aztemi/svelte-on-solana-wallet-adapter-core": "^1.1.2-alpha.0",
+    "@aztemi/svelte-on-solana-wallet-adapter-ui": "^1.1.2-alpha.0",
     "@solana/pay": "^0.2.4",
-    "@solana/wallet-adapter-base": "^0.9.22",
-    "@solana/wallet-adapter-wallets": "^0.19.15",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-wallets": "^0.19.21",
     "@solana/web3.js": "^1.73.3",
-    "@svelte-on-solana/wallet-adapter-core": "^1.0.11-alpha.0",
-    "@svelte-on-solana/wallet-adapter-ui": "^1.0.21-alpha.0",
     "bignumber.js": "^9.1.1",
     "buffer": "^6.0.3"
   }

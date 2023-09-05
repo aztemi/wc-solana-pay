@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
-  import { WalletConnectButton, WalletModal } from "@svelte-on-solana/wallet-adapter-ui";
+  import { walletStore } from "@aztemi/svelte-on-solana-wallet-adapter-core";
+  import { WalletConnectButton, WalletModal } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import IconButton from "./icon_button.svelte";
   import DropdownButton from "./dropdown_button.svelte";
   import MenuList from "../popup_menu/menu_list.svelte";
