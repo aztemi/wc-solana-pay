@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Pay with Solana Pay for WooCommerce 2.2.0\n"
+"Project-Id-Version: Pay with Solana Pay for WooCommerce 2.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-solana-pay\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-08-28T14:06:08+00:00\n"
+"POT-Creation-Date: 2023-09-05T15:08:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wc-solana-pay\n"
@@ -32,50 +32,6 @@ msgstr ""
 
 #. Author URI of the plugin
 msgid "https://www.aztemi.com"
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:67
-#: admin/partials/admin-tokens-table.php:64
-msgid "Enabled"
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:68
-#: admin/partials/admin-tokens-table.php:65
-msgid "Token"
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:69
-#: admin/partials/admin-tokens-table.php:66
-msgid "Auto Refresh"
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:69
-#: admin/partials/admin-tokens-table.php:66
-msgid "Auto refresh exchange rate every hour if checked."
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:70
-#: admin/partials/admin-tokens-table.php:67
-msgid "Exchange Rate"
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:71
-#: admin/partials/admin-tokens-table.php:68
-msgid "% Commission"
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:72
-#: admin/partials/admin-tokens-table.php:69
-msgid "Preview"
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:113
-#: admin/partials/admin-tokens-table.php:130
-msgid "Click to refresh exchange rate"
-msgstr ""
-
-#: 2del-with-placeholder-admin-tokens-table.php:150
-msgid "Rate required"
 msgstr ""
 
 #: admin/class-solana-pay.php:128
@@ -230,6 +186,38 @@ msgstr ""
 
 #: admin/partials/admin-settings.php:56
 msgid "Payment method description that customers will see on the checkout page."
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:64
+msgid "Enabled"
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:65
+msgid "Token"
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:66
+msgid "Auto Refresh"
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:66
+msgid "Auto refresh exchange rate every hour if checked."
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:67
+msgid "Exchange Rate"
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:68
+msgid "% Commission"
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:69
+msgid "Preview"
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:130
+msgid "Click to refresh exchange rate"
 msgstr ""
 
 #: admin/partials/admin-tokens-table.php:144

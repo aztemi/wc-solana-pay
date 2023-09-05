@@ -9,6 +9,10 @@ It supports payments in SOL, USDC, USDT and more via QR Code and through all maj
 
 It is a quick and easy way to add crypto payments to your WooCommerce store and WordPress website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
 
+## How to use on a WordPress site
+
+This project is available on the official [WordPress Plugins](https://wordpress.org/plugins/wc-solana-pay/) Marketplace. Install it from within your WP site following the [installation guidelines](https://wordpress.org/plugins/wc-solana-pay/#installation).
+
 ## Demo Store
 
 Below is an online store for the project. Get free tokens for testing from the [Devnet Faucet](https://apps.aztemi.com/wc-solana-pay/faucet/) and try out the store for yourself.
@@ -48,7 +52,7 @@ npm run makepot
 npm run package
 ```
 
-4. This will get you a zip file ready to be used on a WordPress site. The zip file will be generated under the root folder. Upload and install the zip package on a WP website by following [these instructions](https://www.hostinger.com/tutorials/wordpress/how-to-install-wordpress-plugins).
+4. This will get you a zip file ready to be used on a WordPress site. The zip file will be generated under the root folder. Upload and install the zip package on a WP website.
 
 ## Buy me a coffee
 
