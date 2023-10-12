@@ -40,6 +40,9 @@ class WC_Solana_Pay_Admin {
 	 */
 	private function register_hooks() {
 
+		// declare compatibility for HPOS
+		add_action( 'before_woocommerce_init', array( $this, 'declare_compatibility' ) );
+
 		// register Solana Pay payment gateway class
 		add_action( 'plugins_loaded', array( $this, 'load_payment_gateway_class' ) );
 		add_filter( 'woocommerce_payment_gateways', array( $this, 'register_payment_gateway_class' ) );
@@ -49,6 +52,18 @@ class WC_Solana_Pay_Admin {
 
 		// register an endpoint for handling REST calls
 		add_action( 'rest_api_init', array( $this, 'register_rest_endpoint' ) );
+
+	}
+
+
+	/**
+	 * Declare compatibility for Woo High-Performance Order Storage (HPOS)
+	 */
+	public function declare_compatibility() {
+
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', PLUGIN_FILE, true );
+		}
 
 	}
 
