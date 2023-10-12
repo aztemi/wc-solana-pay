@@ -31,7 +31,7 @@ return array(
 	'network'       => array(
 		'title'       => __('Solana Network', 'wc-solana-pay'),
 		'type'        => 'select',
-		'default'     => Solana_Pay::NETWORK_DEVNET,
+		'default'     => Solana_Pay::NETWORK_MAINNET_BETA,
 		'description' => __('The Solana network cluster for processing transactions.<br /><b>"Devnet" is only for testing and has no monetary value. Select "Mainnet-Beta" to go live for real cryptocurrencies.</b>', 'wc-solana-pay'),
 		'options'     => array(
 											Solana_Pay::NETWORK_DEVNET => __( 'Devnet (Test Mode)', 'wc-solana-pay' ),
