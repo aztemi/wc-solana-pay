@@ -3,8 +3,8 @@ Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay
 Tags: solana pay, solana, woocommerce, payment, web3, crypto, cryptocurrency, sol, usdc, usdt, wallet
 Requires at least: 5.2
-Tested up to: 6.3.1
-Stable tag: 2.2.1
+Tested up to: 6.3.2
+Stable tag: 2.2.2
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -86,10 +86,13 @@ This plugin is an open source software with [GPLv3 or later](https://www.gnu.org
 
 == Changelog ==
 
+= 2.2.2 =
+* Compatibility with WooCommerce High-Performance Order Storage (HPOS).
+
 = 2.2.1 =
 * Initial release to the WordPress plugins repository.
 
 == Upgrade Notice ==
 
-= 2.2.1 =
-First public listing on the WordPress plugins repository - No further actions required
+= 2.2.2 =
+Declare WooCommerce High-Performance Order Storage (HPOS) extension compatibility. Upgrade is recommended.
