@@ -343,7 +343,8 @@ class Solana_Tokens {
 
 				if ( array_key_exists( $token_coingecko, $coingecko_prices ) ) {
 					// update token rate
-					$rate = bcdiv( '1', $coingecko_prices[ $token_coingecko ] );
+					$price = number_format( $coingecko_prices[ $token_coingecko ], self::BC_MATH_SCALE );
+					$rate = bcdiv( '1', $price );
 					$tokens_table[ $token ]['rate'] = rtrim( $rate, '0' );
 				}
 			}
