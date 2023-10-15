@@ -17,7 +17,7 @@ return array(
 	'enabled' => array(
 		'title'       => __( 'Enable/Disable', 'wc-solana-pay' ),
 		'type'        => 'checkbox',
-		'label'       => __( 'Enable Pay with Solana Pay', 'wc-solana-pay' ),
+		'label'       => __( 'Enable WC Solana Pay', 'wc-solana-pay' ),
 		'default'     => 'no',
 		'description' => __( 'This gateway must be enabled in order to use Solana Pay.', 'wc-solana-pay' ),
 		'desc_tip'    => true,

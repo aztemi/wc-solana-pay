@@ -1,7 +1,7 @@
-=== Pay with Solana Pay for WooCommerce ===
+=== WC Solana Pay ===
 Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay
-Tags: solana pay, solana, woocommerce, payment, web3, crypto, cryptocurrency, sol, usdc, usdt, wallet
+Tags: wc solana pay, wc-solana-pay, solana pay, solana, blockchain, woocommerce, wc, payment, web3, crypto, cryptocurrency, sol, usdc, usdt
 Requires at least: 5.2
 Tested up to: 6.3.2
 Stable tag: 2.2.2
@@ -9,7 +9,7 @@ Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Pay with Solana Pay for WooCommerce - Fast payment gateway powered by Solana blockchain.
+WC Solana Pay - Fast payment gateway powered by Solana blockchain.
 
 Accept crypto payments in SOL, USDC, USDT and more via QR Code and through all major Solana wallets, including Phantom, Solflare and Backpack.
 
@@ -39,14 +39,14 @@ Below is a live demo store. Get free tokens for testing from the [Devnet Faucet]
 == Installation ==
 
 1. Go to **Plugins > Add New**.
-2. Search for **Pay with Solana Pay for WooCommerce** plugin.
+2. Search for **WC Solana Pay** plugin.
 3. Click on **Install Now** and wait until the plugin is installed successfully.
 4. Click on **Activate**. (You can also activate on the **Plugins > Installed Plugins** page).
 
 = Setup Configurations =
 
-1. After activating the plugin, go to **WooCommerce > Settings**. Choose **Payments** tab and select **Pay with Solana Pay**.
-2. Select **Enable Pay with Solana Pay** checkbox.
+1. After activating the plugin, go to **WooCommerce > Settings**. Choose **Payments** tab and select **WC Solana Pay**.
+2. Select **Enable WC Solana Pay** checkbox.
 3. Add your Solana wallet address to the **Merchant Wallet Address** field.
 4. Choose **Solana Network**. Select **Mainnet-Beta** for the Production Mode. (You can try first in Test Mode by selecting **Devnet**. Get free tokens for testing from the [Devnet Faucet](https://apps.aztemi.com/wc-solana-pay/faucet/).)
 5. Enable Solana Tokens you want to accept. You can adjust their **% Commission** to compensate for fluctuations in tokens prices.
@@ -70,7 +70,7 @@ We currently support payments in SOL, USDC and USDT. Support for more tokens are
 
 = How much does it cost to use? =
 
-**Pay with Solana Pay for WooCommerce** is free to install on your WordPress website. We charge a 0.5% fee per transaction. You only pay when you receive transactions. We make money only when you do.
+**WC Solana Pay** is free to install on your WordPress website. We charge a 0.5% fee per transaction. You only pay when you receive transactions. We make money only when you do.
 
 == Screenshots ==
 

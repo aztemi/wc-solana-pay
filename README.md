@@ -1,8 +1,8 @@
-# wc-solana-pay
+# WC Solana Pay
 
 Solana Pay powered payment gateway for WordPress and WooCommerce.
 
-<img src="/.wordpress.org/assets/screenshot-3.png" alt="Pay with Solana Pay demo screenshot" width="240">
+<img src="/.wordpress.org/assets/screenshot-3.png" alt="WC Solana Pay demo screenshot" width="240">
 
 This is a decentralized, permissionless, and fast payment gateway powered by Solana blockchain.
 It supports payments in SOL, USDC, USDT and more via QR Code and through all major Solana wallets, including Phantom, Solflare and Backpack.

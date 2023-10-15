@@ -2,20 +2,21 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Pay with Solana Pay for WooCommerce 2.2.2\n"
+"Project-Id-Version: WC Solana Pay 2.2.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-solana-pay\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-10-13T11:17:35+00:00\n"
+"POT-Creation-Date: 2023-10-15T11:28:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wc-solana-pay\n"
 
 #. Plugin Name of the plugin
-msgid "Pay with Solana Pay for WooCommerce"
+#: admin/class-wc-solana-pay-payment-gateway.php:131
+msgid "WC Solana Pay"
 msgstr ""
 
 #. Plugin URI of the plugin
@@ -67,10 +68,6 @@ msgstr ""
 
 #: admin/class-wc-solana-pay-admin.php:107
 msgid "Settings"
-msgstr ""
-
-#: admin/class-wc-solana-pay-payment-gateway.php:131
-msgid "Pay with Solana Pay"
 msgstr ""
 
 #: admin/class-wc-solana-pay-payment-gateway.php:133
@@ -126,7 +123,7 @@ msgid "Enable/Disable"
 msgstr ""
 
 #: admin/partials/admin-settings.php:20
-msgid "Enable Pay with Solana Pay"
+msgid "Enable WC Solana Pay"
 msgstr ""
 
 #: admin/partials/admin-settings.php:22
@@ -226,11 +223,11 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/class-wc-solana-pay.php:60
-msgid "<b>Pay with Solana Pay for WooCommerce</b> is an extension for <b>WooCommerce</b>. Please install and activate <b>WooCommerce</b> plugin."
+msgid "<b>WC Solana Pay</b> is an extension for <b>WooCommerce</b>. Please install and activate <b>WooCommerce</b> plugin."
 msgstr ""
 
 #: includes/class-wc-solana-pay.php:66
-msgid "<b>Pay with Solana Pay for WooCommerce</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP."
+msgid "<b>WC Solana Pay</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP."
 msgstr ""
 
 #: public/partials/public-payment-details.php:35
