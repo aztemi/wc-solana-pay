@@ -57,13 +57,13 @@ class WC_Solana_Pay {
 
 		// check if WooCommerce is installed and activated
 		if ( ! is_woocommerce_activated() ) {
-			show_error_notice( __( '<b>Pay with Solana Pay for WooCommerce</b> is an extension for <b>WooCommerce</b>. Please install and activate <b>WooCommerce</b> plugin.', 'wc-solana-pay' ) );
+			show_error_notice( __( '<b>WC Solana Pay</b> is an extension for <b>WooCommerce</b>. Please install and activate <b>WooCommerce</b> plugin.', 'wc-solana-pay' ) );
 			$available = false;
 		}
 
 		// check if BC Math extension for bignumbers handling is installed
 		if ( ! is_bcmath_installed() ) {
-			show_error_notice( __( '<b>Pay with Solana Pay for WooCommerce</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP.', 'wc-solana-pay' ) );
+			show_error_notice( __( '<b>WC Solana Pay</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP.', 'wc-solana-pay' ) );
 			$available = false;
 		}
 

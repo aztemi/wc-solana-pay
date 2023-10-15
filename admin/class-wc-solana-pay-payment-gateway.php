@@ -128,7 +128,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
 		$this->has_fields         = false;
 		$this->supports           = array( 'products' );
-		$this->title              = __( 'Pay with Solana Pay', 'wc-solana-pay' );
+		$this->title              = __( 'WC Solana Pay', 'wc-solana-pay' );
 		$this->method_title       = $this->title;
 		$this->method_description = __( 'Accept payments in SOL, USDC, USDT and more with Solana Pay.', 'wc-solana-pay' );
 
