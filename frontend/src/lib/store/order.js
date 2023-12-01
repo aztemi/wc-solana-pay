@@ -3,8 +3,6 @@ import { writable } from "svelte/store";
 import { PublicKey } from "@solana/web3.js";
 import supportedTokens from "../../../../assets/json/supported_solana_tokens.json";
 
-const DP = 4; // default decimal places
-
 const emptyOrder = {
   updated: false,
   timedOut: false,
@@ -38,7 +36,7 @@ function createOrderStore() {
 
     setOrder: order =>
       update(old => {
-        let { id, reference, amount, testmode, tokens, suffix, rpc, home, link, poll } = order;
+        let { id, reference, amount, tokens, suffix, rpc, home, link, poll } = order;
 
         let homeUrl = new URL(home);
         homeUrl.searchParams.set("id", id);
@@ -54,9 +52,8 @@ function createOrderStore() {
           const token = key.replace(suffix, "");
           if (token in supportedTokens) {
             paymentTokens[key] = supportedTokens[token];
-            paymentTokens[key]["amount"] = new BigNumber(value.amount).decimalPlaces(DP, BigNumber.ROUND_CEIL);
-            if (testmode) paymentTokens[key]["mint"] = paymentTokens[key]["mint_devnet"];
-            if (paymentTokens[key]["mint"]) paymentTokens[key]["mint"] = new PublicKey(paymentTokens[key]["mint"]);
+            paymentTokens[key]["amount"] = new BigNumber(value.amount).decimalPlaces(value.dp, BigNumber.ROUND_CEIL);
+            if (value.mint) paymentTokens[key]["mint"] = new PublicKey(value.mint);
             if (!activeToken) activeToken = key;
           }
         }

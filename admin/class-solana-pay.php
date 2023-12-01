@@ -466,7 +466,8 @@ class Solana_Pay {
 
 				$options['tokens'][ $k ] = array(
 					'amount' => $amount_in_token,
-					'mint' => $tokens[ $k ]['mint']
+					'mint' => $tokens[ $k ]['mint'],
+					'dp' => $tokens[ $k ]['decimals_view']
 				);
 			}
 		}

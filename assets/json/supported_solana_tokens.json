@@ -5,6 +5,7 @@
     "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     "mint_devnet": "9W81AjUS2hCPdXFuVpeqfyCzZyWdbFENG4fjRR2YmYZR",
     "decimals": 6,
+    "decimals_view": 4,
     "icon": "assets/img/tokens/usdc.png",
     "coingecko": "usd-coin"
   },
@@ -14,6 +15,7 @@
     "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
     "mint_devnet": "2wYLrR96yEn5wPHvMFs7uULvgRJk7pWhzeXsDREtqn75",
     "decimals": 6,
+    "decimals_view": 4,
     "icon": "assets/img/tokens/usdt.png",
     "coingecko": "tether"
   },
@@ -23,6 +25,7 @@
     "mint": "",
     "mint_devnet": "",
     "decimals": 9,
+    "decimals_view": 6,
     "icon": "assets/img/tokens/sol.png",
     "coingecko": "solana"
   }
