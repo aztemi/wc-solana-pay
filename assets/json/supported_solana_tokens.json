@@ -2,7 +2,8 @@
   "USDC": {
     "symbol": "USDC",
     "name": "Circle USD Coin",
-    "mint": "9W81AjUS2hCPdXFuVpeqfyCzZyWdbFENG4fjRR2YmYZR",
+    "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "mint_devnet": "9W81AjUS2hCPdXFuVpeqfyCzZyWdbFENG4fjRR2YmYZR",
     "decimals": 6,
     "icon": "assets/img/tokens/usdc.png",
     "coingecko": "usd-coin"
@@ -10,7 +11,8 @@
   "USDT": {
     "symbol": "USD₮",
     "name": "Tether USDt",
-    "mint": "2wYLrR96yEn5wPHvMFs7uULvgRJk7pWhzeXsDREtqn75",
+    "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "mint_devnet": "2wYLrR96yEn5wPHvMFs7uULvgRJk7pWhzeXsDREtqn75",
     "decimals": 6,
     "icon": "assets/img/tokens/usdt.png",
     "coingecko": "tether"
@@ -19,6 +21,7 @@
     "symbol": "SOL",
     "name": "Solana",
     "mint": "",
+    "mint_devnet": "",
     "decimals": 9,
     "icon": "assets/img/tokens/sol.png",
     "coingecko": "solana"

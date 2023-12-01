@@ -77,8 +77,7 @@ class Solana_Tokens {
 		$this->load_dependencies();
 
 		// load supported tokens
-		$this->load_testmode_tokens();
-		$this->load_livemode_tokens();
+		$this->load_supported_tokens();
 
 		// register hooks that will add supported tokens to the WC Currencies list
 		$this->register_hooks();
@@ -99,29 +98,19 @@ class Solana_Tokens {
 
 
 	/**
-	 * Load Testmode tokens list.
+	 * Load supported tokens list.
 	 */
-	private function load_testmode_tokens() {
+	private function load_supported_tokens() {
 
-		$file_path_testmode = '/assets/json/supported_solana_tokens_devnet.json';
-		self::$testmode_tokens = $this->load_tokens_json( $file_path_testmode );
+		$file_path = '/assets/json/supported_solana_tokens.json';
+		self::$supported_tokens = $this->load_tokens_json( $file_path );
 
-		// update all supported tokens list
-		self::$supported_tokens = array_merge( self::$supported_tokens ?? array(), self::$testmode_tokens );
-
-	}
-
-
-	/**
-	 * Load Live mode tokens list.
-	 */
-	private function load_livemode_tokens() {
-
-		$file_path_live = '/assets/json/supported_solana_tokens_mainnet_beta.json';
-		self::$livemode_tokens = $this->load_tokens_json( $file_path_live );
-
-		// update all supported tokens list
-		self::$supported_tokens = array_merge( self::$supported_tokens ?? array(), self::$livemode_tokens );
+		// update live & testmode tokens list
+		self::$livemode_tokens = self::$supported_tokens;
+		self::$testmode_tokens = self::$supported_tokens;
+		foreach ( self::$supported_tokens as $k => $v ) {
+			self::$testmode_tokens[ $k ]['mint'] = $v['mint_devnet'];
+		}
 
 	}
 
