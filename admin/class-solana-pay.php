@@ -116,12 +116,13 @@ class Solana_Pay {
 		$url = self::endpoint_url( $data['id'], 'rpc', $this->hGateway->get_testmode() );
 
 		$params = array( $reference, array( 'commitment' => 'confirmed' ) );
-		$txn = self::rpc_remote_post( 'getSignaturesForAddress', $params, $url );
+		$res = self::rpc_remote_post( 'getSignaturesForAddress', $params, $url );
 
 		// Return false in case of error in post request
-		if ( ! is_array( $txn ) ) {
+		if ( ! isset( $res['result'] ) ) {
 			return false;
 		}
+		$txn = $res['result'];
 
 		// Payment transaction not found, return false
 		if ( ! count( $txn ) ) {
@@ -156,12 +157,13 @@ class Solana_Pay {
 				'maxSupportedTransactionVersion' => 0,
 			)
 		);
-		$txn_data = self::rpc_remote_post( 'getTransaction', $params, $url );
+		$res = self::rpc_remote_post( 'getTransaction', $params, $url );
 
 		// Return false in case of error in post request
-		if ( ! is_array( $txn_data ) ) {
+		if ( ! isset( $res['result'] ) ) {
 			return false;
 		}
+		$txn_data = $res['result'];
 
 		// Return false if unable to confirm transaction details
 		if ( ! count( $txn_data ) ) {
@@ -529,29 +531,18 @@ class Solana_Pay {
 	 *
 	 * @param  string $data     Payment order details.
 	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
-	 * @return string Remote reference ID of the order.
+	 * @return array  Remote server response, containing the reference ID of the order.
 	 */
 	public static function register_payment_details( $data, $testmode ) {
 
-		$id = '';
 		$url = self::endpoint_url( '', 'order', $testmode );
-
-		$response = wp_remote_post( $url, array(
-			'method'      => 'POST',
-			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-			'timeout'     => 45,
-			'body'        => wp_json_encode( $data ),
-			'data_format' => 'body',
-			)
-		);
-
-		if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
-			$response_body = wp_remote_retrieve_body( $response );
-			$response_array = json_decode( $response_body, true );
-			$id = array_key_exists( 'id', $response_array ) ? $response_array['id'] : '';
+		$response = remote_request( $url, 'POST', wp_json_encode( $data ) );
+		if ( 200 === $response['status'] ) {
+			$body = $response['body'];
+			$response['id'] = array_key_exists( 'id', $body ) ? $body['id'] : '';
 		}
 
-		return $id;
+		return $response;
 
 	}
 
@@ -563,26 +554,19 @@ class Solana_Pay {
 	 * @param  string $address  Wallet address of the transaction fee payer.
 	 * @param  string $token_id Payment token ID.
 	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
-	 * @return string
+	 * @return array
 	 */
 	public static function get_payment_transaction( $ref_id, $address, $token_id, $testmode ) {
 
-		$txn = '';
 		$url = self::endpoint_url( $ref_id, 'txn', $testmode );
 		$url = sprintf( '%s&account=%s&token=%s', $url, $address, $token_id );
-		$response = wp_remote_get( $url, array(
-			'method'      => 'GET',
-			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-			'timeout'     => 10,
-			)
-		);
-		if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
-			$response_body = wp_remote_retrieve_body( $response );
-			$response_array = json_decode( $response_body, true );
-			$txn = array_key_exists( 'transaction', $response_array ) ? $response_array['transaction'] : '';
+		$response = remote_request( $url );
+		if ( 200 === $response['status'] ) {
+			$body = $response['body'];
+			$response['transaction'] = array_key_exists( 'transaction', $body ) ? $body['transaction'] : '';
 		}
 
-		return $txn;
+		return $response;
 
 	}
 
@@ -593,7 +577,7 @@ class Solana_Pay {
 	 * @param  string $ref_id   Remote session reference ID.
 	 * @param  string $txn      Base64 serialized transaction.
 	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
-	 * @return array|null
+	 * @return array
 	 */
 	public static function send_payment_transaction( $ref_id, $txn, $testmode ) {
 
@@ -605,10 +589,8 @@ class Solana_Pay {
 			)
 		);
 		$url = self::endpoint_url( $ref_id, 'rpc', $testmode );
-		$txn_id = self::rpc_remote_post( 'sendTransaction', $params, $url );
-		$rtn = $txn_id ? $txn_id : null;
 
-		return $rtn;
+		return self::rpc_remote_post( 'sendTransaction', $params, $url );
 
 	}
 
@@ -619,12 +601,11 @@ class Solana_Pay {
 	 * @param  string $method Remote RPC method that will be called.
 	 * @param  array  $params List of attributes for the RPC method.
 	 * @param  string $url    RPC endpoint URL.
-	 * @return mixed          RPC response array or string if request succeeds or false otherwise.
+	 * @return array          Array containing RPC response in the 'result' field if request succeeds.
 	 */
 	public static function rpc_remote_post( $method, $params, $url ) {
 
-		$rtn = false;
-		$body = wp_json_encode(
+		$data = wp_json_encode(
 			array(
 				'jsonrpc' => '2.0',
 				'id'      => 1,
@@ -633,32 +614,22 @@ class Solana_Pay {
 			)
 		);
 
-		$response = wp_remote_post( $url, array(
-			'method'      => 'POST',
-			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-			'timeout'     => 45,
-			'body'        => $body,
-			'data_format' => 'body',
-			)
-		);
+		$response = remote_request( $url, 'POST', $data );
+		$error = $response['error'];
+		$code = $response['status'];
+		$body = $response['body'];
 
-		if ( is_wp_error( $response ) ) {
-			wc_add_notice( __( 'Connection to RPC failed', 'wc-solana-pay' ), 'error' );
+		if ( $error ) {
+			/* translators: %s: WordPress error message, e.g. 'Timeout error' */
+			wc_add_notice( sprintf( __( 'Connection to RPC node failed: %s', 'wc-solana-pay' ), $error ), 'error' );
+		} else if ( 200 === $code ) {
+			$response['result'] = ( array_key_exists( 'result', $body ) ? $body['result'] : array() );
 		} else {
-			$response_code = wp_remote_retrieve_response_code( $response );
-
-			if ( 200 === $response_code ) {
-				$response_body = wp_remote_retrieve_body( $response );
-				$response = json_decode( $response_body, true );
-
-				$rtn = ( array_key_exists( 'result', $response ) ? $response['result'] : array() );
-			} else {
-				/* translators: %d: rpc call response code error, e.g. 404 */
-				wc_add_notice( sprintf( __( 'RPC remote call failed with code %d', 'wc-solana-pay' ), $response_code ), 'error' );
-			}
+			/* translators: %d: rpc call response code error, e.g. 404 */
+			wc_add_notice( sprintf( __( 'RPC remote call failed with code %d', 'wc-solana-pay' ), $code ), 'error' );
 		}
 
-		return $rtn;
+		return $response;
 
 	}
 

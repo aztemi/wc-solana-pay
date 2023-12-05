@@ -166,15 +166,9 @@ class Solana_Tokens {
 
 		if ( ! count( $currencies_list ) ) {
 			$url = 'https://api.coingecko.com/api/v3/simple/supported_vs_currencies';
-			$response = wp_remote_get( $url, array(
-				'method'  => 'GET',
-				'headers' => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-				'timeout' => 10,
-				)
-			);
-			if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
-				$response_body = wp_remote_retrieve_body( $response );
-				$currencies_list = json_decode( $response_body, true );
+			$response = remote_request( $url );
+			if ( 200 === $response['status'] ) {
+				$currencies_list = $response['body'];
 			}
 		}
 
@@ -200,17 +194,9 @@ class Solana_Tokens {
 
 			// get prices from Coingecko API
 			$url = sprintf( 'https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=%s', $token_str, $currency );
-			$response = wp_remote_get( $url, array(
-				'method'  => 'GET',
-				'headers' => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-				'timeout' => 10,
-				)
-			);
-
-			// validate the result
-			if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
-				$response_body = wp_remote_retrieve_body( $response );
-				$prices = json_decode( $response_body, true );
+			$response = remote_request( $url );
+			if ( 200 === $response['status'] ) {
+				$prices = $response['body'];
 
 				// update return list if response is valid and requested tokens are in the response
 				if ( is_array( $prices ) ) {
