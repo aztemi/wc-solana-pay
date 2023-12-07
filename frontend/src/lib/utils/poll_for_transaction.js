@@ -27,6 +27,6 @@ async function confirmPaymentTxn() {
     const json = await fetch(endpoint).then(r => r.json());
     if (json?.signature) order.confirmPayment(json.signature);
   } catch (error) {
-    console.error(error);
+    console.error(error.toString());
   }
 }

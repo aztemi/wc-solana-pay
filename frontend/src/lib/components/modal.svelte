@@ -1,6 +1,7 @@
 <script>
   import { Keypair } from "@solana/web3.js";
   import { order } from "../store/order.js";
+  import { notification, EXIT, STATE } from "./notification";
   import { submitCheckoutForm, getCheckoutOrderDetails } from "../utils/backend_proxy.js";
   import Header from "./header.svelte";
   import Loading from "./loading.svelte";
@@ -17,6 +18,7 @@
   }
 
   async function openModal() {
+    notification.reset();
     order.reset();
     showModal = true;
     await getCheckoutOrder();
@@ -28,9 +30,19 @@
 
   // query payment details from the backend
   async function getCheckoutOrder() {
-    const ref = new Keypair().publicKey;
-    const jsonOrder = await getCheckoutOrderDetails(ref.toBase58());
-    order.setOrder(jsonOrder);
+    let msgId = 0;
+    try {
+      msgId = notification.addNotice("Getting order details", STATE.LOADING);
+
+      const ref = new Keypair().publicKey;
+      const jsonOrder = await getCheckoutOrderDetails(ref.toBase58());
+      order.setOrder(jsonOrder);
+
+      notification.updateNotice(msgId, { status: STATE.OK, exit: EXIT.TIMEOUT });
+    } catch (error) {
+      notification.updateNotice(msgId, { status: STATE.ERROR, error: error.message, exit: EXIT.MANUAL });
+      console.error(error.toString());
+    }
   }
 </script>
 

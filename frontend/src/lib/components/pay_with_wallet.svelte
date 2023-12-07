@@ -6,6 +6,7 @@
   import { ConnectionProvider, WalletProvider } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
   import { postRequest } from "../utils/post_request";
+  import { notification, EXIT, STATE } from "./notification";
   import WalletSplitMultiButton from "./buttons/wallet_split_multi_button.svelte";
 
   export let link;
@@ -40,9 +41,12 @@
   });
 
   async function payWithConnectedWallet() {
+    let msgId = 0;
     if ($walletStore?.connected) {
       try {
         loading = true;
+        msgId = notification.addNotice("Processing payment transaction", STATE.LOADING);
+
         // fetch the transaction
         const { transaction } = await postRequest(link, { account: $walletStore.publicKey.toBase58() });
 
@@ -58,10 +62,14 @@
 
         // poll for transaction result
         startPolling();
+
+        notification.updateNotice(msgId, { status: STATE.OK, exit: EXIT.TIMEOUT });
       } catch (error) {
-        console.error(error);
+        notification.updateNotice(msgId, { status: STATE.ERROR, error: error.message, exit: EXIT.MANUAL });
+        console.error(error.toString());
+      } finally {
+        loading = false;
       }
-      loading = false;
     }
   }
 </script>
