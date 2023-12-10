@@ -18,6 +18,9 @@
     justify-content space-between
     cursor pointer
 
+    &:disabled, &[disabled]
+      cursor auto
+
     i
       display flex
       align-items center

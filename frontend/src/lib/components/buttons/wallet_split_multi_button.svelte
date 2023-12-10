@@ -64,6 +64,7 @@
     <IconButton
       on:click={() => dispatch("payclick")}
       class="paybtn wallet-adapter-button wallet-adapter-button-trigger {loading ? 'loading' : ''}"
+      disabled={loading}
     >
       <img slot="start-icon" src={wallet.icon} alt={`${wallet.name} icon`} />
       Pay Now
