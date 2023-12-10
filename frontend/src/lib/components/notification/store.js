@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-const TIMEOUT_DELAY = 10000;
+const TIMEOUT_DELAY = 5000;
 
 /**
  * @typedef {(typeof STATE)[keyof typeof STATE]} StateType

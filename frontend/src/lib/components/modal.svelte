@@ -6,6 +6,7 @@
   import Header from "./header.svelte";
   import Loading from "./loading.svelte";
   import PaymentWidget from "./payment_widget.svelte";
+  import { Notification } from "./notification";
 
   let showModal = false;
 
@@ -57,6 +58,7 @@
       {:else}
         <Loading />
       {/if}
+      <Notification />
     </div>
   </div>
 {/if}
@@ -79,7 +81,7 @@
       display block
       overflow-y auto
       max-width 90vw
-      max-height 90%
+      max-height 95%
       border-radius 0.5rem
       border 1px solid var(--modal_border_color)
       background-color var(--modal_back_color)
