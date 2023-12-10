@@ -46,5 +46,6 @@
       border 1px solid var(--overlay_back_color)
       border-radius 0.3rem
       background-color transparent
+      margin-bottom 1rem
 
 </style>

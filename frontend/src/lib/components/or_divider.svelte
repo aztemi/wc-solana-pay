@@ -19,7 +19,7 @@
       height 1px
       border-width 0px
       width 90%
-      margin 2rem 0
+      margin 1.5rem 0
       background-color var(--overlay_back_color)
 
     span

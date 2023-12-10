@@ -97,6 +97,11 @@
       position relative
       display flex
 
+      img
+        width 100%
+        height 100%
+        overflow hidden
+
       .paybtn
         border-top-right-radius 0
         border-bottom-right-radius 0
