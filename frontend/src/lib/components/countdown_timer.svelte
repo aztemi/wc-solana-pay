@@ -18,7 +18,7 @@
   let countdownStarted = false;
 
   function countdown() {
-    if (countdownStarted) timeLeft--;
+    if (countdownStarted && timeLeft > 0) timeLeft--;
     else countdownStarted = true; // just another way to wait 1 loop before starting countdown
 
     if (timeLeft <= 0) order.timeout();
