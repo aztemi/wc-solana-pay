@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { order } from "../store/order.js";
-  import { isMobile } from "../utils/is_mobile.js";
+  import { isMobile } from "../utils/helpers.js";
   import { startPolling } from "../utils/poll_for_transaction.js";
   import Icon from "./icons/icon.svelte";
   import QrCode from "./qrcode.svelte";

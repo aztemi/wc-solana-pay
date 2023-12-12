@@ -1,6 +1,9 @@
+export function isLocalhost() {
+  return location.hostname === "localhost" || location.hostname === "127.0.0.1";
+}
+
 // Check if the client is a mobile device or not
 // This code was taken from https://github.com/WalletConnect/web3modal/blob/bb797372281816378f241093171a12a9f8d6e9fc/packages/core/src/utils/CoreUtil.ts
-
 export function isMobile() {
   if (typeof window !== "undefined") {
     return Boolean(
