@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WC Solana Pay 2.2.3\n"
+"Project-Id-Version: WC Solana Pay 2.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-solana-pay\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-10-15T15:27:47+00:00\n"
+"POT-Creation-Date: 2023-12-13T02:25:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wc-solana-pay\n"
@@ -32,37 +32,38 @@ msgstr ""
 msgid "AZTemi"
 msgstr ""
 
-#: admin/class-solana-pay.php:128
+#: admin/class-solana-pay.php:129
 msgid "Payment transaction not found. Please try again."
 msgstr ""
 
-#: admin/class-solana-pay.php:168
+#: admin/class-solana-pay.php:170
 msgid "Unable to confirm payment transaction details. Please try again."
 msgstr ""
 
-#: admin/class-solana-pay.php:192
+#: admin/class-solana-pay.php:194
 msgid "Payment currency not in supported Solana tokens list."
 msgstr ""
 
-#: admin/class-solana-pay.php:430
+#: admin/class-solana-pay.php:432
 msgid "Solana Pay payment completed"
 msgstr ""
 
-#: admin/class-solana-pay.php:645
-msgid "Connection to RPC failed"
+#. translators: %s: WordPress error message, e.g. 'Timeout error'
+#: admin/class-solana-pay.php:624
+msgid "Connection to RPC node failed: %s"
 msgstr ""
 
 #. translators: %d: rpc call response code error, e.g. 404
-#: admin/class-solana-pay.php:656
+#: admin/class-solana-pay.php:629
 msgid "RPC remote call failed with code %d"
 msgstr ""
 
-#: admin/class-solana-tokens.php:456
+#: admin/class-solana-tokens.php:431
 msgid "Devnet Faucet"
 msgstr ""
 
 #. translators: %s: Devnet Faucet
-#: admin/class-solana-tokens.php:458
+#: admin/class-solana-tokens.php:433
 msgid "Get free tokens for testing from the %s."
 msgstr ""
 

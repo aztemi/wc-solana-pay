@@ -1,10 +1,10 @@
 === WC Solana Pay ===
 Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay
-Tags: wc solana pay, wc-solana-pay, solana pay, solana, blockchain, woocommerce, wc, payment, web3, crypto, cryptocurrency, sol, usdc, usdt
+Tags: solana pay, solana, payment, web3, crypto, sol, usdc, usdt, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
-Tested up to: 6.4.1
-Stable tag: 2.2.3
+Tested up to: 6.4.2
+Stable tag: 2.3.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -86,6 +86,9 @@ This plugin is an open source software with [GPLv3 or later](https://www.gnu.org
 
 == Changelog ==
 
+= 2.3.0 =
+* Notification bar added to show transactions status and to notify errors.
+
 = 2.2.3 =
 * Plugin renamed for naming consistency with its WordPress slug and directory name.
 
@@ -97,5 +100,5 @@ This plugin is an open source software with [GPLv3 or later](https://www.gnu.org
 
 == Upgrade Notice ==
 
-= 2.2.3 =
-Rename plugin to "WC Solana Pay" for naming consistency with its WordPress slug and folder name.
+= 2.3.0 =
+Notification bar added to show transactions status and to notify errors. Upgrade is recommended.
