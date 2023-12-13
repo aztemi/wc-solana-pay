@@ -3,7 +3,7 @@ Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay
 Tags: wc solana pay, wc-solana-pay, solana pay, solana, blockchain, woocommerce, wc, payment, web3, crypto, cryptocurrency, sol, usdc, usdt
 Requires at least: 5.2
-Tested up to: 6.3.2
+Tested up to: 6.4.1
 Stable tag: 2.2.3
 Requires PHP: 7.2
 License: GPLv3 or later

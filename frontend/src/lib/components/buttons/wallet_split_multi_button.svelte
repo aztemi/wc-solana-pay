@@ -64,6 +64,7 @@
     <IconButton
       on:click={() => dispatch("payclick")}
       class="paybtn wallet-adapter-button wallet-adapter-button-trigger {loading ? 'loading' : ''}"
+      disabled={loading}
     >
       <img slot="start-icon" src={wallet.icon} alt={`${wallet.name} icon`} />
       Pay Now
@@ -95,6 +96,11 @@
     .wallet-adapter-split-dropdown
       position relative
       display flex
+
+      img
+        width 100%
+        height 100%
+        overflow hidden
 
       .paybtn
         border-top-right-radius 0

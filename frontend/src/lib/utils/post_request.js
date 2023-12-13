@@ -14,7 +14,7 @@ export async function postRequest(url, body) {
     body: JSON.stringify(body)
   }).then(async res => {
     const json = await res.json();
-    if (!res.ok) throw new Error(json.error || "Unknown error");
+    if (!res.ok) throw new Error(json.data || json.error || "Unknown error");
 
     return json;
   });

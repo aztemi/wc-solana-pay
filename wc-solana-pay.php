@@ -13,9 +13,9 @@
  *
  * Requires PHP:         7.2
  * Requires at least:    5.2
- * Tested up to:         6.3.2
+ * Tested up to:         6.4.1
  * WC requires at least: 3.0
- * WC tested up to:      8.2.0
+ * WC tested up to:      8.2.2
  *
  * @package AZTemi\WC_Solana_Pay
  */

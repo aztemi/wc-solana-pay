@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { order } from "../store/order.js";
-  import { isMobile } from "../utils/is_mobile.js";
+  import { isMobile } from "../utils/helpers.js";
   import { startPolling } from "../utils/poll_for_transaction.js";
   import Icon from "./icons/icon.svelte";
   import QrCode from "./qrcode.svelte";
@@ -46,5 +46,6 @@
       border 1px solid var(--overlay_back_color)
       border-radius 0.3rem
       background-color transparent
+      margin-bottom 1rem
 
 </style>

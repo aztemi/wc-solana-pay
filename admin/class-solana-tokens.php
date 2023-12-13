@@ -77,8 +77,7 @@ class Solana_Tokens {
 		$this->load_dependencies();
 
 		// load supported tokens
-		$this->load_testmode_tokens();
-		$this->load_livemode_tokens();
+		$this->load_supported_tokens();
 
 		// register hooks that will add supported tokens to the WC Currencies list
 		$this->register_hooks();
@@ -99,29 +98,19 @@ class Solana_Tokens {
 
 
 	/**
-	 * Load Testmode tokens list.
+	 * Load supported tokens list.
 	 */
-	private function load_testmode_tokens() {
+	private function load_supported_tokens() {
 
-		$file_path_testmode = '/assets/json/supported_solana_tokens_devnet.json';
-		self::$testmode_tokens = $this->load_tokens_json( $file_path_testmode );
+		$file_path = '/assets/json/supported_solana_tokens.json';
+		self::$supported_tokens = $this->load_tokens_json( $file_path );
 
-		// update all supported tokens list
-		self::$supported_tokens = array_merge( self::$supported_tokens ?? array(), self::$testmode_tokens );
-
-	}
-
-
-	/**
-	 * Load Live mode tokens list.
-	 */
-	private function load_livemode_tokens() {
-
-		$file_path_live = '/assets/json/supported_solana_tokens_mainnet_beta.json';
-		self::$livemode_tokens = $this->load_tokens_json( $file_path_live );
-
-		// update all supported tokens list
-		self::$supported_tokens = array_merge( self::$supported_tokens ?? array(), self::$livemode_tokens );
+		// update live & testmode tokens list
+		self::$livemode_tokens = self::$supported_tokens;
+		self::$testmode_tokens = self::$supported_tokens;
+		foreach ( self::$supported_tokens as $k => $v ) {
+			self::$testmode_tokens[ $k ]['mint'] = $v['mint_devnet'];
+		}
 
 	}
 
@@ -177,15 +166,9 @@ class Solana_Tokens {
 
 		if ( ! count( $currencies_list ) ) {
 			$url = 'https://api.coingecko.com/api/v3/simple/supported_vs_currencies';
-			$response = wp_remote_get( $url, array(
-				'method'  => 'GET',
-				'headers' => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-				'timeout' => 10,
-				)
-			);
-			if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
-				$response_body = wp_remote_retrieve_body( $response );
-				$currencies_list = json_decode( $response_body, true );
+			$response = remote_request( $url );
+			if ( 200 === $response['status'] ) {
+				$currencies_list = $response['body'];
 			}
 		}
 
@@ -211,17 +194,9 @@ class Solana_Tokens {
 
 			// get prices from Coingecko API
 			$url = sprintf( 'https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=%s', $token_str, $currency );
-			$response = wp_remote_get( $url, array(
-				'method'  => 'GET',
-				'headers' => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-				'timeout' => 10,
-				)
-			);
-
-			// validate the result
-			if ( ! is_wp_error( $response ) && ( 200 === wp_remote_retrieve_response_code( $response ) ) ) {
-				$response_body = wp_remote_retrieve_body( $response );
-				$prices = json_decode( $response_body, true );
+			$response = remote_request( $url );
+			if ( 200 === $response['status'] ) {
+				$prices = $response['body'];
 
 				// update return list if response is valid and requested tokens are in the response
 				if ( is_array( $prices ) ) {

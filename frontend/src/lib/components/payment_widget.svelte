@@ -38,7 +38,7 @@
 
 <style lang="stylus">
   section
-    padding 1rem 2rem
+    padding 0 2rem
 
   .paywith
     padding-top 1rem

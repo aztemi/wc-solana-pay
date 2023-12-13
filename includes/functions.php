@@ -91,3 +91,49 @@ function get_script_path( $relpath, $base = '' ) {
 	return $path;
 
 }
+
+
+/**
+ * Perform an HTTP request and returns its response as a formatted array
+ *
+ * @param  string $url      URL to retrieve.
+ * @param  string $method   Request method. 'GET' or 'POST'.
+ * @param  array  $postdata POST request body payload.
+ * @return array            The formatted array containing status code, error if any and json body.
+ */
+function remote_request( $url, $method = 'GET', $postdata = array() ) {
+
+	$rtn = array(
+		'status' => 500,
+		'error'  => '',
+		'body'   => '',
+	);
+
+	$args = array(
+		'method'  => $method,
+		'headers' => array( 'Content-Type' => 'application/json; charset=utf-8' ),
+		'timeout' => 10,
+	);
+
+	if ( 'POST' === $method ) {
+		$args['body'] = $postdata;
+		$args['data_format'] = 'body';
+	}
+
+	$response = wp_remote_request( $url, $args );
+
+	if ( is_wp_error( $response ) ) {
+		$rtn['error'] = $response->get_error_message();
+	} else {
+		$rtn['status'] = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		$rtn['body'] = $body;
+
+		if ( is_array( $body ) && isset( $body['error'] ) ) {
+			$rtn['error'] = $body['error'];
+		}
+	}
+
+	return $rtn;
+
+}

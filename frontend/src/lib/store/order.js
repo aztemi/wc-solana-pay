@@ -1,10 +1,7 @@
 import BigNumber from "bignumber.js";
 import { writable } from "svelte/store";
 import { PublicKey } from "@solana/web3.js";
-import TestmodeTokens from "../../../../assets/json/supported_solana_tokens_devnet.json";
-import LiveTokens from "../../../../assets/json/supported_solana_tokens_mainnet_beta.json";
-
-const DP = 4; // default decimal places
+import supportedTokens from "../../../../assets/json/supported_solana_tokens.json";
 
 const emptyOrder = {
   updated: false,
@@ -39,7 +36,7 @@ function createOrderStore() {
 
     setOrder: order =>
       update(old => {
-        let { id, reference, amount, testmode, tokens, suffix, rpc, home, link, poll } = order;
+        let { id, reference, amount, tokens, suffix, rpc, home, link, poll } = order;
 
         let homeUrl = new URL(home);
         homeUrl.searchParams.set("id", id);
@@ -50,14 +47,13 @@ function createOrderStore() {
         // update tokens
         let paymentTokens = {};
         let activeToken = "";
-        const supportedTokens = testmode ? TestmodeTokens : LiveTokens;
 
         for (const [key, value] of Object.entries(tokens)) {
           const token = key.replace(suffix, "");
           if (token in supportedTokens) {
             paymentTokens[key] = supportedTokens[token];
-            paymentTokens[key]["amount"] = new BigNumber(value.amount).decimalPlaces(DP, BigNumber.ROUND_CEIL);
-            if (paymentTokens[key]["mint"]) paymentTokens[key]["mint"] = new PublicKey(paymentTokens[key]["mint"]);
+            paymentTokens[key]["amount"] = new BigNumber(value.amount).decimalPlaces(value.dp, BigNumber.ROUND_CEIL);
+            if (value.mint) paymentTokens[key]["mint"] = new PublicKey(value.mint);
             if (!activeToken) activeToken = key;
           }
         }

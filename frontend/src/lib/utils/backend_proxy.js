@@ -50,7 +50,12 @@ export async function getCheckoutOrderDetails(ref) {
     url += `cart_created=${cartCreated}`;
   }
 
-  const jsonOrder = await fetch(url).then(r => r.json());
+  const jsonOrder = await fetch(url).then(async res => {
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.data || json.error || "Unknown error");
+
+    return json;
+  });
 
   return jsonOrder;
 }

@@ -2,6 +2,7 @@
 
 import { get } from "svelte/store";
 import { order } from "../store/order.js";
+import { isLocalhost } from "./helpers.js";
 
 const POLLING_DELAY = 10000; // Delay in ms between polling intervals
 
@@ -9,7 +10,7 @@ let endpoint = "";
 let pollingInterval = null;
 
 export function startPolling() {
-  if (pollingInterval) return;
+  if (pollingInterval || isLocalhost()) return;
 
   const { reference, poll } = get(order);
   endpoint = `${poll}&ref=${reference.toBase58()}`;
@@ -27,6 +28,6 @@ async function confirmPaymentTxn() {
     const json = await fetch(endpoint).then(r => r.json());
     if (json?.signature) order.confirmPayment(json.signature);
   } catch (error) {
-    console.error(error);
+    console.error(error.toString());
   }
 }
