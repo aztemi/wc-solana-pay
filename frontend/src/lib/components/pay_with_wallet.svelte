@@ -6,7 +6,7 @@
   import { ConnectionProvider, WalletProvider } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
   import { postRequest } from "../utils/post_request";
-  import { notification, EXIT, STATE } from "./notification";
+  import { notification, showSubmitOrderStatus, EXIT, STATE } from "./notification";
   import WalletSplitMultiButton from "./buttons/wallet_split_multi_button.svelte";
 
   export let link;
@@ -62,6 +62,7 @@
 
         // poll for transaction result
         startPolling();
+        showSubmitOrderStatus();
 
         notification.updateNotice(msgId, { status: STATE.OK, exit: EXIT.TIMEOUT });
       } catch (error) {

@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { isLocalhost } from "../../utils/helpers";
 
 const TIMEOUT_DELAY = 5000;
 
@@ -82,3 +83,18 @@ function createNotificationStore() {
       })
   };
 }
+
+export const showSubmitOrderStatus = (function () {
+  let msgId = -1;
+
+  return function () {
+    if (msgId >= 0) return;
+    msgId = notification.addNotice("Submitting order", STATE.LOADING);
+    if (isLocalhost())
+      notification.updateNotice(msgId, {
+        status: STATE.ERROR,
+        exit: EXIT.MANUAL,
+        error: "WordPress is on localhost. Webhook callback not available."
+      });
+  };
+})();

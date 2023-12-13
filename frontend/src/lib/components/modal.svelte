@@ -1,20 +1,26 @@
 <script>
   import { Keypair } from "@solana/web3.js";
   import { order } from "../store/order.js";
-  import { notification, EXIT, STATE } from "./notification";
+  import { Notification, notification, showSubmitOrderStatus, EXIT, STATE } from "./notification";
   import { submitCheckoutForm, getCheckoutOrderDetails } from "../utils/backend_proxy.js";
   import Header from "./header.svelte";
   import Loading from "./loading.svelte";
   import PaymentWidget from "./payment_widget.svelte";
-  import { Notification } from "./notification";
 
+  const WAIT_DURATION = 2000;
   let showModal = false;
 
+  // close modal when order times out
+  $: if ($order.timedOut) closeModal();
+
+  // If payment transaction received, show notice for few seconds, submit form and close modal
   $: {
-    if ($order.paymentSignature || $order.timedOut) {
-      // submit form and close popup modal. This will inform the backend to confirm payment
-      if ($order.paymentSignature) submitCheckoutForm();
-      closeModal();
+    if ($order.paymentSignature) {
+      showSubmitOrderStatus();
+      setTimeout(() => {
+        submitCheckoutForm();
+        closeModal();
+      }, WAIT_DURATION);
     }
   }
 
