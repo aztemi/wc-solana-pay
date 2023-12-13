@@ -3,6 +3,7 @@
   import { order } from "../store/order.js";
   import { Notification, notification, showSubmitOrderStatus, EXIT, STATE } from "./notification";
   import { submitCheckoutForm, getCheckoutOrderDetails } from "../utils/backend_proxy.js";
+  import { isLocalhost } from "../utils/helpers.js";
   import Header from "./header.svelte";
   import Loading from "./loading.svelte";
   import PaymentWidget from "./payment_widget.svelte";
@@ -29,6 +30,13 @@
     order.reset();
     showModal = true;
     await getCheckoutOrder();
+    if (isLocalhost())
+      notification.addNotice(
+        "Transactions validation not possible",
+        STATE.ERROR,
+        EXIT.MANUAL,
+        "WordPress is on localhost. Webhook callback not available."
+      );
   }
 
   function closeModal() {

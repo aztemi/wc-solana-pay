@@ -42,12 +42,12 @@ function createNotificationStore() {
     /**
      * @param {string} message
      */
-    addNotice: (message, status = STATE.NONE, exit = EXIT.NONE) => {
+    addNotice: (message, status = STATE.NONE, exit = EXIT.NONE, error = "") => {
       let id = -1;
       update(last => {
         let { count, notices } = last;
         id = ++count;
-        notices.push({ id, message, status, exit });
+        notices.push({ id, message, status, exit, error });
 
         return { ...last, count, notices };
       });
