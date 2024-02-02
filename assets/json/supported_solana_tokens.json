@@ -19,6 +19,26 @@
     "icon": "assets/img/tokens/usdt.png",
     "coingecko": "tether"
   },
+  "EURC": {
+    "symbol": "EURC",
+    "name": "Circle EURO Coin",
+    "mint": "HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr",
+    "mint_devnet": "87J6Cbh6BM5YwKgsb7H8fPDyBgVZXQpSc2idRiKsYL7J",
+    "decimals": 6,
+    "decimals_view": 4,
+    "icon": "assets/img/tokens/eurc.png",
+    "coingecko": "euro-coin"
+  },
+  "EUROE": {
+    "symbol": "EUROe",
+    "name": "EUROe Stablecoin",
+    "mint": "2VhjJ9WxaGC3EZFwJG9BDUs9KxKCAjQY4vgd1qxgYWVg",
+    "mint_devnet": "G8zzJpVNH6VPY1wo7uVeqXruTxin9gfdY4kdGJcFipqF",
+    "decimals": 6,
+    "decimals_view": 4,
+    "icon": "assets/img/tokens/euroe.png",
+    "coingecko": "euroe-stablecoin"
+  },
   "SOL": {
     "symbol": "SOL",
     "name": "Solana",
