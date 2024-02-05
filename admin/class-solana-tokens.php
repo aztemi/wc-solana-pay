@@ -287,15 +287,18 @@ class Solana_Tokens {
 			}
 		}
 
-		// get persisted tokens table settings
+		// get tokens table persisted in settings
 		$tokens_table = get_option( self::TOKENS_OPTION_KEY, array() );
+
+		// get a list of supported tokens
 		$supported_tokens = self::$supported_tokens;
 
-		// initialize table if empty
-		if ( ! count( $tokens_table ) ) {
-			foreach ( $supported_tokens as $k => $v ) {
+		// initialize supported tokens that are not in persisted table
+		foreach ( $supported_tokens as $k => $v ) {
+			if ( ! array_key_exists( $k, $tokens_table ) ) {
 				$tokens_table[ $k ] = array(
 					'id'          => $k,
+					'enabled'     => false,
 					'autorefresh' => true,
 				);
 			}
