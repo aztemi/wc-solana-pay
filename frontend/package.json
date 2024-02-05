@@ -10,10 +10,11 @@
     "build:modal": "PACKAGE_NAME=modal vite build",
     "build:button": "PACKAGE_NAME=button vite build",
     "build:table": "PACKAGE_NAME=table vite build",
-    "build": "npm run clean && npm run build:modal && npm run build:button && npm run build:table"
+    "build": "npm-run-all clean build:*"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "npm-run-all": "^4.1.5",
     "stylus": "^0.59.0",
     "svelte": "^3.55.1",
     "svelte-preprocess": "^5.0.1",
