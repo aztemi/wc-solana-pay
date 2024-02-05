@@ -1,7 +1,7 @@
 === WC Solana Pay ===
 Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay
-Tags: solana pay, solana, payment, web3, crypto, sol, usdc, usdt, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
+Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
 Tested up to: 6.4.2
 Stable tag: 2.3.0
@@ -11,7 +11,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 WC Solana Pay - Fast payment gateway powered by Solana blockchain.
 
-Accept crypto payments in SOL, USDC, USDT and more via QR Code and through all major Solana wallets, including Phantom, Solflare and Backpack.
+Accept crypto payments in **SOL**, **USDT**, **USDC**, **EURC** and more via **QR Code** and through all major Solana wallets, including Phantom, Solflare and Backpack.
 
 This is a quick and easy way to add crypto payments to your WooCommerce store and WordPress website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
 
@@ -23,18 +23,25 @@ Below is a live demo store. Get free tokens for testing from the [Devnet Faucet]
 
 * [https://solana-pay-demo.juxdan.io/](https://solana-pay-demo.juxdan.io/)
 
+= Supported Tokens for Payments =
+
+* Solana (SOL)
+* Tether USD Stablecoin (USDT)
+* Circle USD Stablecoin (USDC)
+* Circle EURO Stablecoin (EURC)
+* EUROe Stablecoin (EUROe)
+
 = Features =
 
 * Solana Pay smart button integrated with the Checkout page for express checkout without redirect.
 * Supports payments via QR Code scan and connection to browser wallets.
 * Fast transactions handling and direct payments into the Solana wallet address that you configure.
-* Supports payments in SOL, USDC and USDT. More tokens are planned for future releases.
 
 = Benefits for Merchants =
 
 * Immediate cash flow. Payments go directly into your Solana wallet.
 * No lock-ups, No redirect, No pay-later intermediaries. Transactions are settled onchain immediately.
-* No upfront costs, No upsell. Merchant fee is 0.5% per transaction. We make money only when you do.
+* No setup fees, No monthly fees, No upsell. Only Pay-as-you-go fee of 0.5% per transaction. We make money only when you do.
 
 == Installation ==
 
@@ -66,7 +73,7 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 = Which Solana tokens can be accepted as payment? =
 
-We currently support payments in SOL, USDC and USDT. Support for more tokens are planned to be added in future releases.
+We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for more tokens are planned to be added in future releases.
 
 = How much does it cost to use? =
 

@@ -105,8 +105,12 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		);
 
 		// merge saved settings into table
-		if ( array_key_exists( $k, $tokens_table ) ) {
-			$table = array_merge( $table, $tokens_table[ $k ] );
+		if ( count( $tokens_table ) ) {
+			if ( array_key_exists( $k, $tokens_table ) ) {
+				$table = array_merge( $table, $tokens_table[ $k ] );
+			} else {
+				$table['enabled'] = false;
+			}
 		}
 
 		// input element name fields

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WC Solana Pay
  * Plugin URI:  https://apps.aztemi.com/wc-solana-pay
- * Description: Accept crypto payments in SOL, USDC, USDT and more in your WooCommerce store.
+ * Description: Accept crypto payments in SOL, USDT, USDC, EURC and more in your WooCommerce store.
  * Version:     2.3.0
  * Author:      AZTemi
  * Author URI:  https://apps.aztemi.com/wc-solana-pay

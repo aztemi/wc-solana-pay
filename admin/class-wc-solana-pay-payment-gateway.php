@@ -130,7 +130,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->supports           = array( 'products' );
 		$this->title              = __( 'WC Solana Pay', 'wc-solana-pay' );
 		$this->method_title       = $this->title;
-		$this->method_description = __( 'Accept payments in SOL, USDC, USDT and more with Solana Pay.', 'wc-solana-pay' );
+		$this->method_description = __( 'Accept payments in SOL, USDT, USDC, EURC and more with Solana Pay.', 'wc-solana-pay' );
 
 	}
 

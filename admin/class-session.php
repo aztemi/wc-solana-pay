@@ -47,7 +47,7 @@ class Session {
 	/**
 	 * Read plugin session data
 	 *
-	 * @return array User data retrieved from session or empty array is session is empty
+	 * @return array User data retrieved from session or empty array if session is empty
 	 */
 	public function get_data() {
 
