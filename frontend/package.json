@@ -7,6 +7,7 @@
   "scripts": {
     "clean": "rm -rf ../assets/script/",
     "dev": "vite",
+    "build:block": "wp-scripts build --config block.webpack.config.cjs",
     "build:modal": "PACKAGE_NAME=modal vite build",
     "build:button": "PACKAGE_NAME=button vite build",
     "build:table": "PACKAGE_NAME=table vite build",
@@ -14,6 +15,8 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "@woocommerce/dependency-extraction-webpack-plugin": "^2.3.0",
+    "@wordpress/scripts": "^27.1.0",
     "npm-run-all": "^4.1.5",
     "stylus": "^0.59.0",
     "svelte": "^3.55.1",
