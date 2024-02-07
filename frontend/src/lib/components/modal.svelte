@@ -10,6 +10,7 @@
 
   const WAIT_DURATION = 2000;
   let showModal = false;
+  let eventResponse = {};
 
   // close modal when order times out
   $: if ($order.timedOut) closeModal();
@@ -25,7 +26,8 @@
     }
   }
 
-  async function openModal() {
+  async function openModal(/** @type {{ detail: any; }} */ e) {
+    eventResponse = e?.detail || {};
     notification.reset();
     order.reset();
     showModal = true;
@@ -40,6 +42,10 @@
   }
 
   function closeModal() {
+    const { success, error } = eventResponse;
+    if (success && error) {
+      $order.paymentSignature ? success($order.activeToken) : error();
+    }
     showModal = false;
   }
 

@@ -53,6 +53,14 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
+	 * Payment description that customers will see on the block checkout page.
+	 *
+	 * @var string
+	 */
+	public $block_desc;
+
+
+	/**
 	 * List of Solana tokens that are accepted as store currency.
 	 *
 	 * @var array
@@ -110,11 +118,9 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		require_once PLUGIN_DIR . '/admin/class-webhook.php';
 		new Webhook( $this, $this->hSession );
 
-		// load public class if on checkout or pay order page
-		if ( is_checkout() || is_checkout_pay_page() ) {
-			require_once PLUGIN_DIR . '/public/class-wc-solana-pay-public.php';
-			new WC_Solana_Pay_Public();
-		}
+		// load public class
+		require_once PLUGIN_DIR . '/public/class-wc-solana-pay-public.php';
+		new WC_Solana_Pay_Public();
 
 	}
 
@@ -151,6 +157,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->description     = $this->get_option( 'description' );
 		$this->merchant_wallet = $this->get_option( 'merchant_wallet', '' );
 		$this->is_testmode     = Solana_Pay::NETWORK_MAINNET_BETA != $this->get_option( 'network', Solana_Pay::NETWORK_DEVNET );
+		$this->block_desc      = $this->description;
 
 		// update settings that depend on testmode status
 		if ( $this->is_testmode ) {
@@ -377,7 +384,11 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		// Confirm payment transaction on Solana chain, return if not found or if balance is less.
 		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount, $payment_token ) ) {
-			return array();
+			return array(
+				'result'       => 'failure',
+				'redirect'     => wc_get_checkout_url(),
+				'errorMessage' => __( 'Payment failed. Please try again.', 'wc-solana-pay' ),
+			);
 		}
 
 		// Clear session

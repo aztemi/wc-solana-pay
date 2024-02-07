@@ -1,7 +1,7 @@
 === WC Solana Pay ===
 Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay
-Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
+Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
 Tested up to: 6.4.2
 Stable tag: 2.3.0
@@ -9,7 +9,7 @@ Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-WC Solana Pay - Fast payment gateway powered by Solana blockchain.
+WC Solana Pay - Fast payment gateway powered by Solana blockchain with support for **Block** and **Classic** themes.
 
 Accept crypto payments in **SOL**, **USDT**, **USDC**, **EURC** and more via **QR Code** and through all major Solana wallets, including Phantom, Solflare and Backpack.
 
@@ -33,15 +33,16 @@ Below is a live demo store. Get free tokens for testing from the [Devnet Faucet]
 
 = Features =
 
-* Solana Pay smart button integrated with the Checkout page for express checkout without redirect.
-* Supports payments via QR Code scan and connection to browser wallets.
-* Fast transactions handling and direct payments into the Solana wallet address that you configure.
+* Solana Pay smart button integrated with the Checkout page for express checkout without redirect
+* Supports payments via QR Code scan and connection to browser wallets
+* Fast transactions handling and direct payments into the Solana wallet address that you configure
+* Compatible with Gutenberg Block and Classic themes
 
 = Benefits for Merchants =
 
-* Immediate cash flow. Payments go directly into your Solana wallet.
+* Get paid instantly for immediate cash flow. Payments go directly into your Solana wallet.
 * No lock-ups, No redirect, No pay-later intermediaries. Transactions are settled onchain immediately.
-* No setup fees, No monthly fees, No upsell. Only Pay-as-you-go fee of 0.5% per transaction. We make money only when you do.
+* No setup fees, No monthly fees, No upsell. Only pay-as-you-go fee of 0.5% per transaction. We make money only when you do.
 
 == Installation ==
 

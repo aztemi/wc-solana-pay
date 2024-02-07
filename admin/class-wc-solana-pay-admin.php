@@ -7,6 +7,8 @@
 
 namespace AZTemi\WC_Solana_Pay;
 
+use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
+
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -46,6 +48,9 @@ class WC_Solana_Pay_Admin {
 		// register Solana Pay payment gateway class
 		add_action( 'plugins_loaded', array( $this, 'load_payment_gateway_class' ) );
 		add_filter( 'woocommerce_payment_gateways', array( $this, 'register_payment_gateway_class' ) );
+
+		// register WooCommerce Blocks integration class
+		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_block_support_class' ) );
 
 		// Add 'Settings' link to the Installed Plugins page after plugin activation
 		add_filter( 'plugin_action_links_' . PLUGIN_BASENAME, array( $this, 'add_action_links' ) );
@@ -88,6 +93,31 @@ class WC_Solana_Pay_Admin {
 
 		$gateways[] = __NAMESPACE__ . '\WC_Solana_Pay_Payment_Gateway';
 		return $gateways;
+
+	}
+
+
+	/**
+	 * Register WooCommerce Blocks integration class
+	 */
+	public function register_block_support_class() {
+
+		// check if block is in use for the Checkout page
+		$checkout_page_id = wc_get_page_id( 'checkout' );
+		$has_block_checkout = $checkout_page_id && has_block( 'woocommerce/checkout', $checkout_page_id );
+
+		// load block if in Admin page or Checkout has block
+		$load_block = is_admin() || $has_block_checkout;
+
+		if ( $load_block && class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+			require_once PLUGIN_DIR . '/admin/class-wc-solana-pay-payment-block.php';
+			add_action(
+				'woocommerce_blocks_payment_method_type_registration',
+				function( PaymentMethodRegistry $payment_method_registry ) {
+					$payment_method_registry->register( new WC_Solana_Pay_Payment_Block() );
+				}
+			);
+		}
 
 	}
 
