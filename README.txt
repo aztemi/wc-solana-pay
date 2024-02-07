@@ -87,6 +87,7 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 3. Dropdown list of Solana tokens acceptable for payments.
 4. Admin settings page.
 5. Payment details on the backend Order page.
+6. Payment options on the Block Editor page.
 
 == Source Code ==
 
