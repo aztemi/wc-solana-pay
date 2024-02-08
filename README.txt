@@ -3,8 +3,8 @@ Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay
 Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
-Tested up to: 6.4.2
-Stable tag: 2.3.0
+Tested up to: 6.4.3
+Stable tag: 2.4.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -89,11 +89,11 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 5. Payment details on the backend Order page.
 6. Payment options on the Block Editor page.
 
-== Source Code ==
-
-This plugin is an open source software with [GPLv3 or later](https://www.gnu.org/licenses/gpl-3.0.html) license. The code is available from our [repository on GitHub](https://github.com/aztemi/wc-solana-pay).
-
 == Changelog ==
+
+= 2.4.0 =
+* Support for EURC and EUROe tokens for payments.
+* Compatibility support for Gutenberg and WooCommerce Block themes.
 
 = 2.3.0 =
 * Notification bar added to show transactions status and to notify errors.
@@ -109,5 +109,5 @@ This plugin is an open source software with [GPLv3 or later](https://www.gnu.org
 
 == Upgrade Notice ==
 
-= 2.3.0 =
-Notification bar added to show transactions status and to notify errors. Upgrade is recommended.
+= 2.4.0 =
+Accept EURC & EUROe for payments. Added supports for Block themes. Upgrade is recommended.
