@@ -16,7 +16,7 @@
 
   const dispatch = createEventDispatcher();
 
-  $: ({ publicKey, wallet, disconnect, connect, select } = $walletStore);
+  $: ({ publicKey, wallet, disconnect, connect, select, connecting } = $walletStore);
   $: base58 = publicKey && publicKey?.toBase58();
   $: content = showAddressContent($walletStore);
 
@@ -35,7 +35,6 @@
   }
 
   async function copyAddress() {
-    if (!base58) return;
     await navigator.clipboard.writeText(base58);
     copied = true;
     setTimeout(() => (copied = false), 400);
@@ -57,25 +56,31 @@
   <IconButton class="wallet-adapter-button wallet-adapter-button-trigger" on:click={openModal}>
     Select Wallet
   </IconButton>
-{:else if !base58}
+{:else if connecting}
   <WalletConnectButton />
 {:else}
   <div class="wallet-adapter-split-dropdown">
-    <IconButton
-      on:click={() => dispatch("payclick")}
-      class="paybtn wallet-adapter-button wallet-adapter-button-trigger {loading ? 'loading' : ''}"
-      disabled={loading}
-    >
-      <img slot="start-icon" src={wallet.icon} alt={`${wallet.name} icon`} />
-      Pay Now
-    </IconButton>
+    {#if !base58}
+      <WalletConnectButton />
+    {:else}
+      <IconButton
+        on:click={() => dispatch("payclick")}
+        class="paybtn wallet-adapter-button wallet-adapter-button-trigger {loading ? 'loading' : ''}"
+        disabled={loading}
+      >
+        <img slot="start-icon" src={wallet.icon} alt={`${wallet.name} icon`} />
+        Pay Now
+      </IconButton>
+    {/if}
     <DropdownButton class="arrowbtn wallet-adapter-button wallet-adapter-button-trigger" bind:open={dropdownVisible} />
     <MenuList class="wallet-adapter-dropdown-list wallet-adapter-dropdown-list-active" bind:open={dropdownVisible}>
-      <MenuItem>
-        <button class="wallet-adapter-dropdown-list-item" on:click={copyAddress}>
-          {copied ? "Copied" : "Copy address"}
-        </button>
-      </MenuItem>
+      {#if base58}
+        <MenuItem>
+          <button class="wallet-adapter-dropdown-list-item" on:click={copyAddress}>
+            {copied ? "Copied" : "Copy address"}
+          </button>
+        </MenuItem>
+      {/if}
       <MenuItem>
         <button class="wallet-adapter-dropdown-list-item" on:click={openModal}>Connect a different wallet</button>
       </MenuItem>
@@ -84,7 +89,9 @@
       </MenuItem>
     </MenuList>
   </div>
-  <span>Connected: <strong>{content}</strong></span>
+  {#if base58}
+    <span>Connected: <strong>{content}</strong></span>
+  {/if}
 {/if}
 
 {#if modalVisible}
