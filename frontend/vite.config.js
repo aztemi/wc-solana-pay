@@ -29,5 +29,10 @@ export default defineConfig({
         format: "iife"
       }
     }
+  },
+  resolve: {
+    alias: {
+      crypto: 'crypto-browserify',
+    },
   }
 });
