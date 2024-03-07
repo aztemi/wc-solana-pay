@@ -49,6 +49,12 @@ return array(
 		'default'     => get_bloginfo( 'name' ) ?? '',
 		'description' => __( 'Merchant or Store name displayed in payment instructions.', 'wc-solana-pay' ),
 	),
+	'title'         => array(
+		'title'       => __( 'Plugin Name', 'wc-solana-pay' ),
+		'type'        => 'text',
+		'default'     => __( 'WC Solana Pay', 'wc-solana-pay' ),
+		'description' => __( 'The name of the payment gateway that customers will see on the checkout page.', 'wc-solana-pay' ),
+	),
 	'description'   => array(
 		'title'       => __( 'Description', 'wc-solana-pay' ),
 		'type'        => 'textarea',

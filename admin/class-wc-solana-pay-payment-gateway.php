@@ -134,8 +134,8 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
 		$this->has_fields         = false;
 		$this->supports           = array( 'products' );
-		$this->title              = __( 'WC Solana Pay', 'wc-solana-pay' );
-		$this->method_title       = $this->title;
+		$this->method_title       = __( 'WC Solana Pay', 'wc-solana-pay' );
+		$this->title              = $this->method_title;
 		$this->method_description = __( 'Accept payments in SOL, USDT, USDC, EURC and more with Solana Pay.', 'wc-solana-pay' );
 
 	}
@@ -152,6 +152,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->init_settings();
 
 		// update configurations
+		$this->title           = $this->get_option( 'title', $this->title );
 		$this->enabled         = $this->get_option( 'enabled' );
 		$this->brand_name      = $this->get_option( 'brand_name' );
 		$this->description     = $this->get_option( 'description' );
