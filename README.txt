@@ -1,10 +1,10 @@
 === WC Solana Pay ===
 Contributors: aztemi, t4top
-Donate link: https://apps.aztemi.com/wc-solana-pay
+Donate link: https://apps.aztemi.com/wc-solana-pay/donate/
 Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
 Tested up to: 6.4.3
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -91,6 +91,10 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 
 == Changelog ==
 
+= 2.4.1 :: 2024-03-08 =
+* Make gateway title name editable in the Admin settings page.
+* Support Solana Mobile Wallet Adapter for improved stability on smartphones.
+
 = 2.4.0 =
 * Support for EURC and EUROe tokens for payments.
 * Compatibility support for Gutenberg and WooCommerce Block themes.
@@ -109,5 +113,5 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 
 == Upgrade Notice ==
 
-= 2.4.0 =
-Accept EURC & EUROe for payments. Added supports for Block themes. Upgrade is recommended.
+= 2.4.1 =
+Editable plugin name, bug fixes and improved operability on smartphones.

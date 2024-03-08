@@ -2,20 +2,21 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WC Solana Pay 2.4.0\n"
+"Project-Id-Version: WC Solana Pay 2.4.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-solana-pay\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-02-07T21:40:21+00:00\n"
+"POT-Creation-Date: 2024-03-08T14:41:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wc-solana-pay\n"
 
 #. Plugin Name of the plugin
 #: admin/class-wc-solana-pay-payment-gateway.php:137
+#: admin/partials/admin-settings.php:55
 msgid "WC Solana Pay"
 msgstr ""
 
@@ -75,23 +76,23 @@ msgstr ""
 msgid "Accept payments in SOL, USDT, USDC, EURC and more with Solana Pay."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:164
+#: admin/class-wc-solana-pay-payment-gateway.php:165
 msgid "(Test Mode enabled. Devnet in use)."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:207
+#: admin/class-wc-solana-pay-payment-gateway.php:208
 msgid "Solana Pay setup is not complete. Please set Merchant Wallet Address"
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:219
+#: admin/class-wc-solana-pay-payment-gateway.php:220
 msgid "Solana Pay setup is not complete. Please enable at least 1 Solana Token."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:249
+#: admin/class-wc-solana-pay-payment-gateway.php:250
 msgid "Invalid Solana Wallet Address"
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:390
+#: admin/class-wc-solana-pay-payment-gateway.php:391
 msgid "Payment failed. Please try again."
 msgstr ""
 
@@ -176,14 +177,22 @@ msgid "Merchant or Store name displayed in payment instructions."
 msgstr ""
 
 #: admin/partials/admin-settings.php:53
-msgid "Description"
-msgstr ""
-
-#: admin/partials/admin-settings.php:55
-msgid "Complete your payment with Solana Pay."
+msgid "Plugin Name"
 msgstr ""
 
 #: admin/partials/admin-settings.php:56
+msgid "The name of the payment gateway that customers will see on the checkout page."
+msgstr ""
+
+#: admin/partials/admin-settings.php:59
+msgid "Description"
+msgstr ""
+
+#: admin/partials/admin-settings.php:61
+msgid "Complete your payment with Solana Pay."
+msgstr ""
+
+#: admin/partials/admin-settings.php:62
 msgid "Payment method description that customers will see on the checkout page."
 msgstr ""
 
