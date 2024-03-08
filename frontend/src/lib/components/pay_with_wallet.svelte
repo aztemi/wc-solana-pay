@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { Buffer } from "buffer";
   import { Transaction } from "@solana/web3.js";
+  import { WalletReadyState } from '@solana/wallet-adapter-base';
   import { walletStore } from "@aztemi/svelte-on-solana-wallet-adapter-core";
   import { ConnectionProvider, WalletProvider } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
@@ -15,6 +16,7 @@
   let wallets = [];
   let loading = false;
   const localStorageKey = "SolanaWalletAdapter";
+  const autoConnect = (adapter) => adapter && adapter.readyState === WalletReadyState.Installed;
 
   onMount(async () => {
     const {
@@ -76,7 +78,7 @@
 </script>
 
 <ConnectionProvider network={endpoint} />
-<WalletProvider {localStorageKey} {wallets} autoConnect={true} />
+<WalletProvider {localStorageKey} {wallets} {autoConnect} />
 
 <span>Pay with Browser Wallet</span>
 <div>
