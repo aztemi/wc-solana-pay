@@ -36,13 +36,17 @@ function createOrderStore() {
 
     setOrder: order =>
       update(old => {
-        let { id, reference, amount, tokens, suffix, rpc, home, link, poll } = order;
+        let { id, reference, amount, tokens, suffix, rpc, home, link, poll, testmode } = order;
 
         let homeUrl = new URL(home);
         homeUrl.searchParams.set("id", id);
 
         reference = new PublicKey(reference);
         amount = new BigNumber(amount);
+
+        // Append 'devnet' to RPC endpoint in testmode.
+        // A hack to make the 'getChainForEndpoint()', used in WalletProvider, detect the correct network
+        const network = testmode ? '&n=devnet' : '';
 
         // update tokens
         let paymentTokens = {};
@@ -63,7 +67,7 @@ function createOrderStore() {
           reference,
           amount,
           activeToken,
-          rpc: `${homeUrl.toString()}&action=${rpc}`,
+          rpc: `${homeUrl.toString()}&action=${rpc}${network}`,
           link: `${homeUrl.toString()}&action=${link}`,
           poll: `${homeUrl.toString()}&action=${poll}`,
           tokens: paymentTokens
