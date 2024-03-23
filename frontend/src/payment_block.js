@@ -41,7 +41,7 @@ function Content({ activePaymentMethod, eventRegistration, emitResponse }) {
     });
 
     return unsubscribe;
-  }, [onPaymentSetup, activePaymentMethod]);
+  }, [onPaymentSetup, activePaymentMethod, responseTypes]);
 
   return <div>{description}</div>;
 }
