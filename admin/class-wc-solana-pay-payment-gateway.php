@@ -147,7 +147,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	private function get_settings() {
 
 		// load settings
-		Solana_Tokens::update_tokens_prices();
 		$this->init_form_fields();
 		$this->init_settings();
 

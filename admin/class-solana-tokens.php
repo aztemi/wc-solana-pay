@@ -32,14 +32,6 @@ class Solana_Tokens {
 
 
 	/**
-	 * Cron schedule event hook name to update tokens rate every hour.
-	 *
-	 * @var string
-	 */
-	protected const TOKENS_RATE_UPDATE_HOOK = PLUGIN_ID . '_update_rate_event';
-
-
-	/**
 	 * Unique Key for storing tokens table settings in WP Option array.
 	 *
 	 * @var string
@@ -160,44 +152,6 @@ class Solana_Tokens {
 
 
 	/**
-	 * Get current prices of tokens in specified currecy using Coingecko's rate lookup API.
-	 *
-	 * @param  array  $tokens   List of tokens to get their prices
-	 * @param  string $currency Base currency
-	 * @return array Tokens to prices list
-	 */
-	private static function get_coingecko_tokens_prices( $tokens, $currency ) {
-
-		$rtn = array();
-		$token_str = trim( implode( ',', $tokens ) );
-		$currency = trim( strtolower( $currency ) );
-
-		if ( ! empty( $token_str ) && ! empty( $currency ) ) {
-
-			// get prices from Coingecko API
-			$url = sprintf( 'https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=%s', $token_str, $currency );
-			$response = remote_request( $url );
-			if ( 200 === $response['status'] ) {
-				$prices = $response['body'];
-
-				// update return list if response is valid and requested tokens are in the response
-				if ( is_array( $prices ) ) {
-					foreach ( $prices as $token => $price ) {
-						if ( is_array( $price ) && array_key_exists( $currency, $price ) ) {
-							$rtn[ $token ] = $price[ $currency ];
-						}
-					}
-				}
-			}
-
-		}
-
-		return $rtn;
-
-	}
-
-
-	/**
 	 * Add supported Solana tokens to WC Currencies list.
 	 */
 	public function add_woocommerce_currencies( $currencies ) {
@@ -240,85 +194,6 @@ class Solana_Tokens {
 		}
 
 		return $symbol;
-
-	}
-
-
-	/**
-	 * Update Solana tokens prices.
-	 */
-	public static function update_tokens_prices() {
-
-		// prevent back-to-back execution
-		static $last_execution;
-		if ( isset( $last_execution ) ) {
-			return;
-		}
-
-		$one_hour = 1 * 60 * 60;
-		$store_currency = self::get_store_currency();
-		$last_currency = $store_currency;
-
-		// ensure time between execution is over 1 hour when store currency is unchanged
-		$last_execution = get_option( self::TOKENS_RATE_UPDATE_HOOK );
-		if ( is_array( $last_execution ) ) {
-			$last_time = $last_execution['time'];
-			$last_currency = $last_execution['currency'];
-			if ( ( time() - $last_time < $one_hour ) && ( $store_currency === $last_currency ) ) {
-				return;
-			}
-		}
-
-		// get tokens table persisted in settings
-		$tokens_table = get_option( self::TOKENS_OPTION_KEY, array() );
-
-		// get a list of supported tokens
-		$supported_tokens = self::$supported_tokens;
-
-		// initialize supported tokens that are not in persisted table
-		foreach ( $supported_tokens as $k => $v ) {
-			if ( ! array_key_exists( $k, $tokens_table ) ) {
-				$tokens_table[ $k ] = array(
-					'id'          => $k,
-					'enabled'     => false,
-					'autorefresh' => true,
-				);
-			}
-		}
-
-		// get current exchange prices
-		$coingecko_tokens = array_column( $supported_tokens, 'coingecko' );
-		$coingecko_prices = self::get_coingecko_tokens_prices( $coingecko_tokens, $store_currency );
-
-		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
-
-		// update exchange rates in table
-		foreach ( $tokens_table as $token => $v ) {
-			if ( $v['autorefresh'] && $store_currency != $last_currency ) {
-				$tokens_table[ $token ]['rate'] = '';
-			}
-
-			if ( $v['autorefresh'] && array_key_exists( $token, $supported_tokens ) ) {
-				$token_coingecko = $supported_tokens[ $token ]['coingecko'];
-
-				if ( array_key_exists( $token_coingecko, $coingecko_prices ) ) {
-					// update token rate
-					$price = number_format( $coingecko_prices[ $token_coingecko ], self::BC_MATH_SCALE );
-					$rate = bcdiv( '1', $price );
-					$tokens_table[ $token ]['rate'] = rtrim( $rate, '0' );
-				}
-			}
-		}
-
-		bcscale( $old_scale ); // reset back to old scale
-
-		// update last successful execution
-		$last_execution = array(
-			'time'     => time(),
-			'currency' => $store_currency,
-		);
-		update_option( self::TOKENS_OPTION_KEY, $tokens_table );
-		update_option( self::TOKENS_RATE_UPDATE_HOOK, $last_execution );
 
 	}
 
