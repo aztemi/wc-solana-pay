@@ -78,6 +78,7 @@ class Webhook {
 		$data['memo'] = "Order#{$order_id}";
 		$data['amount'] = (float) $order->get_total();
 		$data['currency'] = $order->get_currency();
+		$data['symbol'] = get_woocommerce_currency_symbol( $data['currency'] );
 		$data['order_id'] = $order_id;
 
 	}
@@ -103,7 +104,8 @@ class Webhook {
 
 		$data['memo'] = "Cart@{$cart_created}";
 		$data['amount'] = (float) WC()->cart->get_total('edit');
-		$data['currency'] = get_woocommerce_currency_symbol( Solana_Tokens::get_store_currency('edit') );
+		$data['currency'] = Solana_Tokens::get_store_currency('edit');
+		$data['symbol'] = get_woocommerce_currency_symbol( $data['currency'] );
 		$data['cart_hash'] = $cart_hash;
 		$data['cart_created'] = $cart_created;
 

@@ -2,7 +2,7 @@
   import Icon from "./icons/icon.svelte";
 
   export let amount;
-  export let currency;
+  export let symbol;
 </script>
 
 <div>
@@ -12,7 +12,7 @@
   <span>
     <bdi>
       <span><b>{amount}</b></span>
-      <span class="woocommerce-Price-currencySymbol"><b>{@html currency}</b></span>
+      <span class="woocommerce-Price-currencySymbol"><b>{@html symbol}</b></span>
     </bdi>
   </span>
 </div>

@@ -9,6 +9,7 @@ const emptyOrder = {
   reference: null,
   amount: new BigNumber(0),
   currency: "",
+  symbol: "",
   rpc: "", // RPC endpoint
   link: "", // `link` param in Solana Pay spec
   poll: "", // endpoint to poll transaction status
@@ -46,7 +47,7 @@ function createOrderStore() {
 
         // Append 'devnet' to RPC endpoint in testmode.
         // A hack to make the 'getChainForEndpoint()', used in WalletProvider, detect the correct network
-        const network = testmode ? '&n=devnet' : '';
+        const network = testmode ? "&n=devnet" : "";
 
         // update tokens
         let paymentTokens = {};
