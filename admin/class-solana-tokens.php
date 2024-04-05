@@ -130,28 +130,6 @@ class Solana_Tokens {
 
 
 	/**
-	 * Get list of currencies supported by Coingecko's rate lookup APIs.
-	 *
-	 * @return array Supported currencies list
-	 */
-	private static function get_coingecko_supported_currencies() {
-
-		static $currencies_list = array();
-
-		if ( ! count( $currencies_list ) ) {
-			$url = 'https://api.coingecko.com/api/v3/simple/supported_vs_currencies';
-			$response = remote_request( $url );
-			if ( 200 === $response['status'] ) {
-				$currencies_list = $response['body'];
-			}
-		}
-
-		return $currencies_list;
-
-	}
-
-
-	/**
 	 * Add supported Solana tokens to WC Currencies list.
 	 */
 	public function add_woocommerce_currencies( $currencies ) {
@@ -266,16 +244,70 @@ class Solana_Tokens {
 
 	/**
 	 * Check if rate conversion lookup is supported for store base currency or not.
-	 * It checks if store currency is part of Coingecko supported currencies since rate conversion uses Coingecko API.
 	 *
 	 * @return bool
 	 */
 	public static function is_rate_conversion_supported() {
 
-		$store_currency = self::get_store_currency();
-		$coingecko_currencies = self::get_coingecko_supported_currencies();
+		// list of currencies supported for rate lookup in the backend
+		$supported_currencies = array(
+			// Solana tokens supported
+			'usdc',
+			'usdt',
+			'eurc',
+			'euroe',
+			'sol',
 
-		return in_array( strtolower( $store_currency ), $coingecko_currencies );
+			// WC currencies supported on Coingecko since rate conversion uses Coingecko API
+			'usd',
+			'aed',
+			'ars',
+			'aud',
+			'bdt',
+			'bhd',
+			'bmd',
+			'brl',
+			'cad',
+			'chf',
+			'clp',
+			'cny',
+			'czk',
+			'dkk',
+			'eur',
+			'gbp',
+			'hkd',
+			'huf',
+			'idr',
+			'ils',
+			'inr',
+			'jpy',
+			'krw',
+			'kwd',
+			'lkr',
+			'mmk',
+			'mxn',
+			'myr',
+			'ngn',
+			'nok',
+			'nzd',
+			'php',
+			'pkr',
+			'pln',
+			'rub',
+			'sar',
+			'sek',
+			'sgd',
+			'thb',
+			'try',
+			'twd',
+			'uah',
+			'vef',
+			'vnd',
+			'zar',		
+		);
+
+		$store_currency = self::get_store_currency();
+		return in_array( strtolower( $store_currency ), $supported_currencies );
 
 	}
 
