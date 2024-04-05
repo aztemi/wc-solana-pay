@@ -73,26 +73,11 @@ class Solana_Tokens {
 
 	public function __construct() {
 
-		// load dependencies
-		$this->load_dependencies();
-
 		// load supported tokens
 		$this->load_supported_tokens();
 
 		// register hooks that will add supported tokens to the WC Currencies list
 		$this->register_hooks();
-
-	}
-
-
-	/**
-	 * Load required dependencies for this class.
-	 */
-	private function load_dependencies() {
-
-		// load Cron Event class for hourly update
-		require_once PLUGIN_DIR . '/admin/class-cronjob.php';
-		new Cronjob( self::TOKENS_RATE_UPDATE_HOOK );
 
 	}
 
@@ -124,9 +109,6 @@ class Solana_Tokens {
 		add_filter( 'woocommerce_currencies', array( $this, 'add_woocommerce_currencies' ) );
 		add_filter( 'woocommerce_currency_symbols', array( $this, 'add_woocommerce_currency_symbols' ) );
 		add_filter( 'woocommerce_currency_symbol', array( $this, 'get_woocommerce_currency_symbol' ), 10, 2 );
-
-		// add action to update tokens rates at scheduled intervals
-		add_action( self::TOKENS_RATE_UPDATE_HOOK, array( __CLASS__, 'update_tokens_prices' ) );
 
 	}
 
