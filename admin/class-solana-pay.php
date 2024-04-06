@@ -540,6 +540,7 @@ class Solana_Pay {
 		if ( 200 === $response['status'] ) {
 			$body = $response['body'];
 			$response['id'] = array_key_exists( 'id', $body ) ? $body['id'] : '';
+			$response['tokens'] = array_key_exists( 'tokens', $body ) ? $body['tokens'] : array();
 		}
 
 		return $response;

@@ -193,6 +193,9 @@ class Webhook {
 		}
 
 		// store the data in user session for later use during payment processing
+		if ( count( $res['tokens'] ) ) {
+			$data['tokens'] = $res['tokens'];
+		}
 		$data['id'] = $res['id'];
 		$this->hSession->set_data( $data );
 
