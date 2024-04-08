@@ -275,6 +275,7 @@ class Solana_Tokens {
 			'dkk',
 			'eur',
 			'gbp',
+			'gel',
 			'hkd',
 			'huf',
 			'idr',
