@@ -296,12 +296,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		if ( $tablejs ) {
 			$base_currency = Solana_Tokens::get_store_currency('edit');
 			$show_currency = Solana_Tokens::get_store_currency();
-			$script = get_partial_file_html(
-				$tablejs,
-				array(
-					'show_currency' => $show_currency,
-				)
-			);
+			$script = get_partial_file_html( $tablejs );
 
 			$html = get_partial_file_html(
 				'/admin/partials/admin-tokens-table.php',
@@ -333,12 +328,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verification already handled in WC_Admin_Settings::save()
 		if (
 			isset( $_POST['pwspfwc_id'] ) &&
-			isset( $_POST['pwspfwc_rate'] ) &&
-			isset( $_POST['pwspfwc_fee'] )
+			isset( $_POST['pwspfwc_rate'] )
 		) {
 			$ids    = wc_clean( wp_unslash( $_POST['pwspfwc_id'] ) );
 			$rates  = wc_clean( wp_unslash( $_POST['pwspfwc_rate'] ) );
-			$fees   = wc_clean( wp_unslash( $_POST['pwspfwc_fee'] ) );
 
 			foreach ( $ids as $i => $id ) {
 				if ( ! isset( $ids[ $i ] ) ) {
@@ -348,9 +341,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 				$tokens[ $ids[ $i ] ] = array(
 					'id'          => $ids[ $i ],
 					'rate'        => $rates[ $i ],
-					'fee'         => $fees[ $i ],
 					'enabled'     => isset( $_POST['pwspfwc_enabled'][ $i ] ) ? true : false,
-					'autorefresh' => isset( $_POST['pwspfwc_autorefresh'][ $i ] ) ? true : false,
 				);
 			}
 		}
