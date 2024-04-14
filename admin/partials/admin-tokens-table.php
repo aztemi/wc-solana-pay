@@ -74,7 +74,7 @@ function get_tokens_table_header( $show_currency, $rate_available ) {
 	return '<tr>'
 		. get_th( __( 'Enabled', 'wc-solana-pay' ), 'text-align:center;max-width:4rem' )
 		. get_th( __( 'Token', 'wc-solana-pay' ), 'min-width:10rem' )
-		. ($rate_available ? '' : get_th( sprintf( '%s: 1.00 %s =', __( 'Exchange Rate', 'wc-solana-pay' ), $show_currency ), 'text-align:center' ))
+		. ( $rate_available ? '' : get_th( sprintf( '%s: 1.00 %s =', __( 'Exchange Rate', 'wc-solana-pay' ), $show_currency ), 'text-align:center' ) )
 		. '</tr>';
 
 }
@@ -120,12 +120,12 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		$token_icon = '<img src="' . PLUGIN_URL . '/' . $v['icon'] . '" alt="' . $v['name'] . ' icon" style="width:1.5rem;border-radius:50%">';
 		$token_name = '<span style="padding-left:0.3rem">' . esc_html( $v['symbol'] ) . ' (' . esc_html( $v['name'] ) . ')</span>';
 		$token_div = '<div style="display:flex;align-items:center">' . $token_icon . $token_name . '</div>'
-			. ($rate_available ? get_input( $rate, $table['rate'], '', 'hidden' ) : '');
+			. ( $rate_available ? get_input( $rate, $table['rate'], '', 'hidden' ) : '' );
 
 		$tr = '<tr class="' . $class . '" data-symbol="' . esc_attr( $v['symbol'] ) . '">'
 			. get_td( get_input( $id, $k, '', 'hidden' ) . get_input( $enabled, $table['enabled'], '', 'checkbox' ), 'text-align:center' )
 			. get_td( $token_div, 'padding-left:0.5rem' )
-			. ($rate_available ? '' : get_td( get_input( $rate, $table['rate'], 'text-align:end;min-width:8rem;width:100%', 'text' ) ))
+			. ( $rate_available ? '' : get_td( get_input( $rate, $table['rate'], 'text-align:end;min-width:8rem;width:100%', 'text' ) ) )
 			. '</tr>';
 		$rows .= $tr;
 	}

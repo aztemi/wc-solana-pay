@@ -304,7 +304,7 @@ class Solana_Tokens {
 			'uah',
 			'vef',
 			'vnd',
-			'zar',		
+			'zar',
 		);
 
 		$store_currency = self::get_store_currency();
