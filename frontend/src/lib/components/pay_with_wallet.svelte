@@ -1,8 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import { Buffer } from "buffer";
-  import { Transaction } from "@solana/web3.js";
-  import { WalletReadyState } from '@solana/wallet-adapter-base';
+  import { Connection, Transaction } from "@solana/web3.js";
+  import { WalletReadyState } from "@solana/wallet-adapter-base";
   import { walletStore } from "@aztemi/svelte-on-solana-wallet-adapter-core";
   import { ConnectionProvider, WalletProvider } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
@@ -16,7 +16,7 @@
   let wallets = [];
   let loading = false;
   const localStorageKey = "SolanaWalletAdapter";
-  const autoConnect = (adapter) => adapter && adapter.readyState === WalletReadyState.Installed;
+  const autoConnect = adapter => adapter && adapter.readyState === WalletReadyState.Installed;
 
   onMount(async () => {
     const {
@@ -56,11 +56,9 @@
         const txBuf = Buffer.from(transaction, "base64");
         let tx = Transaction.from(txBuf);
 
-        // sign the transaction
-        tx = await $walletStore.signTransaction(tx);
-
-        // send the transaction via backend RPC endpoint
-        await postRequest(endpoint, { transaction: tx.serialize().toString("base64") });
+        // sign and send the transaction
+        const connection = new Connection(endpoint, "confirmed");
+        await $walletStore.sendTransaction(tx, connection);
 
         // poll for transaction result
         startPolling();
