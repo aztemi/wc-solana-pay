@@ -12,6 +12,7 @@
 
   export let link;
   export let endpoint;
+  export let network;
 
   let wallets = [];
   let loading = false;
@@ -32,7 +33,7 @@
 
     wallets = [
       new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
+      new SolflareWalletAdapter({ network }),
       new CoinbaseWalletAdapter(),
       new LedgerWalletAdapter(),
       new SafePalWalletAdapter(),

@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import { writable } from "svelte/store";
 import { PublicKey } from "@solana/web3.js";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import supportedTokens from "../../../../assets/json/supported_solana_tokens.json";
 
 const emptyOrder = {
@@ -13,6 +14,7 @@ const emptyOrder = {
   rpc: "", // RPC endpoint
   link: "", // `link` param in Solana Pay spec
   poll: "", // endpoint to poll transaction status
+  network: WalletAdapterNetwork.Mainnet,
   tokens: {},
   activeToken: "",
   label: "",
@@ -47,7 +49,7 @@ function createOrderStore() {
 
         // Append 'devnet' to RPC endpoint in testmode.
         // A hack to make the 'getChainForEndpoint()', used in WalletProvider, detect the correct network
-        const network = testmode ? "&n=devnet" : "";
+        const devnetLink = testmode ? "&n=devnet" : "";
 
         // update tokens
         let paymentTokens = {};
@@ -68,9 +70,10 @@ function createOrderStore() {
           reference,
           amount,
           activeToken,
-          rpc: `${homeUrl.toString()}&action=${rpc}${network}`,
+          rpc: `${homeUrl.toString()}&action=${rpc}${devnetLink}`,
           link: `${homeUrl.toString()}&action=${link}`,
           poll: `${homeUrl.toString()}&action=${poll}`,
+          network: testmode ? WalletAdapterNetwork.Devnet : WalletAdapterNetwork.Mainnet,
           tokens: paymentTokens
         });
       })
