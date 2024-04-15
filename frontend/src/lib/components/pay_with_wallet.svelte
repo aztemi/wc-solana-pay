@@ -1,10 +1,10 @@
 <script>
   import { onMount } from "svelte";
   import { Buffer } from "buffer";
-  import { Connection, Transaction } from "@solana/web3.js";
+  import { Transaction } from "@solana/web3.js";
   import { WalletReadyState } from "@solana/wallet-adapter-base";
   import { walletStore } from "@aztemi/svelte-on-solana-wallet-adapter-core";
-  import { ConnectionProvider, WalletProvider } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
+  import { ConnectionProvider, WalletProvider, workSpace } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
   import { postRequest } from "../utils/post_request";
   import { notification, showSubmitOrderStatus, EXIT, STATE } from "./notification";
@@ -57,8 +57,7 @@
         let tx = Transaction.from(txBuf);
 
         // sign and send the transaction
-        const connection = new Connection(endpoint, "confirmed");
-        await $walletStore.sendTransaction(tx, connection);
+        await $walletStore.sendTransaction(tx, $workSpace.connection);
 
         // poll for transaction result
         startPolling();
@@ -75,7 +74,7 @@
   }
 </script>
 
-<ConnectionProvider network={endpoint} />
+<ConnectionProvider network={endpoint} config="confirmed" />
 <WalletProvider {localStorageKey} {wallets} {autoConnect} />
 
 <span>Pay with Browser Wallet</span>
