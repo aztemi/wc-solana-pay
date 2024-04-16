@@ -2,9 +2,9 @@
   import { onMount } from "svelte";
   import { Buffer } from "buffer";
   import { Transaction } from "@solana/web3.js";
-  import { WalletReadyState } from '@solana/wallet-adapter-base';
+  import { WalletReadyState } from "@solana/wallet-adapter-base";
   import { walletStore } from "@aztemi/svelte-on-solana-wallet-adapter-core";
-  import { ConnectionProvider, WalletProvider } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
+  import { ConnectionProvider, WalletProvider, workSpace } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
   import { postRequest } from "../utils/post_request";
   import { notification, showSubmitOrderStatus, EXIT, STATE } from "./notification";
@@ -12,11 +12,12 @@
 
   export let link;
   export let endpoint;
+  export let network;
 
   let wallets = [];
   let loading = false;
   const localStorageKey = "SolanaWalletAdapter";
-  const autoConnect = (adapter) => adapter && adapter.readyState === WalletReadyState.Installed;
+  const autoConnect = adapter => adapter && adapter.readyState === WalletReadyState.Installed;
 
   onMount(async () => {
     const {
@@ -32,7 +33,7 @@
 
     wallets = [
       new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
+      new SolflareWalletAdapter({ network }),
       new CoinbaseWalletAdapter(),
       new LedgerWalletAdapter(),
       new SafePalWalletAdapter(),
@@ -56,11 +57,8 @@
         const txBuf = Buffer.from(transaction, "base64");
         let tx = Transaction.from(txBuf);
 
-        // sign the transaction
-        tx = await $walletStore.signTransaction(tx);
-
-        // send the transaction via backend RPC endpoint
-        await postRequest(endpoint, { transaction: tx.serialize().toString("base64") });
+        // sign and send the transaction
+        await $walletStore.sendTransaction(tx, $workSpace.connection);
 
         // poll for transaction result
         startPolling();
@@ -77,7 +75,7 @@
   }
 </script>
 
-<ConnectionProvider network={endpoint} />
+<ConnectionProvider network={endpoint} config="confirmed" />
 <WalletProvider {localStorageKey} {wallets} {autoConnect} />
 
 <span>Pay with Browser Wallet</span>

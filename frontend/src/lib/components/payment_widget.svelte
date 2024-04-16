@@ -9,7 +9,7 @@
   import PayWithQrcode from "./pay_with_qrcode.svelte";
 
   let specLink;
-  const { amount, currency, rpc, link } = $order;
+  const { amount, symbol, rpc, link, network } = $order;
 
   $: {
     if ($order.activeToken) {
@@ -25,12 +25,12 @@
 </script>
 
 <section>
-  <FiatPrice amount={amount.toNumber()} {currency} />
+  <FiatPrice amount={amount.toNumber()} {symbol} />
 
   <CryptoPrice />
 
   <div class="paywith">
-    <PayWithWallet link={specLink} endpoint={rpc} />
+    <PayWithWallet link={specLink} endpoint={rpc} {network} />
     <OrDivider />
     <PayWithQrcode link={specLink} />
   </div>

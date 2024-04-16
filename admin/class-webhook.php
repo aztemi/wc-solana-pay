@@ -78,6 +78,7 @@ class Webhook {
 		$data['memo'] = "Order#{$order_id}";
 		$data['amount'] = (float) $order->get_total();
 		$data['currency'] = $order->get_currency();
+		$data['symbol'] = get_woocommerce_currency_symbol( $data['currency'] );
 		$data['order_id'] = $order_id;
 
 	}
@@ -103,7 +104,8 @@ class Webhook {
 
 		$data['memo'] = "Cart@{$cart_created}";
 		$data['amount'] = (float) WC()->cart->get_total('edit');
-		$data['currency'] = get_woocommerce_currency_symbol( Solana_Tokens::get_store_currency('edit') );
+		$data['currency'] = Solana_Tokens::get_store_currency('edit');
+		$data['symbol'] = get_woocommerce_currency_symbol( $data['currency'] );
 		$data['cart_hash'] = $cart_hash;
 		$data['cart_created'] = $cart_created;
 
@@ -191,11 +193,15 @@ class Webhook {
 		}
 
 		// store the data in user session for later use during payment processing
+		if ( count( $res['tokens'] ) ) {
+			$data['tokens'] = $res['tokens'];
+		}
 		$data['id'] = $res['id'];
 		$this->hSession->set_data( $data );
 
 		// remove unused info; share only necessary data with the frontend
 		unset( $data['recipient'] );
+		unset( $data['callback_url'] );
 
 		// send response
 		wp_send_json( $data, 200 );
@@ -356,7 +362,7 @@ class Webhook {
 
 
 	/**
-	 * Send signed transaction request to remote RPC node.
+	 * Send RPC request to remote RPC node.
 	 */
 	public function send_rpc_request( $request ) {
 
@@ -370,42 +376,107 @@ class Webhook {
 		// handle POST request
 		if ( 'POST' === $request->get_method() ) {
 
-			// validate json body
-			$request_json = $request->get_json_params();
-			$schema = array(
-				'type' => 'object',
-				'properties' => array(
-					'transaction' => array(
-						'type' => 'string',
-						'required' => true
-					),
-				),
-			);
-			$result = rest_validate_value_from_schema( $request_json, $schema );
-			if ( is_wp_error( $result ) ) {
+			// proxy request based on body parameters
+			$body = $request->get_json_params();
+			if ( is_array( $body ) && isset( $body['method'] ) && isset( $body['params'] ) ) {
+				$this->proxy_raw_rpc_request($id, $body);
+
+			} elseif ( is_array( $body ) && isset( $body['transaction'] ) ) {
+				$this->proxy_transaction_request($id, $body);
+
+			} else {
 				wp_send_json_error( 'Bad Request', 400 );
+
 			}
-
-			// sanitize & get transaction from the json body
-			$request_json = rest_sanitize_value_from_schema( $request_json, $schema );
-			$transaction = trim( wc_clean( wp_unslash( $request_json['transaction'] ) ) );
-
-			// return if transaction is empty
-			if ( empty( $transaction ) ) {
-				wp_send_json_error( 'Bad Request', 400 );
-			}
-
-			// send transaction to remote
-			$testmode = $this->hGateway->get_testmode();
-			$res = Solana_Pay::send_payment_transaction( $id, $transaction, $testmode );
-			if ( $res['error'] ) {
-				wp_send_json_error( $res['error'], $res['status'] );
-			}
-
-			// send ok response
-			wp_send_json_success();
 
 		}
+
+	}
+
+
+	/**
+	 * Forward raw RPC request to remote RPC node.
+	 *
+	 * @param  array  $request_json Request body as json array.
+	 */
+	public function proxy_raw_rpc_request( $id, $request_json ) {
+
+		// validate json body
+		$schema = array(
+			'type' => 'object',
+			'properties' => array(
+				'method' => array(
+					'type' => 'string',
+					'required' => true
+				),
+				'params' => array(
+					'type' => 'array',
+					'minItems' => 1
+				),
+			),
+		);
+		$result = rest_validate_value_from_schema( $request_json, $schema );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( 'Bad Request', 400 );
+		}
+
+		// sanitize the json body
+		$request_json = rest_sanitize_value_from_schema( $request_json, $schema );
+
+		// send transaction to remote
+		$testmode = $this->hGateway->get_testmode();
+		$url = Solana_Pay::endpoint_url( $id, 'rpc', $testmode );
+		$res = remote_request( $url, 'POST', wp_json_encode( $request_json ) );
+		if ( $res['error'] ) {
+			wp_send_json_error( $res['error'], $res['status'] );
+		}
+
+		// send response
+		wp_send_json( $res['body'], 200 );
+
+	}
+
+
+	/**
+	 * Forward signed transaction request to remote RPC node.
+	 *
+	 * @param  array  $request_json Request body as json array.
+	 */
+	public function proxy_transaction_request( $id, $request_json ) {
+
+		// validate json body
+		$schema = array(
+			'type' => 'object',
+			'properties' => array(
+				'transaction' => array(
+					'type' => 'string',
+					'required' => true
+				),
+			),
+		);
+		$result = rest_validate_value_from_schema( $request_json, $schema );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( 'Bad Request', 400 );
+		}
+
+		// sanitize & get transaction from the json body
+		$request_json = rest_sanitize_value_from_schema( $request_json, $schema );
+		$transaction = trim( wc_clean( wp_unslash( $request_json['transaction'] ) ) );
+
+		// return if transaction is empty
+		if ( empty( $transaction ) ) {
+			wp_send_json_error( 'Bad Request', 400 );
+		}
+
+		// send transaction to remote
+		$testmode = $this->hGateway->get_testmode();
+		$res = Solana_Pay::send_payment_transaction( $id, $transaction, $testmode );
+		if ( $res['error'] ) {
+			wp_send_json_error( $res['error'], $res['status'] );
+		}
+
+		// send ok response
+		wp_send_json_success();
 
 	}
 

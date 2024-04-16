@@ -117,4 +117,4 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 == Upgrade Notice ==
 
 = 2.5.0 =
-Bug fixes and user account validation during checkout. 
+Bug fixes and user account validation during checkout.

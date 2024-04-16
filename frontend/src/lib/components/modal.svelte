@@ -105,5 +105,7 @@
       border-radius 0.5rem
       border 1px solid var(--modal_border_color)
       background-color var(--modal_back_color)
+      @media screen and (min-width: 640px)
+        max-width 30rem
 
 </style>

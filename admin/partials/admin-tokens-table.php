@@ -58,30 +58,30 @@ function get_input( $name, $value, $style = '', $type = 'text', $readonly = fals
 
 }
 
-function get_tokens_table_header( $show_currency ) {
+function get_rate_notice( $show_currency ) {
 
-	$header = '<tr>'
-		. get_th( __( 'Enabled', 'wc-solana-pay' ), 'text-align:center;max-width:6rem' )
-		. get_th( __( 'Token', 'wc-solana-pay' ), 'min-width:15rem' )
-		. get_th( __( 'Auto Refresh', 'wc-solana-pay' ), 'text-align:center;min-width:9rem;max-width:12rem', '', wp_kses_post( wc_help_tip( __( 'Auto refresh exchange rate every hour if checked.', 'wc-solana-pay' ), true ) ) )
-		. get_th( __( 'Exchange Rate', 'wc-solana-pay' ), '', 3 )
-		. get_th( __( '% Commission', 'wc-solana-pay' ), '' )
-		. get_th( sprintf( '%s: 1.00 %s', __( 'Preview', 'wc-solana-pay' ), $show_currency ), 'text-align:right;min-width:8rem' )
-		. '</tr>';
-
-	return $header;
+	return '<p class="description">'
+		/* translators: %s: Store currency name, e.g. 'USD' */
+		. sprintf( __( 'Your store currency is: %s', 'wc-solana-pay' ), '<b>' . $show_currency . '</b>' )
+		. '</p><p class="description" style="padding-bottom:0.5rem">'
+		. __( 'It is currently not supported for automatic exchange rate lookup. Please enter your preferred exchange rates below.', 'wc-solana-pay' )
+		. '</p>';
 
 }
 
-function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency ) {
+function get_tokens_table_header( $show_currency, $rate_available ) {
+
+	return '<tr>'
+		. get_th( __( 'Enabled', 'wc-solana-pay' ), 'text-align:center;max-width:4rem' )
+		. get_th( __( 'Token', 'wc-solana-pay' ), 'min-width:10rem' )
+		. ( $rate_available ? '' : get_th( sprintf( '%s: 1.00 %s =', __( 'Exchange Rate', 'wc-solana-pay' ), $show_currency ), 'text-align:center' ) )
+		. '</tr>';
+
+}
+
+function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $rate_available ) {
 
 	$rows = '';
-
-	// Enqueue DashIcons
-	wp_enqueue_style( 'dashicons' );
-
-	// check if exchange rate lookup is available for the store base currency
-	$rate_lookup_available = Solana_Tokens::is_rate_conversion_supported();
 
 	// Create Admin Settings table row for each supported token
 	$i = -1;
@@ -99,9 +99,7 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		// default settings
 		$table = array(
 			'rate'        => '1.00',
-			'fee'         => Solana_Pay::endpoint_usage_fee(),
 			'enabled'     => !! $in_testmode, // enable testmode tokens by default
-			'autorefresh' => true,
 		);
 
 		// merge saved settings into table
@@ -115,55 +113,19 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 
 		// input element name fields
 		$id          = "pwspfwc_id[$i]";
-		$fee         = "pwspfwc_fee[$i]";
 		$rate        = "pwspfwc_rate[$i]";
 		$enabled     = "pwspfwc_enabled[$i]";
-		$autorefresh = "pwspfwc_autorefresh[$i]";
 
 		// token icon & name
 		$token_icon = '<img src="' . PLUGIN_URL . '/' . $v['icon'] . '" alt="' . $v['name'] . ' icon" style="width:1.5rem;border-radius:50%">';
 		$token_name = '<span style="padding-left:0.3rem">' . esc_html( $v['symbol'] ) . ' (' . esc_html( $v['name'] ) . ')</span>';
-		$token_div = '<div style="display:flex;align-items:center">' . $token_icon . $token_name . '</div>';
-
-		// fee input & percent
-		$fee_input = get_input( $fee, $table['fee'], 'max-width:5rem' );
-		$percent = '<span style="padding-left:0.3rem"><strong>%</strong></span>';
-		$fee_div = '<div style="display:flex;align-items:center">' . $fee_input . $percent . '</div>';
-
-		// rate refresh icon button
-		$title_attr = __( 'Click to refresh exchange rate', 'wc-solana-pay' );
-		$update_icon = '<span class="button-link dashicons dashicons-update" style="text-decoration-line:none" title="' . esc_attr( $title_attr ) . '" data-coingecko="' . esc_attr( $v['coingecko'] ) . '"></span>';
-
-		// rate auto-refresh input
-		if ( $rate_lookup_available ) {
-			// show checkbox if rate lookup is available
-			$rate_checkbox = get_input( $autorefresh, $table['autorefresh'], '', 'checkbox' );
-		} else {
-			// show 'Not Available' otherwise
-			$update_icon = '';
-			if ( $table['autorefresh'] ) {
-				$table['rate'] = '';
-				$table['autorefresh'] = false;
-			}
-			$title_attr = __( 'Not available for the store currency', 'wc-solana-pay' );
-			$rate_checkbox = '<span title="' . esc_attr( $title_attr ) . '">' . esc_html__( 'Not Available', 'wc-solana-pay' ) . '<span>';
-		}
-
-		// remove rate refresh button for the store base currency
-		if ( $k === $base_currency ) {
-			$update_icon = '';
-			$table['rate'] = '1.00';
-		}
+		$token_div = '<div style="display:flex;align-items:center">' . $token_icon . $token_name . '</div>'
+			. ( $rate_available ? get_input( $rate, $table['rate'], '', 'hidden' ) : '' );
 
 		$tr = '<tr class="' . $class . '" data-symbol="' . esc_attr( $v['symbol'] ) . '">'
 			. get_td( get_input( $id, $k, '', 'hidden' ) . get_input( $enabled, $table['enabled'], '', 'checkbox' ), 'text-align:center' )
 			. get_td( $token_div, 'padding-left:0.5rem' )
-			. get_td( $rate_checkbox, 'text-align:center' )
-			. get_td( $update_icon, 'text-align:right;padding-right:0 !important;vertical-align:bottom' )
-			. get_td( get_input( $rate, $table['rate'], 'max-width:7rem', 'text', $table['autorefresh'] ), '' )
-			. get_td( '<strong>+</strong>', 'text-align:center;vertical-align:middle' )
-			. get_td( $fee_div, '' )
-			. get_td( '<span class="token_preview"></span>', 'text-align:right;padding-right:0.5rem' )
+			. ( $rate_available ? '' : get_td( get_input( $rate, $table['rate'], 'text-align:end;min-width:8rem;width:100%', 'text' ) ) )
 			. '</tr>';
 		$rows .= $tr;
 	}
@@ -199,9 +161,13 @@ function get_allowed_tags() {
 
 }
 
+// show notice if exchange rate lookup is not available for the store base currency
+$rate_available = Solana_Tokens::is_rate_conversion_supported();
+$rate_notice = $rate_available ? '' : get_rate_notice( $show_currency );
+
 $allowed_tags = get_allowed_tags();
-$header = get_tokens_table_header( $show_currency );
-$body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $base_currency, $show_currency );
+$header = get_tokens_table_header( $show_currency, $rate_available );
+$body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $rate_available );
 ?>
 
 <tr valign="top">
@@ -209,8 +175,9 @@ $body = get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $b
 		<label><?php echo esc_html( $title ); ?><?php echo wp_kses_post( wc_help_tip( $tip, true ) ); ?></label>
 	</th>
 	<td class="forminp">
+		<?php echo wp_kses_post( $rate_notice ); ?>
 		<div class="wc_input_table_wrapper">
-			<table class="wc_gateways widefat" style="min-width:70rem;max-width:85rem" cellspacing="0" cellpadding="0">
+			<table class="wc_gateways widefat" style="max-width:45rem" cellspacing="0" cellpadding="0">
 				<thead><?php echo wp_kses_post( $header ); ?></thead>
 				<tbody><?php echo wp_kses( $body, $allowed_tags ); ?></tbody>
 			</table>

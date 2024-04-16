@@ -52,6 +52,8 @@
     padding 0
     &.error
       font-size 0.8rem
+      overflow-x hidden
+      overflow-wrap break-word
   .msgspan
     display flex
     align-items center

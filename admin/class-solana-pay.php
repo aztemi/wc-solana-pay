@@ -463,8 +463,7 @@ class Solana_Pay {
 				$power = bcpow( '10', $decimals );
 				$amount_pow = bcmul( $amount, $power );
 				$rate = bcmul( $amount_pow, $table[ $k ]['rate'] );
-				$fee = bcdiv( bcmul( $rate, $table[ $k ]['fee'] ), '100' );
-				$amount_in_token = rtrim( bcdiv( bcadd( $rate, $fee ), $power, $decimals ), '0' );
+				$amount_in_token = rtrim( bcdiv( $rate, $power, $decimals ), '0' );
 
 				$options['tokens'][ $k ] = array(
 					'amount' => $amount_in_token,
@@ -540,6 +539,7 @@ class Solana_Pay {
 		if ( 200 === $response['status'] ) {
 			$body = $response['body'];
 			$response['id'] = array_key_exists( 'id', $body ) ? $body['id'] : '';
+			$response['tokens'] = array_key_exists( 'tokens', $body ) ? $body['tokens'] : array();
 		}
 
 		return $response;
