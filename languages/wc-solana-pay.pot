@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WC Solana Pay 2.5.0\n"
+"Project-Id-Version: WC Solana Pay 2.6.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-solana-pay\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-03-23T15:00:30+00:00\n"
+"POT-Creation-Date: 2024-04-16T21:00:38+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wc-solana-pay\n"
@@ -59,12 +59,12 @@ msgstr ""
 msgid "RPC remote call failed with code %d"
 msgstr ""
 
-#: admin/class-solana-tokens.php:434
+#: admin/class-solana-tokens.php:324
 msgid "Devnet Faucet"
 msgstr ""
 
 #. translators: %s: Devnet Faucet
-#: admin/class-solana-tokens.php:436
+#: admin/class-solana-tokens.php:326
 msgid "Get free tokens for testing from the %s."
 msgstr ""
 
@@ -76,36 +76,36 @@ msgstr ""
 msgid "Accept payments in SOL, USDT, USDC, EURC and more with Solana Pay."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:165
+#: admin/class-wc-solana-pay-payment-gateway.php:164
 msgid "(Test Mode enabled. Devnet in use)."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:208
+#: admin/class-wc-solana-pay-payment-gateway.php:207
 msgid "Solana Pay setup is not complete. Please set Merchant Wallet Address"
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:220
+#: admin/class-wc-solana-pay-payment-gateway.php:219
 msgid "Solana Pay setup is not complete. Please enable at least 1 Solana Token."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:250
+#: admin/class-wc-solana-pay-payment-gateway.php:249
 msgid "Invalid Solana Wallet Address"
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:391
+#: admin/class-wc-solana-pay-payment-gateway.php:381
 msgid "Payment failed. Please try again."
 msgstr ""
 
-#: admin/class-webhook.php:139
-#: admin/class-webhook.php:272
+#: admin/class-webhook.php:141
+#: admin/class-webhook.php:278
 msgid "Thank you for your order"
 msgstr ""
 
-#: admin/class-webhook.php:158
+#: admin/class-webhook.php:160
 msgid "Bad Request - Email address not valid"
 msgstr ""
 
-#: admin/class-webhook.php:164
+#: admin/class-webhook.php:166
 msgid "An account is already registered with your email address. Please log in and try again."
 msgstr ""
 
@@ -204,44 +204,25 @@ msgstr ""
 msgid "Payment method description that customers will see on the checkout page."
 msgstr ""
 
-#: admin/partials/admin-tokens-table.php:64
-msgid "Enabled"
-msgstr ""
-
+#. translators: %s: Store currency name, e.g. 'USD'
 #: admin/partials/admin-tokens-table.php:65
-msgid "Token"
-msgstr ""
-
-#: admin/partials/admin-tokens-table.php:66
-msgid "Auto Refresh"
-msgstr ""
-
-#: admin/partials/admin-tokens-table.php:66
-msgid "Auto refresh exchange rate every hour if checked."
+msgid "Your store currency is: %s"
 msgstr ""
 
 #: admin/partials/admin-tokens-table.php:67
+msgid "It is currently not supported for automatic exchange rate lookup. Please enter your preferred exchange rates below."
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:75
+msgid "Enabled"
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:76
+msgid "Token"
+msgstr ""
+
+#: admin/partials/admin-tokens-table.php:77
 msgid "Exchange Rate"
-msgstr ""
-
-#: admin/partials/admin-tokens-table.php:68
-msgid "% Commission"
-msgstr ""
-
-#: admin/partials/admin-tokens-table.php:69
-msgid "Preview"
-msgstr ""
-
-#: admin/partials/admin-tokens-table.php:134
-msgid "Click to refresh exchange rate"
-msgstr ""
-
-#: admin/partials/admin-tokens-table.php:148
-msgid "Not available for the store currency"
-msgstr ""
-
-#: admin/partials/admin-tokens-table.php:149
-msgid "Not Available"
 msgstr ""
 
 #: includes/class-wc-solana-pay.php:60

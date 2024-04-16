@@ -3,8 +3,8 @@ Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay/donate/
 Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
-Tested up to: 6.4.3
-Stable tag: 2.5.0
+Tested up to: 6.5.2
+Stable tag: 2.6.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -91,6 +91,10 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 
 == Changelog ==
 
+= 2.6.0 :: 2024-04-16 =
+* Simplify tokens rates lookup using remote price feed
+* Fix 'network mismatch' and 'dapp not trusted' warnings shown by some wallets
+
 = 2.5.0 :: 2024-03-23 =
 * Validate email during checkout to prevent "email already registered" error.
 
@@ -116,5 +120,5 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 
 == Upgrade Notice ==
 
-= 2.5.0 =
-Bug fixes and user account validation during checkout.
+= 2.6.0 =
+Bug fixes and simplified tokens price feed. Upgrade is recommended.
