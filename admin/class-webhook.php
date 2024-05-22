@@ -185,9 +185,9 @@ class Webhook {
 		$options = $this->hGateway->get_accepted_solana_tokens_payment_options( $amount );
 		$data = array_merge( $data, $options );
 
-		// register payment details with the remote backend
+		// register order details with the remote backend
 		$testmode = $this->hGateway->get_testmode();
-		$res = Solana_Pay::register_payment_details( $data, $testmode );
+		$res = Solana_Pay::register_order_details( $data, $testmode );
 		if ( ! isset( $res['id'] ) ) {
 			wp_send_json_error( $res['error'], $res['status'] );
 		}
@@ -379,10 +379,10 @@ class Webhook {
 			// proxy request based on body parameters
 			$body = $request->get_json_params();
 			if ( is_array( $body ) && isset( $body['method'] ) && isset( $body['params'] ) ) {
-				$this->proxy_raw_rpc_request($id, $body);
+				$this->proxy_raw_rpc_request( $id, $body );
 
 			} elseif ( is_array( $body ) && isset( $body['transaction'] ) ) {
-				$this->proxy_transaction_request($id, $body);
+				$this->proxy_transaction_request( $id, $body );
 
 			} else {
 				wp_send_json_error( 'Bad Request', 400 );
@@ -397,6 +397,7 @@ class Webhook {
 	/**
 	 * Forward raw RPC request to remote RPC node.
 	 *
+	 * @param  string $id           Remote ID of the checkout order.
 	 * @param  array  $request_json Request body as json array.
 	 */
 	public function proxy_raw_rpc_request( $id, $request_json ) {
@@ -440,6 +441,7 @@ class Webhook {
 	/**
 	 * Forward signed transaction request to remote RPC node.
 	 *
+	 * @param  string $id           Remote ID of the checkout order.
 	 * @param  array  $request_json Request body as json array.
 	 */
 	public function proxy_transaction_request( $id, $request_json ) {

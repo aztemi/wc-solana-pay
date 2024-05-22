@@ -156,7 +156,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->brand_name      = $this->get_option( 'brand_name' );
 		$this->description     = $this->get_option( 'description' );
 		$this->merchant_wallet = $this->get_option( 'merchant_wallet', '' );
-		$this->is_testmode     = Solana_Pay::NETWORK_MAINNET_BETA != $this->get_option( 'network', Solana_Pay::NETWORK_DEVNET );
+		$this->is_testmode     = Solana_Pay::NETWORK_MAINNET_BETA !== $this->get_option( 'network', Solana_Pay::NETWORK_DEVNET );
 		$this->block_desc      = $this->description;
 
 		// update settings that depend on testmode status

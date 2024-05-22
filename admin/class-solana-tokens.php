@@ -16,14 +16,6 @@ if ( ! defined( 'WPINC' ) ) {
 class Solana_Tokens {
 
 	/**
-	 * Default scale precision for bc math functions.
-	 *
-	 * @var int
-	 */
-	private const BC_MATH_SCALE = 6;
-
-
-	/**
 	 * Suffix added to token key codes to make them unique in WC currencies list.
 	 *
 	 * @var string

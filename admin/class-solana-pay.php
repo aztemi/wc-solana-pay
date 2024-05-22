@@ -526,13 +526,13 @@ class Solana_Pay {
 
 
 	/**
-	 * Register payment order details with remote server.
+	 * Register checkout order details with remote server.
 	 *
 	 * @param  string $data     Payment order details.
 	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
 	 * @return array  Remote server response, containing the reference ID of the order.
 	 */
-	public static function register_payment_details( $data, $testmode ) {
+	public static function register_order_details( $data, $testmode ) {
 
 		$url = self::endpoint_url( '', 'order', $testmode );
 		$response = remote_request( $url, 'POST', wp_json_encode( $data ) );
