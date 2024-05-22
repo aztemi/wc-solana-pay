@@ -361,20 +361,12 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function process_payment( $order_id ) {
 
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verification already handled in WC_Checkout::process_checkout() and WC_Form_Handler::pay_action()
-		// return if the hidden field containing payment token is missing
-		if ( ! isset( $_POST['pwspfwc_payment_token'] ) ) {
-			return array();
-		}
-		$payment_token = wc_clean( wp_unslash( $_POST['pwspfwc_payment_token'] ) );
-		// phpcs:enable
-
 		// get order info and pending amount
 		$order = wc_get_order( $order_id );
 		$amount = $order->get_total();
 
 		// Confirm payment transaction on Solana chain, return if not found or if balance is less.
-		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount, $payment_token ) ) {
+		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount ) ) {
 			return array(
 				'result'       => 'failure',
 				'redirect'     => wc_get_checkout_url(),

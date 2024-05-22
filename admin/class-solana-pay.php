@@ -56,14 +56,6 @@ class Solana_Pay {
 
 
 	/**
-	 * 0.5% fee for above default endpoints usage.
-	 *
-	 * @var string
-	 */
-	protected const ENDPOINT_USAGE_FEE = '0.50';
-
-
-	/**
 	 * Handle instance of the payment gateway class.
 	 *
 	 * @var WC_Solana_Pay_Payment_Gateway
@@ -104,328 +96,54 @@ class Solana_Pay {
 
 
 	/**
-	 * Find confirmed payment transaction by reference from the Solana network.
-	 *
-	 * @param  string $txn_id Found transaction ID as output.
-	 * @return bool           true if transaction is found, false otherwise.
-	 */
-	private function get_transaction_id( &$txn_id ) {
-
-		$data = $this->hSession->get_data();
-		$reference = $data['reference'];
-		$url = self::endpoint_url( $data['id'], 'rpc', $this->hGateway->get_testmode() );
-
-		$params = array( $reference, array( 'commitment' => 'confirmed' ) );
-		$res = self::rpc_remote_post( 'getSignaturesForAddress', $params, $url );
-
-		// Return false in case of error in post request
-		if ( ! isset( $res['result'] ) ) {
-			return false;
-		}
-		$txn = $res['result'];
-
-		// Payment transaction not found, return false
-		if ( ! count( $txn ) ) {
-			wc_add_notice( __( 'Payment transaction not found. Please try again.', 'wc-solana-pay' ), 'error' );
-			return false;
-		}
-
-		$txn_id = $txn[0]['signature'];
-
-		return true;
-
-	}
-
-
-	/**
-	 * Get payment transaction parsed details from the Solana network.
-	 *
-	 * @param  string $txn_id   Transaction ID.
-	 * @param  array  $txn_data Parsed transaction details as output.
-	 * @return bool             true if successful, false otherwise.
-	 */
-	private function get_transaction_details( $txn_id, &$txn_data ) {
-
-		$data = $this->hSession->get_data();
-		$url = self::endpoint_url( $data['id'], 'rpc', $this->hGateway->get_testmode() );
-
-		$params = array(
-			$txn_id,
-			array(
-				'commitment' => 'confirmed',
-				'encoding'   => 'jsonParsed',
-				'maxSupportedTransactionVersion' => 0,
-			)
-		);
-		$res = self::rpc_remote_post( 'getTransaction', $params, $url );
-
-		// Return false in case of error in post request
-		if ( ! isset( $res['result'] ) ) {
-			return false;
-		}
-		$txn_data = $res['result'];
-
-		// Return false if unable to confirm transaction details
-		if ( ! count( $txn_data ) ) {
-			wc_add_notice( __( 'Unable to confirm payment transaction details. Please try again.', 'wc-solana-pay' ), 'error' );
-			return false;
-		}
-
-		return true;
-
-	}
-
-
-	/**
-	 * Get received balance of a payment transaction.
-	 *
-	 * @param  \WC_Order $order    Order object.
-	 * @param  array     $txn_data Parsed transaction details.
-	 * @param  string    $token_id Solana Token ID.
-	 * @param  array     $balance  Received balance as output.
-	 * @return bool                true if successful, false otherwise.
-	 */
-	private function get_transaction_balance( $order, $txn_data, $token_id, &$balance ) {
-
-		$tokens = $this->hGateway->get_accepted_solana_tokens();
-
-		// Return false if payment currency is not part of our supported tokens
-		if ( ! array_key_exists( $token_id, $tokens ) ) {
-			$order->add_order_note( __( 'Payment currency not in supported Solana tokens list.', 'wc-solana-pay' ) );
-			return false;
-		}
-
-		$currency = $tokens[ $token_id ];
-		$currency_mint = $currency['mint'];
-		$currency_symbol = $currency['symbol'];
-		$receiver = $this->hGateway->get_merchant_wallet_address();
-		$payer = $this->get_transaction_payer( $txn_data );
-
-		if ( 'SOL' === $currency_symbol ) {
-			$balance['received'] = $this->get_transaction_received_sol( $txn_data, $receiver );
-			$balance['paid'] = $this->get_transaction_received_sol( $txn_data, $payer );
-		} else {
-			$balance['received'] = $this->get_transaction_received_spltoken( $txn_data, $receiver, $currency_mint );
-			$balance['paid'] = $this->get_transaction_received_spltoken( $txn_data, $payer, $currency_mint );
-		}
-
-		// Add token number of decimals & symbol
-		$balance['decimals'] = $currency['decimals'];
-		$balance['symbol'] = $currency_symbol;
-		$balance['receiver'] = $receiver;
-		$balance['payer'] = $payer;
-
-		return true;
-
-	}
-
-
-	/**
-	 * Get SOL balance of a transaction.
-	 *
-	 * @param  array  $txn_data  Parsed transaction details.
-	 * @param  string $account58 Receiver wallet address.
-	 * @return array             Pre and Post balances in SOL.
-	 */
-	private function get_transaction_received_sol( $txn_data, $account58 ) {
-
-		$accounts = $txn_data['transaction']['message']['accountKeys'];
-		foreach ( $accounts as $idx => $v ) {
-			if ( $account58 === $v['pubkey'] ) {
-				$pre_balance  = $txn_data['meta']['preBalances'][ $idx ];
-				$post_balance = $txn_data['meta']['postBalances'][ $idx ];
-
-				return array( 'pre' => $pre_balance, 'post' => $post_balance );
-			}
-		}
-
-		return array( 'pre' => 0, 'post' => 0 );
-
-	}
-
-
-	/**
-	 * Get a SPL Token balance of a transaction.
-	 *
-	 * @param  array  $txn_data  Parsed transaction details.
-	 * @param  string $account58 Receiver wallet address.
-	 * @param  string $spltoken  SPL token mint address.
-	 * @return array             Pre and Post balances in specified SPL token.
-	 */
-	private function get_transaction_received_spltoken( $txn_data, $account58, $spltoken ) {
-
-		$pre_token_balance = 0;
-		$post_token_balance = 0;
-
-		foreach ( $txn_data['meta']['preTokenBalances'] as $idx => $v ) {
-			if ( ( $v['owner'] === $account58 ) && ( $v['mint'] === $spltoken ) ) {
-				$pre_token_balance = $v['uiTokenAmount']['amount'];
-			}
-		}
-
-		foreach ( $txn_data['meta']['postTokenBalances'] as $idx => $v ) {
-			if ( ( $v['owner'] === $account58 ) && ( $v['mint'] === $spltoken ) ) {
-				$post_token_balance = $v['uiTokenAmount']['amount'];
-			}
-		}
-
-		return array( 'pre' => $pre_token_balance, 'post' => $post_token_balance );
-
-	}
-
-
-	/**
-	 * Get the wallet address of a transaction signer (aka. Payer).
-	 *
-	 * @param  array  $txn_data  Parsed transaction details.
-	 * @return string            Wallet address of the transaction signer.
-	 */
-	private function get_transaction_payer( $txn_data ) {
-
-		// The transaction signer is considered the payer
-		$accounts = $txn_data['transaction']['message']['accountKeys'];
-		foreach ( $accounts as $v ) {
-			if ( isset( $v['signer'] ) && $v['signer'] ) {
-				return $v['pubkey'];
-			}
-		}
-
-		return '';
-
-	}
-
-
-	/**
-	 * Get the order total in specified Solana payment tokens.
-	 *
-	 * @param  float  $amount   Order cost in store base currency.
-	 * @param  string $token_id Token ID.
-	 * @return string Expected payment amount as a BC Math string.
-	 */
-	private function get_payment_token_amount( $amount, $token_id ) {
-
-		$token_amount = '';
-		$data = $this->hSession->get_data();
-
-		if ( array_key_exists( $token_id, $data['tokens'] ) && ( $amount == $data['amount'] ) ) {
-			$token_amount = $data['tokens'][ $token_id ]['amount'];
-		}
-
-		return $token_amount;
-
-	}
-
-
-	/**
-	 * Validates if an expected amount is fully paid or not.
-	 *
-	 * @param  string $amount   Expected amount to be paid.
-	 * @param  array  $balance  Payment transaction balance info.
-	 * @return bool             true if received amount is greater than or equal to expected amount, false otherwise.
-	 */
-	private function validate_payment_amount( $amount, $balance ) {
-
-		$decimals = $balance['decimals'];
-		list( 'pre' => $pre, 'post' => $post ) = $balance['received'];
-
-		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
-
-		// compensate for endpoint usage fee already deducted in transaction
-		$percent_fee = self::endpoint_usage_fee();
-		$rpc_fee = bcdiv( bcmul( $percent_fee, $amount ), 100 );
-		$expected_amount = bcsub( $amount, $rpc_fee );
-
-		$validated = bccomp(
-				bcsub( $post, $pre ),
-				bcmul( $expected_amount, bcpow( '10', $decimals ) )
-			) >= 0;
-
-		bcscale( $old_scale ); // reset back to old scale
-
-		return $validated;
-
-	}
-
-
-	/**
-	 * Get metadata from a payment transaction details.
-	 *
-	 * @param  string $txn_id   Transaction ID.
-	 * @param  array  $balance  Payment transaction balance info.
-	 * @return array            List of metadata of the payment transaction details.
-	 */
-	private function get_payment_meta( $txn_id, $balance ) {
-
-		$data = $this->hSession->get_data();
-		$symbol = $balance['symbol'];
-		$decimals = $balance['decimals'];
-		$meta = array(
-			'id'          => $data['id'],
-			'transaction' => $txn_id,
-			'reference'   => $data['reference'],
-			'payer'       => $balance['payer'],
-			'receiver'    => $balance['receiver'],
-			'url'         => $this->get_explorer_url( $txn_id ),
-		);
-
-		$old_scale = bcscale( self::BC_MATH_SCALE ); // set scale precision
-
-		// crypto amount paid by customer
-		list( 'pre' => $post, 'post' => $pre ) = $balance['paid']; // post & pre swapped since it's an outgoing balance diff
-		$paid = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
-		$meta['paid'] = rtrim( $paid, '0' ) . ' ' . $symbol;
-
-		// crypto amount received by merchant after fee is deducted
-		list( 'pre' => $pre, 'post' => $post ) = $balance['received'];
-		$received = bcdiv( bcsub( $post, $pre ), bcpow( '10', $decimals ), $decimals );
-		$meta['received'] = rtrim( $received, '0' ) . ' ' . $symbol;
-
-		bcscale( $old_scale ); // reset back to old scale
-
-		return $meta;
-
-	}
-
-
-	/**
 	 * Validate payment transaction on Solana network.
 	 *
-	 * @param  \WC_Order $order    Order object.
-	 * @param  string    $amount   Order cost amount in the store base currency.
-	 * @param  string    $token_id Payment token ID.
+	 * @param  \WC_Order $order  Order object.
+	 * @param  string    $amount Order cost amount in the store base currency.
 	 * @return bool      true if transaction was found and correct amount was paid into merchant wallet, false otherwise.
 	 */
-	public function confirm_payment_onchain( $order, $amount, $token_id ) {
+	public function confirm_payment_onchain( $order, $amount ) {
 
-		$txn_id = '';
-		$txn_data = array();
-		$balance = array();
+		// get checkout order details from current session
+		$data = $this->hSession->get_data();
+		$id = $data['id'];
 
-		// get expected payment amount in Solana token
-		$token_amount = $this->get_payment_token_amount( $amount, $token_id );
-		// Return false if amount is not valid
-		if ( empty( trim( $token_amount ) ) ) {
+		// fetch payment status details for the order from remote
+		$res = self::get_payment_details( $id, $this->hGateway->get_testmode() );
+
+		// return false if payment is not confirmed or checkout reference id does not match
+		if ( ! isset( $res['confirmed'] ) || ( true !== $res['confirmed'] ) || ( $id !== $res['body']['id'] ) ) {
 			return false;
 		}
 
-		// Get payment transaction details from Solana chain
-		$rtn =
-			$this->get_transaction_id( $txn_id ) &&
-			$this->get_transaction_details( $txn_id, $txn_data ) &&
-			$this->get_transaction_balance( $order, $txn_data, $token_id, $balance );
-
-		// Return false in case of any error
-		if ( ! $rtn ) {
+		// validate paid token. Return false if paid token is not enabled by the store
+		$token_id = $res['body']['currency'];
+		$table = $this->hGateway->get_tokens_table();
+		if ( ! array_key_exists( $token_id, $table ) || ! $table[ $token_id ]['enabled'] ) {
 			return false;
 		}
 
-		// Validate payment amount. Return false if payment is missing or not up to expected amount
-		if ( ! $this->validate_payment_amount( $token_amount, $balance ) ) {
+		// validate recipient. Return false if recipient does not match
+		$receiver = $res['body']['receiver'];
+		$expected_receiver = $data['recipient'];
+		if ( $receiver !== $expected_receiver ) {
 			return false;
 		}
 
 		// update order meta info
-		$meta = $this->get_payment_meta( $txn_id, $balance );
+		$txn_id = $res['body']['signature'];
+		$tokens = $this->hGateway->get_accepted_solana_tokens();
+		$symbol = $tokens[ $token_id ]['symbol'];
+		$meta = array(
+			'id'          => $id,
+			'transaction' => $txn_id,
+			'reference'   => $data['reference'],
+			'receiver'    => $receiver,
+			'payer'       => $res['body']['payer'],
+			'received'    => rtrim( $received_token_amount, '0' ) . ' ' . $symbol,
+			'paid'        => rtrim( $res['body']['paid'], '0' ) . ' ' . $symbol,
+			'url'         => $this->get_explorer_url( $txn_id ),
+		);
 		$this->hGateway->set_order_payment_meta( $order, $meta );
 
 		// Complete payment and return true
@@ -514,18 +232,6 @@ class Solana_Pay {
 
 
 	/**
-	 * Get RPC and transactions endpoint usage fee.
-	 *
-	 * @return string
-	 */
-	public static function endpoint_usage_fee() {
-
-		return self::ENDPOINT_USAGE_FEE;
-
-	}
-
-
-	/**
 	 * Register checkout order details with remote server.
 	 *
 	 * @param  string $data     Payment order details.
@@ -564,6 +270,28 @@ class Solana_Pay {
 		if ( 200 === $response['status'] ) {
 			$body = $response['body'];
 			$response['transaction'] = array_key_exists( 'transaction', $body ) ? $body['transaction'] : '';
+		}
+
+		return $response;
+
+	}
+
+
+	/**
+	 * Get payment details from remote server.
+	 *
+	 * @param  string $ref_id   Remote reference ID of the order.
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return array
+	 */
+	public static function get_payment_details( $ref_id, $testmode ) {
+
+		$url = self::endpoint_url( $ref_id, 'payment', $testmode );
+		$response = remote_request( $url );
+		if ( 200 === $response['status'] ) {
+			$body = $response['body'];
+			$response['signature'] = array_key_exists( 'signature', $body ) ? $body['signature'] : '';
+			$response['confirmed'] = array_key_exists( 'confirmed', $body ) ? $body['confirmed'] : false;
 		}
 
 		return $response;
