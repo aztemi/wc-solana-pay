@@ -15,8 +15,8 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
-    "@woocommerce/dependency-extraction-webpack-plugin": "^2.3.0",
-    "@wordpress/scripts": "^27.1.0",
+    "@woocommerce/dependency-extraction-webpack-plugin": "^3.0.1",
+    "@wordpress/scripts": "^27.9.0",
     "npm-run-all": "^4.1.5",
     "stylus": "^0.59.0",
     "svelte": "^3.55.1",
@@ -28,8 +28,8 @@
     "@aztemi/svelte-on-solana-wallet-adapter-ui": "^1.1.5",
     "@solana/pay": "^0.2.5",
     "@solana/wallet-adapter-base": "^0.9.23",
-    "@solana/wallet-adapter-wallets": "^0.19.23",
-    "@solana/web3.js": "^1.87.1",
+    "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@solana/web3.js": "^1.91.8",
     "bignumber.js": "^9.1.2",
     "buffer": "^6.0.3"
   }
