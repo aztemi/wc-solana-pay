@@ -34,14 +34,12 @@ define( __NAMESPACE__ . '\PLUGIN_FILE', untrailingslashit( __FILE__ ) );
 define( __NAMESPACE__ . '\PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( __NAMESPACE__ . '\PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-
 // load plugin core class and start it
 function load_plugin_class() {
-
 	require_once PLUGIN_DIR . '/includes/class-wc-solana-pay.php';
 
 	$plugin = new WC_Solana_Pay();
 	$plugin->run();
-
 }
+
 load_plugin_class();

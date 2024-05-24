@@ -72,10 +72,8 @@ class Solana_Pay {
 
 
 	public function __construct( $gateway, $session ) {
-
 		$this->hGateway = $gateway;
 		$this->hSession = $session;
-
 	}
 
 
@@ -86,12 +84,10 @@ class Solana_Pay {
 	 * @return string
 	 */
 	private function get_explorer_url( $txn_id ) {
-
 		$url = 'https://explorer.solana.com/tx/' . $txn_id;
 		$url .= $this->hGateway->get_testmode() ? '?cluster=devnet' : '';
 
 		return $url;
-
 	}
 
 
@@ -103,7 +99,6 @@ class Solana_Pay {
 	 * @return bool      true if transaction was found and correct amount was paid into merchant wallet, false otherwise.
 	 */
 	public function confirm_payment_onchain( $order, $amount ) {
-
 		// get checkout order details from current session
 		$data = $this->hSession->get_data();
 		$id = $data['id'];
@@ -155,7 +150,6 @@ class Solana_Pay {
 		delete_option( $option_key );
 
 		return true;
-
 	}
 
 
@@ -166,7 +160,6 @@ class Solana_Pay {
 	 * @return array          List of payment options and their cost values.
 	 */
 	public function get_available_payment_options( $amount ) {
-
 		$tokens = $this->hGateway->get_accepted_solana_tokens();
 		$table = $this->hGateway->get_tokens_table();
 
@@ -186,7 +179,7 @@ class Solana_Pay {
 				$options['tokens'][ $k ] = array(
 					'amount' => $amount_in_token,
 					'mint' => $tokens[ $k ]['mint'],
-					'dp' => $tokens[ $k ]['decimals_view']
+					'dp' => $tokens[ $k ]['decimals_view'],
 				);
 			}
 		}
@@ -194,7 +187,6 @@ class Solana_Pay {
 		bcscale( $old_scale ); // reset back to old scale
 
 		return $options;
-
 	}
 
 
@@ -206,9 +198,7 @@ class Solana_Pay {
 	 * @return string
 	 */
 	public static function shorten_hash_address( $address, $limit = 6 ) {
-
 		return substr( $address, 0, $limit ) . '...' . substr( $address, -$limit );
-
 	}
 
 
@@ -221,13 +211,11 @@ class Solana_Pay {
 	 * @return string
 	 */
 	public static function endpoint_url( $ref_id, $action, $testmode ) {
-
 		$network = $testmode ? self::NETWORK_DEVNET : self::NETWORK_MAINNET_BETA;
 		$endpoint = $testmode ? self::ENDPOINT_TESTMODE : self::ENDPOINT_PRODUCTION;
 		$ref_id = empty( $ref_id ) ? '' : '/' . $ref_id;
 		$url = sprintf( '%s%s%s/?network=%s', $endpoint, $action, $ref_id, $network );
 		return $url;
-
 	}
 
 
@@ -239,7 +227,6 @@ class Solana_Pay {
 	 * @return array  Remote server response, containing the reference ID of the order.
 	 */
 	public static function register_order_details( $data, $testmode ) {
-
 		$url = self::endpoint_url( '', 'order', $testmode );
 		$response = remote_request( $url, 'POST', wp_json_encode( $data ) );
 		if ( 200 === $response['status'] ) {
@@ -249,7 +236,6 @@ class Solana_Pay {
 		}
 
 		return $response;
-
 	}
 
 
@@ -263,7 +249,6 @@ class Solana_Pay {
 	 * @return array
 	 */
 	public static function get_payment_transaction( $ref_id, $address, $token_id, $testmode ) {
-
 		$url = self::endpoint_url( $ref_id, 'txn', $testmode );
 		$url = sprintf( '%s&account=%s&token=%s', $url, $address, $token_id );
 		$response = remote_request( $url );
@@ -273,7 +258,6 @@ class Solana_Pay {
 		}
 
 		return $response;
-
 	}
 
 
@@ -285,7 +269,6 @@ class Solana_Pay {
 	 * @return array
 	 */
 	public static function get_payment_details( $ref_id, $testmode ) {
-
 		$url = self::endpoint_url( $ref_id, 'payment', $testmode );
 		$response = remote_request( $url );
 		if ( 200 === $response['status'] ) {
@@ -295,7 +278,6 @@ class Solana_Pay {
 		}
 
 		return $response;
-
 	}
 
 
@@ -308,18 +290,16 @@ class Solana_Pay {
 	 * @return array
 	 */
 	public static function send_payment_transaction( $ref_id, $txn, $testmode ) {
-
 		$params = array(
 			$txn,
 			array(
 				'encoding' => 'base64',
-				'skipPreflight' => true
-			)
+				'skipPreflight' => true,
+			),
 		);
 		$url = self::endpoint_url( $ref_id, 'rpc', $testmode );
 
 		return self::rpc_remote_post( 'sendTransaction', $params, $url );
-
 	}
 
 
@@ -332,7 +312,6 @@ class Solana_Pay {
 	 * @return array          Array containing RPC response in the 'result' field if request succeeds.
 	 */
 	public static function rpc_remote_post( $method, $params, $url ) {
-
 		$data = wp_json_encode(
 			array(
 				'jsonrpc' => '2.0',
@@ -358,7 +337,5 @@ class Solana_Pay {
 		}
 
 		return $response;
-
 	}
-
 }

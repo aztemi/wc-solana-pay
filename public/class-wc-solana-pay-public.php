@@ -24,9 +24,7 @@ class WC_Solana_Pay_Public {
 
 
 	public function __construct() {
-
 		$this->register_hooks();
-
 	}
 
 
@@ -34,7 +32,6 @@ class WC_Solana_Pay_Public {
 	 * Register actions and filters for the payment gateway
 	 */
 	private function register_hooks() {
-
 		// enqueue css and js
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -48,7 +45,6 @@ class WC_Solana_Pay_Public {
 		// add custom 'Solana Pay' express checkout button in the place of 'Place Order' button
 		add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_place_order_button' ) );
 		add_filter( 'woocommerce_pay_order_button_html', array( $this, 'add_custom_place_order_button' ) );
-
 	}
 
 
@@ -56,10 +52,8 @@ class WC_Solana_Pay_Public {
 	 * Register stylesheets for the public-facing frontend.
 	 */
 	public function enqueue_styles() {
-
 		// Enqueue DashIcons
 		wp_enqueue_style( 'dashicons' );
-
 	}
 
 
@@ -67,14 +61,12 @@ class WC_Solana_Pay_Public {
 	 * Register JavaScripts for the public-facing frontend.
 	 */
 	public function enqueue_scripts() {
-
 		// Enqueue Solana Pay overlay modal script
 		$modaljs = get_script_path( '/assets/script/wc_solana_pay*.js', PLUGIN_URL );
 		if ( $modaljs ) {
 			$this->handle_js = PLUGIN_ID . '_modaljs';
-			wp_enqueue_script( $this->handle_js, $modaljs, ['jquery'], null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Filename already has version added by the JS bundler.
+			wp_enqueue_script( $this->handle_js, $modaljs, array( 'jquery' ), null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Filename already has version added by the JS bundler.
 		}
-
 	}
 
 
@@ -83,13 +75,11 @@ class WC_Solana_Pay_Public {
 	 *
 	 */
 	public function load_enqueued_scripts_as_modules( $tag, $handle ) {
-
 		if ( $this->handle_js === $handle ) {
 			$tag = str_replace( '></script>', ' type="module" defer></script>', $tag );
 		}
 
 		return $tag;
-
 	}
 
 	/**
@@ -97,9 +87,7 @@ class WC_Solana_Pay_Public {
 	 * Svelte will inject our custom payment modal in it.
 	 */
 	public function add_modal_placeholder() {
-
 		echo wp_kses_post( '<div id="wc_solana_pay_svelte_target"></div>' );
-
 	}
 
 
@@ -107,7 +95,6 @@ class WC_Solana_Pay_Public {
 	 * Replace WC 'Place order' button with custom 'Solana Pay' button for express checkout
 	 */
 	public function add_custom_place_order_button( $button ) {
-
 		$buttonjs = get_script_path('/assets/script/public_place_order_button*.js');
 
 		if ( $buttonjs ) {
@@ -123,7 +110,5 @@ class WC_Solana_Pay_Public {
 		}
 
 		return $button;
-
 	}
-
 }

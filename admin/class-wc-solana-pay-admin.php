@@ -18,10 +18,8 @@ if ( ! defined( 'WPINC' ) ) {
 class WC_Solana_Pay_Admin {
 
 	public function __construct() {
-
 		$this->load_dependencies();
 		$this->register_hooks();
-
 	}
 
 
@@ -29,11 +27,9 @@ class WC_Solana_Pay_Admin {
 	 * Load required dependencies for this class.
 	 */
 	private function load_dependencies() {
-
 		// load Solana tokens class for Store cryptocurrency handling
 		require_once PLUGIN_DIR . '/admin/class-solana-tokens.php';
 		new Solana_Tokens();
-
 	}
 
 
@@ -41,7 +37,6 @@ class WC_Solana_Pay_Admin {
 	 * Register all actions and filters needed to start the plugin
 	 */
 	private function register_hooks() {
-
 		// declare compatibility for HPOS
 		add_action( 'before_woocommerce_init', array( $this, 'declare_compatibility' ) );
 
@@ -57,7 +52,6 @@ class WC_Solana_Pay_Admin {
 
 		// register an endpoint for handling REST calls
 		add_action( 'rest_api_init', array( $this, 'register_rest_endpoint' ) );
-
 	}
 
 
@@ -65,11 +59,9 @@ class WC_Solana_Pay_Admin {
 	 * Declare compatibility for Woo High-Performance Order Storage (HPOS)
 	 */
 	public function declare_compatibility() {
-
 		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
 			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', PLUGIN_FILE, true );
 		}
-
 	}
 
 
@@ -77,9 +69,7 @@ class WC_Solana_Pay_Admin {
 	 * Load payment gateway class
 	 */
 	public function load_payment_gateway_class() {
-
 		require_once PLUGIN_DIR . '/admin/class-wc-solana-pay-payment-gateway.php';
-
 	}
 
 
@@ -89,11 +79,9 @@ class WC_Solana_Pay_Admin {
 	 * @param  array $gateways List of gateways currently registered
 	 * @return array Extended gateways list
 	 */
-	public function register_payment_gateway_class( $gateways = [] ) {
-
+	public function register_payment_gateway_class( $gateways = array() ) {
 		$gateways[] = __NAMESPACE__ . '\WC_Solana_Pay_Payment_Gateway';
 		return $gateways;
-
 	}
 
 
@@ -101,7 +89,6 @@ class WC_Solana_Pay_Admin {
 	 * Register WooCommerce Blocks integration class
 	 */
 	public function register_block_support_class() {
-
 		// check if block is in use for the Checkout page
 		$checkout_page_id = wc_get_page_id( 'checkout' );
 		$has_block_checkout = $checkout_page_id && has_block( 'woocommerce/checkout', $checkout_page_id );
@@ -113,12 +100,11 @@ class WC_Solana_Pay_Admin {
 			require_once PLUGIN_DIR . '/admin/class-wc-solana-pay-payment-block.php';
 			add_action(
 				'woocommerce_blocks_payment_method_type_registration',
-				function( PaymentMethodRegistry $payment_method_registry ) {
+				function ( PaymentMethodRegistry $payment_method_registry ) {
 					$payment_method_registry->register( new WC_Solana_Pay_Payment_Block() );
 				}
 			);
 		}
-
 	}
 
 
@@ -129,7 +115,6 @@ class WC_Solana_Pay_Admin {
 	 * @return array Extended action links list
 	 */
 	public function add_action_links( $links ) {
-
 		if ( current_user_can( 'manage_woocommerce' ) ) {
 			$settings_link = sprintf(
 													'<a href="%1$s">%2$s</a>',
@@ -141,7 +126,6 @@ class WC_Solana_Pay_Admin {
 		}
 
 		return $links;
-
 	}
 
 
@@ -149,13 +133,11 @@ class WC_Solana_Pay_Admin {
 	 * Action callback for registering REST API endpoint
 	 */
 	public function register_rest_endpoint() {
-
 		register_rest_route( PLUGIN_ID . '/v1', '/api', array(
 			'methods'  => 'GET, POST',
 			'callback' => array( $this, 'handle_api_request' ),
 			'permission_callback' => '__return_true',
 		));
-
 	}
 
 
@@ -165,7 +147,6 @@ class WC_Solana_Pay_Admin {
 	 * @param  WP_REST_Request  $request Incoming Request object
 	 */
 	public function handle_api_request( $request ) {
-
 		$action = trim( wc_clean( wp_unslash( $request->get_param('action') ) ) );
 		if ( $action ) {
 			/**
@@ -177,7 +158,5 @@ class WC_Solana_Pay_Admin {
 		} else {
 			wp_send_json_error( 'Bad Request', 400 );
 		}
-
 	}
-
 }

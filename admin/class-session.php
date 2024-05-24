@@ -16,9 +16,7 @@ if ( ! defined( 'WPINC' ) ) {
 class Session {
 
 	public function __construct() {
-
 		$this->init();
-
 	}
 
 
@@ -26,11 +24,9 @@ class Session {
 	 * Initialize plugin session entry in WC session
 	 */
 	public function init() {
-
 		if ( isset( WC()->session ) && ! WC()->session->{ PLUGIN_ID } ) {
 			WC()->session->{ PLUGIN_ID } = array();
 		}
-
 	}
 
 
@@ -38,9 +34,7 @@ class Session {
 	 * Remove plugin session entry from WC session
 	 */
 	public function clear() {
-
 		unset( WC()->session->{ PLUGIN_ID } );
-
 	}
 
 
@@ -50,13 +44,11 @@ class Session {
 	 * @return array User data retrieved from session or empty array if session is empty
 	 */
 	public function get_data() {
-
 		if ( isset( WC()->session ) && isset( WC()->session->{ PLUGIN_ID } ) ) {
 			return WC()->session->{ PLUGIN_ID };
 		}
 
 		return array();
-
 	}
 
 
@@ -66,11 +58,8 @@ class Session {
 	 * @param array $data User data to store
 	 */
 	public function set_data( $data ) {
-
 		if ( isset( WC()->session ) ) {
 			WC()->session->{ PLUGIN_ID } = $data;
 		}
-
 	}
-
 }

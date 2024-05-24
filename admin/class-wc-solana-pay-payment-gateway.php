@@ -85,7 +85,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	public function __construct() {
-
 		// load dependencies
 		$this->load_dependencies();
 
@@ -97,7 +96,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		// add hooks
 		$this->register_hooks();
-
 	}
 
 
@@ -105,7 +103,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Load required dependencies for this class.
 	 */
 	private function load_dependencies() {
-
 		// Load session class and initialize session
 		require_once PLUGIN_DIR . '/admin/class-session.php';
 		$this->hSession = new Session();
@@ -121,7 +118,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		// load public class
 		require_once PLUGIN_DIR . '/public/class-wc-solana-pay-public.php';
 		new WC_Solana_Pay_Public();
-
 	}
 
 
@@ -129,7 +125,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Initialize basic properties inheritted from WC_Payment_Gateway class
 	 */
 	private function setup_properties() {
-
 		$this->id                 = PLUGIN_ID;
 		$this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
 		$this->has_fields         = false;
@@ -137,7 +132,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$this->method_title       = __( 'WC Solana Pay', 'wc-solana-pay' );
 		$this->title              = $this->method_title;
 		$this->method_description = __( 'Accept payments in SOL, USDT, USDC, EURC and more with Solana Pay.', 'wc-solana-pay' );
-
 	}
 
 
@@ -145,7 +139,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Create Admin Settings form and update configuration settings
 	 */
 	private function get_settings() {
-
 		// load settings
 		$this->init_form_fields();
 		$this->init_settings();
@@ -168,7 +161,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		// Get saved settings for the supported Solana tokens table
 		$this->tokens_table = get_option( Solana_Tokens::TOKENS_OPTION_KEY, array() );
-
 	}
 
 
@@ -176,7 +168,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Register actions and filters for the payment gateway
 	 */
 	private function register_hooks() {
-
 		// Save Admin page settings
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_tokens_table' ) );
@@ -187,7 +178,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		// export global JS variables
 		add_action( 'wp_head', array( $this, 'export_global_js_variables' ) );
-
 	}
 
 
@@ -195,7 +185,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Check if our payment gateway is available for use in the frontend.
 	 */
 	public function is_available() {
-
 		// Return false if our payment gateway is disabled
 		if ( 'no' === $this->enabled ) {
 			return false;
@@ -221,7 +210,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		return $rtn && parent::is_available();
-
 	}
 
 
@@ -229,9 +217,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Initialise Gateway Settings Form Fields.
 	 */
 	public function init_form_fields() {
-
 		$this->form_fields = include PLUGIN_DIR . '/admin/partials/admin-settings.php';
-
 	}
 
 
@@ -244,14 +230,12 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function validate_merchant_wallet_field( $key, $value ) {
-
 		if ( ! preg_match( '/^[1-9A-HJ-NP-Za-km-z]{32,44}$/', $value ) ) {
 			\WC_Admin_Settings::add_error( esc_html__( 'Invalid Solana Wallet Address', 'wc-solana-pay' ) );
 			$value = ''; // WC saves any return value despite error; empty it to prevent a wrong value from being saved.
 		}
 
 		return $value;
-
 	}
 
 
@@ -259,7 +243,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Export global JS variables common for both admin and public pages.
 	 */
 	public function export_global_js_variables() {
-
 		// Get order-id if on Order Pay page
 		$pay_page = is_checkout_pay_page();
 		$order_id = '';
@@ -276,7 +259,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		$script = 'var WC_SOLANA_PAY = ' . wp_json_encode( $payload );
 		wp_print_inline_script_tag( $script );
-
 	}
 
 
@@ -289,7 +271,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function generate_tokens_table_html( $key, $data ) {
-
 		$html = '';
 		$tablejs = get_script_path('/assets/script/admin_tokens_table*.js');
 
@@ -314,7 +295,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		return $html;
-
 	}
 
 
@@ -322,7 +302,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Save tokens table admin settings
 	 */
 	public function save_tokens_table() {
-
 		$tokens = array();
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verification already handled in WC_Admin_Settings::save()
@@ -348,7 +327,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		// phpcs:enable
 
 		update_option( Solana_Tokens::TOKENS_OPTION_KEY, $tokens );
-
 	}
 
 
@@ -360,7 +338,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-
 		// get order info and pending amount
 		$order = wc_get_order( $order_id );
 		$amount = $order->get_total();
@@ -387,7 +364,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 			'result'   => 'success',
 			'redirect' => $this->get_return_url( $order ),
 		);
-
 	}
 
 
@@ -398,7 +374,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_transaction_url( $order ) {
-
 		$meta = $this->get_order_payment_meta( $order );
 
 		if ( is_array( $meta ) && array_key_exists( 'url', $meta ) ) {
@@ -406,7 +381,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		return parent::get_transaction_url( $order );
-
 	}
 
 
@@ -417,10 +391,8 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @param array     $meta  Metadata to store.
 	 */
 	public function set_order_payment_meta( $order, $meta ) {
-
 		$order->update_meta_data( self::ORDER_META_KEY, $meta );
 		$order->save_meta_data();
-
 	}
 
 
@@ -431,7 +403,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function get_order_payment_meta( $order ) {
-
 		if ( $this->id === $order->get_payment_method() ) {
 			$meta = $order->get_meta( self::ORDER_META_KEY );
 		}
@@ -441,7 +412,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		return $meta;
-
 	}
 
 
@@ -452,12 +422,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function add_payment_details_to_admin_order_page( $order ) {
-
 		$meta = $this->get_order_payment_meta( $order );
 		if ( count( $meta ) ) {
 			echo wp_kses_post( get_partial_file_html( '/admin/partials/admin-payment-details.php', $meta ) );
 		}
-
 	}
 
 
@@ -468,12 +436,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function add_payment_details_to_public_order_page( $order ) {
-
 		$meta = $this->get_order_payment_meta( $order );
 		if ( count( $meta ) ) {
 			echo wp_kses_post( get_partial_file_html( '/public/partials/public-payment-details.php', $meta ) );
 		}
-
 	}
 
 
@@ -483,9 +449,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array List of acceptable crypto tokens
 	 */
 	public function get_accepted_solana_tokens() {
-
 		return $this->is_testmode ? Solana_Tokens::get_tokens_for_testmode() : Solana_Tokens::get_tokens_for_livemode();
-
 	}
 
 
@@ -496,9 +460,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array  List of payment options and their cost values.
 	 */
 	public function get_accepted_solana_tokens_payment_options( $amount ) {
-
 		return $this->hSolanapay->get_available_payment_options( $amount );
-
 	}
 
 
@@ -508,9 +470,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return bool
 	 */
 	public function get_testmode() {
-
 		return $this->is_testmode;
-
 	}
 
 
@@ -520,9 +480,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_merchant_wallet_address() {
-
 		return $this->merchant_wallet;
-
 	}
 
 
@@ -532,9 +490,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_brand_name() {
-
 		return $this->brand_name;
-
 	}
 
 
@@ -544,9 +500,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function get_tokens_table() {
-
 		return $this->tokens_table;
-
 	}
-
 }

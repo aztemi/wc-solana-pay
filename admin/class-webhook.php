@@ -32,11 +32,9 @@ class Webhook {
 
 
 	public function __construct( $gateway, $session ) {
-
 		$this->hGateway = $gateway;
 		$this->hSession = $session;
 		$this->register_hooks();
-
 	}
 
 
@@ -44,7 +42,6 @@ class Webhook {
 	 * Register an API endpoint action to handle webhook GET request
 	 */
 	private function register_hooks() {
-
 		// webhook GET endpoint for frontend to get order details
 		add_action( 'woocommerce_api_' . PLUGIN_ID, array( $this, 'handle_order_request' ) );
 
@@ -56,7 +53,6 @@ class Webhook {
 
 		// webhook POST endpoint for sending signed transactions to the remote RPC node
 		add_action( PLUGIN_ID . '_rpc', array( $this, 'send_rpc_request' ) );
-
 	}
 
 
@@ -64,7 +60,6 @@ class Webhook {
 	 * Get payment-related details of specified order
 	 */
 	private function get_order_details( $order_id, &$data ) {
-
 		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
 			return;
@@ -80,7 +75,6 @@ class Webhook {
 		$data['currency'] = $order->get_currency();
 		$data['symbol'] = get_woocommerce_currency_symbol( $data['currency'] );
 		$data['order_id'] = $order_id;
-
 	}
 
 
@@ -88,7 +82,6 @@ class Webhook {
 	 * Get payment-related details of checkout cart
 	 */
 	private function get_cart_details( $cart_created, &$data ) {
-
 		$cart_hash = WC()->cart->get_cart_hash();
 		if ( ! $cart_hash ) {
 			return;
@@ -108,7 +101,6 @@ class Webhook {
 		$data['symbol'] = get_woocommerce_currency_symbol( $data['currency'] );
 		$data['cart_hash'] = $cart_hash;
 		$data['cart_created'] = $cart_created;
-
 	}
 
 
@@ -116,7 +108,6 @@ class Webhook {
 	 * Handle incoming webhook GET order request.
 	 */
 	public function handle_order_request() {
-
 		// validate incoming params
 		$ref = isset( $_GET['ref'] ) ? trim( wc_clean( wp_unslash( $_GET['ref'] ) ) ) : '';
 		$order_id = isset( $_GET['order_id'] ) ? absint( wp_unslash( $_GET['order_id'] ) ) : false;
@@ -205,7 +196,6 @@ class Webhook {
 
 		// send response
 		wp_send_json( $data, 200 );
-
 	}
 
 
@@ -213,7 +203,6 @@ class Webhook {
 	 * Handle incoming Transaction request based on Solana Pay Spec.
 	 */
 	public function handle_transaction_request( $request ) {
-
 		// validate incoming params
 		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
 		$token = isset( $_GET['token'] ) ? trim( wc_clean( wp_unslash( $_GET['token'] ) ) ) : '';
@@ -240,7 +229,6 @@ class Webhook {
 
 		// respond to POST request
 		if ( 'POST' === $method ) {
-
 			// validate json body
 			$request_json = $request->get_json_params();
 			$schema = array(
@@ -248,7 +236,7 @@ class Webhook {
 				'properties' => array(
 					'account' => array(
 						'type' => 'string',
-						'required' => true
+						'required' => true,
 					),
 				),
 			);
@@ -281,7 +269,6 @@ class Webhook {
 			wp_send_json( $data, 200 );
 
 		}
-
 	}
 
 
@@ -289,7 +276,6 @@ class Webhook {
 	 * Handle Transaction confirmation status check and notification from the RPC backend.
 	 */
 	public function handle_status_request( $request ) {
-
 		// validate incoming params
 		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
 		$ref = isset( $_GET['ref'] ) ? trim( wc_clean( wp_unslash( $_GET['ref'] ) ) ) : '';
@@ -310,7 +296,6 @@ class Webhook {
 
 		// respond to POST request
 		if ( 'POST' === $method ) {
-
 			// validate json body
 			$request_json = $request->get_json_params();
 			$schema = array(
@@ -321,11 +306,11 @@ class Webhook {
 					'properties' => array(
 						'id' => array(
 							'type' => 'string',
-							'required' => true
+							'required' => true,
 						),
 						'signature' => array(
 							'type' => 'string',
-							'required' => true
+							'required' => true,
 						),
 					),
 				),
@@ -349,7 +334,7 @@ class Webhook {
 				}
 
 				$option_key = PLUGIN_ID . '_' . $id;
-				$signature = array(	'signature' => $signature );
+				$signature = array( 'signature' => $signature );
 				update_option( $option_key, $signature );
 			}
 
@@ -357,7 +342,6 @@ class Webhook {
 			wp_send_json_success();
 
 		}
-
 	}
 
 
@@ -365,7 +349,6 @@ class Webhook {
 	 * Send RPC request to remote RPC node.
 	 */
 	public function send_rpc_request( $request ) {
-
 		// validate incoming params
 		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
 
@@ -375,7 +358,6 @@ class Webhook {
 
 		// handle POST request
 		if ( 'POST' === $request->get_method() ) {
-
 			// proxy request based on body parameters
 			$body = $request->get_json_params();
 			if ( is_array( $body ) && isset( $body['method'] ) && isset( $body['params'] ) ) {
@@ -390,7 +372,6 @@ class Webhook {
 			}
 
 		}
-
 	}
 
 
@@ -401,18 +382,17 @@ class Webhook {
 	 * @param  array  $request_json Request body as json array.
 	 */
 	public function proxy_raw_rpc_request( $id, $request_json ) {
-
 		// validate json body
 		$schema = array(
 			'type' => 'object',
 			'properties' => array(
 				'method' => array(
 					'type' => 'string',
-					'required' => true
+					'required' => true,
 				),
 				'params' => array(
 					'type' => 'array',
-					'minItems' => 1
+					'minItems' => 1,
 				),
 			),
 		);
@@ -434,7 +414,6 @@ class Webhook {
 
 		// send response
 		wp_send_json( $res['body'], 200 );
-
 	}
 
 
@@ -445,14 +424,13 @@ class Webhook {
 	 * @param  array  $request_json Request body as json array.
 	 */
 	public function proxy_transaction_request( $id, $request_json ) {
-
 		// validate json body
 		$schema = array(
 			'type' => 'object',
 			'properties' => array(
 				'transaction' => array(
 					'type' => 'string',
-					'required' => true
+					'required' => true,
 				),
 			),
 		);
@@ -479,7 +457,5 @@ class Webhook {
 
 		// send ok response
 		wp_send_json_success();
-
 	}
-
 }

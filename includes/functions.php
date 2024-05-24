@@ -19,9 +19,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @return bool true if WooCommerce is activated, otherwise false.
  */
 function is_woocommerce_activated() {
-
 	return in_array( 'woocommerce/woocommerce.php', get_option( 'active_plugins', array() ) );
-
 }
 
 
@@ -31,9 +29,7 @@ function is_woocommerce_activated() {
  * @return bool true if service is installed, otherwise false.
  */
 function is_bcmath_installed() {
-
 	return function_exists('bccomp');
-
 }
 
 
@@ -43,14 +39,12 @@ function is_bcmath_installed() {
  * @param string $notice Error message to display.
  */
 function show_error_notice( $notice ) {
-
 	add_action(
 		'admin_notices',
-		function() use( $notice ) {
+		function () use ( $notice ) {
 			echo wp_kses_post( '<div class="notice notice-error"><p>' . $notice . '</p></div>'  );
 		}
 	);
-
 }
 
 
@@ -61,15 +55,13 @@ function show_error_notice( $notice ) {
  * @param  array  $args    List of variables to import into symbol table of the file.
  * @return string          HTML string of loaded php file.
  */
-function get_partial_file_html( $relpath, $args = [] ) {
-
+function get_partial_file_html( $relpath, $args = array() ) {
 	ob_start();
 
 	extract( $args );
 	include PLUGIN_DIR . $relpath;
 
 	return ob_get_clean();
-
 }
 
 
@@ -81,7 +73,6 @@ function get_partial_file_html( $relpath, $args = [] ) {
  * @return string          Path of the script file or empty string if script not found.
  */
 function get_script_path( $relpath, $base = '' ) {
-
 	$path = '';
 	$scripts = glob( PLUGIN_DIR . $relpath );
 	if ( count( $scripts ) ) {
@@ -89,7 +80,6 @@ function get_script_path( $relpath, $base = '' ) {
 	}
 
 	return $path;
-
 }
 
 
@@ -102,7 +92,6 @@ function get_script_path( $relpath, $base = '' ) {
  * @return array            The formatted array containing status code, error if any and json body.
  */
 function remote_request( $url, $method = 'GET', $postdata = array() ) {
-
 	$rtn = array(
 		'status' => 500,
 		'error'  => '',
@@ -135,5 +124,4 @@ function remote_request( $url, $method = 'GET', $postdata = array() ) {
 	}
 
 	return $rtn;
-
 }
