@@ -99,6 +99,8 @@ class Solana_Pay {
 	 * @return bool      true if transaction was found and correct amount was paid into merchant wallet, false otherwise.
 	 */
 	public function confirm_payment_onchain( $order, $amount ) {
+		$order_id = $order->get_id();
+
 		// get checkout order details from current session
 		$data = $this->hSession->get_data();
 		$id = $data['id'];
@@ -106,8 +108,16 @@ class Solana_Pay {
 		// fetch payment status details for the order from remote
 		$res = self::get_payment_details( $id, $this->hGateway->get_testmode() );
 
-		// return false if payment is not confirmed or checkout reference id does not match
-		if ( ! isset( $res['confirmed'] ) || ( true !== $res['confirmed'] ) || ( $id !== $res['body']['id'] ) ) {
+		// return false if checkout reference id does not match
+		$received_id = $res['body']['id'];
+		if ( $id !== $received_id ) {
+			logger( "Process payment failed. Order: $order_id. Checkout id mismatch - expected: $id, received: $received_id." );
+			return false;
+		}
+
+		// return false if payment is not confirmed
+		if ( ! isset( $res['confirmed'] ) || ( true !== $res['confirmed'] ) ) {
+			logger( "Process payment failed. Order: $order_id, checkout id: $id. Payment not confirmed onchain." );
 			return false;
 		}
 
@@ -115,6 +125,7 @@ class Solana_Pay {
 		$token_id = $res['body']['currency'];
 		$table = $this->hGateway->get_tokens_table();
 		if ( ! array_key_exists( $token_id, $table ) || ! $table[ $token_id ]['enabled'] ) {
+			logger( "Process payment failed. Order: $order_id, checkout id: $id. Token ($token_id) not enabled by merchant." );
 			return false;
 		}
 
@@ -122,6 +133,7 @@ class Solana_Pay {
 		$receiver = $res['body']['receiver'];
 		$expected_receiver = $data['recipient'];
 		if ( $receiver !== $expected_receiver ) {
+			logger( "Process payment failed. Order: $order_id, checkout id: $id. Recipient wallet mismatch - expected: $expected_receiver, receiver: $receiver." );
 			return false;
 		}
 
@@ -135,7 +147,7 @@ class Solana_Pay {
 			'reference'   => $data['reference'],
 			'receiver'    => $receiver,
 			'payer'       => $res['body']['payer'],
-			'received'    => rtrim( $received_token_amount, '0' ) . ' ' . $symbol,
+			'received'    => rtrim( $res['body']['received'], '0' ) . ' ' . $symbol,
 			'paid'        => rtrim( $res['body']['paid'], '0' ) . ' ' . $symbol,
 			'url'         => $this->get_explorer_url( $txn_id ),
 		);

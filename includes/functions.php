@@ -49,6 +49,19 @@ function show_error_notice( $notice ) {
 
 
 /**
+ * Add a specified log message to the WooCommerce Status Logs.
+ *
+ * @param string $message Message data to log.
+ */
+function logger( $message, $level = 'warning' ) {
+	$logger = wc_get_logger();
+	if ( $logger ) {
+		$logger->log( $level, wc_print_r( $message, true ), array( 'source' => PLUGIN_ID ) );
+	}
+}
+
+
+/**
  * Load a partial file and return its content HTML
  *
  * @param  string $relpath Relative path to the php file to load.
