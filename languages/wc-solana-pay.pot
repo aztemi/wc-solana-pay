@@ -2,110 +2,102 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WC Solana Pay 2.6.0\n"
+"Project-Id-Version: WC Solana Pay 2.7.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-solana-pay\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-04-16T21:00:38+00:00\n"
+"POT-Creation-Date: 2024-05-27T11:51:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.8.1\n"
+"X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: wc-solana-pay\n"
 
 #. Plugin Name of the plugin
-#: admin/class-wc-solana-pay-payment-gateway.php:137
+#: wc-solana-pay.php
+#: admin/class-wc-solana-pay-payment-gateway.php:132
 #: admin/partials/admin-settings.php:55
 msgid "WC Solana Pay"
 msgstr ""
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
+#: wc-solana-pay.php
 msgid "https://apps.aztemi.com/wc-solana-pay"
 msgstr ""
 
 #. Description of the plugin
+#: wc-solana-pay.php
 msgid "Accept crypto payments in SOL, USDT, USDC, EURC and more in your WooCommerce store."
 msgstr ""
 
 #. Author of the plugin
+#: wc-solana-pay.php
 msgid "AZTemi"
 msgstr ""
 
-#: admin/class-solana-pay.php:129
-msgid "Payment transaction not found. Please try again."
-msgstr ""
-
-#: admin/class-solana-pay.php:170
-msgid "Unable to confirm payment transaction details. Please try again."
-msgstr ""
-
-#: admin/class-solana-pay.php:194
-msgid "Payment currency not in supported Solana tokens list."
-msgstr ""
-
-#: admin/class-solana-pay.php:432
+#: admin/class-solana-pay.php:157
 msgid "Solana Pay payment completed"
 msgstr ""
 
 #. translators: %s: WordPress error message, e.g. 'Timeout error'
-#: admin/class-solana-pay.php:624
+#: admin/class-solana-pay.php:343
 msgid "Connection to RPC node failed: %s"
 msgstr ""
 
 #. translators: %d: rpc call response code error, e.g. 404
-#: admin/class-solana-pay.php:629
+#: admin/class-solana-pay.php:348
 msgid "RPC remote call failed with code %d"
 msgstr ""
 
-#: admin/class-solana-tokens.php:324
+#: admin/class-solana-tokens.php:291
 msgid "Devnet Faucet"
 msgstr ""
 
 #. translators: %s: Devnet Faucet
-#: admin/class-solana-tokens.php:326
+#: admin/class-solana-tokens.php:293
 msgid "Get free tokens for testing from the %s."
 msgstr ""
 
-#: admin/class-wc-solana-pay-admin.php:137
+#: admin/class-wc-solana-pay-admin.php:122
 msgid "Settings"
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:139
+#: admin/class-wc-solana-pay-payment-gateway.php:134
 msgid "Accept payments in SOL, USDT, USDC, EURC and more with Solana Pay."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:164
+#: admin/class-wc-solana-pay-payment-gateway.php:157
 msgid "(Test Mode enabled. Devnet in use)."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:207
+#: admin/class-wc-solana-pay-payment-gateway.php:196
 msgid "Solana Pay setup is not complete. Please set Merchant Wallet Address"
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:219
+#: admin/class-wc-solana-pay-payment-gateway.php:208
 msgid "Solana Pay setup is not complete. Please enable at least 1 Solana Token."
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:249
+#: admin/class-wc-solana-pay-payment-gateway.php:234
 msgid "Invalid Solana Wallet Address"
 msgstr ""
 
-#: admin/class-wc-solana-pay-payment-gateway.php:381
+#: admin/class-wc-solana-pay-payment-gateway.php:350
 msgid "Payment failed. Please try again."
 msgstr ""
 
-#: admin/class-webhook.php:141
-#: admin/class-webhook.php:278
+#: admin/class-webhook.php:132
+#: admin/class-webhook.php:266
 msgid "Thank you for your order"
 msgstr ""
 
-#: admin/class-webhook.php:160
+#: admin/class-webhook.php:151
 msgid "Bad Request - Email address not valid"
 msgstr ""
 
-#: admin/class-webhook.php:166
+#: admin/class-webhook.php:157
 msgid "An account is already registered with your email address. Please log in and try again."
 msgstr ""
 
@@ -205,31 +197,31 @@ msgid "Payment method description that customers will see on the checkout page."
 msgstr ""
 
 #. translators: %s: Store currency name, e.g. 'USD'
-#: admin/partials/admin-tokens-table.php:65
+#: admin/partials/admin-tokens-table.php:58
 msgid "Your store currency is: %s"
 msgstr ""
 
-#: admin/partials/admin-tokens-table.php:67
+#: admin/partials/admin-tokens-table.php:60
 msgid "It is currently not supported for automatic exchange rate lookup. Please enter your preferred exchange rates below."
 msgstr ""
 
-#: admin/partials/admin-tokens-table.php:75
+#: admin/partials/admin-tokens-table.php:66
 msgid "Enabled"
 msgstr ""
 
-#: admin/partials/admin-tokens-table.php:76
+#: admin/partials/admin-tokens-table.php:67
 msgid "Token"
 msgstr ""
 
-#: admin/partials/admin-tokens-table.php:77
+#: admin/partials/admin-tokens-table.php:68
 msgid "Exchange Rate"
 msgstr ""
 
-#: includes/class-wc-solana-pay.php:60
+#: includes/class-wc-solana-pay.php:53
 msgid "<b>WC Solana Pay</b> is an extension for <b>WooCommerce</b>. Please install and activate <b>WooCommerce</b> plugin."
 msgstr ""
 
-#: includes/class-wc-solana-pay.php:66
+#: includes/class-wc-solana-pay.php:59
 msgid "<b>WC Solana Pay</b> requires <b>BC Math</b>. Please install <b>BC Math</b> extension for PHP."
 msgstr ""
 
