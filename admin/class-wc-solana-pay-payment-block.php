@@ -60,21 +60,19 @@ final class WC_Solana_Pay_Payment_Block extends AbstractPaymentMethodType {
 	 * @return array
 	 */
 	public function get_payment_method_script_handles() {
-
 		$handles  = array();
 		$blockjs  = get_script_path( '/assets/script/payment_block*.js', PLUGIN_URL );
 		$blockphp = get_script_path( '/assets/script/payment_block*.php', PLUGIN_DIR );
 
 		if ( $blockphp && $blockjs ) {
 			$handlejs = PLUGIN_ID . '_blockjs';
-			$dependency = require( $blockphp );
+			$dependency = require $blockphp ;
 
 			wp_register_script( $handlejs, $blockjs, $dependency['dependencies'], $dependency['version'], true );
-			$handles = [ $handlejs ];
+			$handles = array( $handlejs );
 		}
 
 		return $handles;
-
 	}
 
 
@@ -88,8 +86,7 @@ final class WC_Solana_Pay_Payment_Block extends AbstractPaymentMethodType {
 			'icon'        => $this->hGateway->icon,
 			'title'       => $this->hGateway->title,
 			'description' => $this->hGateway->block_desc,
-			'supports'    => array_filter( $this->hGateway->supports, array( $this->hGateway, 'supports' ) )
+			'supports'    => array_filter( $this->hGateway->supports, array( $this->hGateway, 'supports' ) ),
 		);
 	}
-
 }

@@ -17,10 +17,8 @@ if ( ! defined( 'WPINC' ) ) {
 class WC_Solana_Pay {
 
 	public function __construct() {
-
 		$this->load_dependencies();
 		$this->register_hooks();
-
 	}
 
 
@@ -28,10 +26,8 @@ class WC_Solana_Pay {
 	 * Load required dependencies for this class.
 	 */
 	private function load_dependencies() {
-
 		// load plugin helper functions
 		require_once PLUGIN_DIR . '/includes/functions.php';
-
 	}
 
 
@@ -39,10 +35,8 @@ class WC_Solana_Pay {
 	 * Register action hooks
 	 */
 	private function register_hooks() {
-
 		// load text domain for translation
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
-
 	}
 
 
@@ -52,7 +46,6 @@ class WC_Solana_Pay {
 	 * @return bool true if all dependencies are installed and activated, false otherwise.
 	 */
 	private function is_available() {
-
 		$available = true;
 
 		// check if WooCommerce is installed and activated
@@ -68,7 +61,6 @@ class WC_Solana_Pay {
 		}
 
 		return $available;
-
 	}
 
 
@@ -76,9 +68,7 @@ class WC_Solana_Pay {
 	 * Load plugin text domain translation
 	 */
 	public function load_textdomain() {
-
 		load_plugin_textdomain( 'wc-solana-pay', false, dirname( PLUGIN_BASENAME ) . '/languages' );
-
 	}
 
 
@@ -86,7 +76,6 @@ class WC_Solana_Pay {
 	 * Register and execute hooks if all dependencies are available
 	 */
 	public function run() {
-
 		// return if any dependency is not available
 		if ( ! $this->is_available() ) {
 			return;
@@ -95,7 +84,5 @@ class WC_Solana_Pay {
 		// load admin class and initialize its instance
 		require_once PLUGIN_DIR . '/admin/class-wc-solana-pay-admin.php';
 		new WC_Solana_Pay_Admin();
-
 	}
-
 }

@@ -14,7 +14,6 @@ if ( ! defined( 'WPINC' ) ) {
 
 
 function get_th( $value, $style = '', $colspan = '', $tip = '' ) {
-
 	if ( $style ) {
 		$style = sprintf( ' style="%s"', $style );
 	}
@@ -25,11 +24,9 @@ function get_th( $value, $style = '', $colspan = '', $tip = '' ) {
 	$th = sprintf( '<th%s%s>%s%s</th>', $style, $colspan, esc_html( $value ), $tip );
 
 	return $th;
-
 }
 
 function get_td( $value, $style = '' ) {
-
 	if ( $style ) {
 		$style = sprintf( ' style="%s"', $style );
 	}
@@ -37,11 +34,9 @@ function get_td( $value, $style = '' ) {
 	$td = sprintf( '<td%s>%s</td>', $style, $value );
 
 	return $td;
-
 }
 
 function get_input( $name, $value, $style = '', $type = 'text', $readonly = false ) {
-
 	if ( $style ) {
 		$style = sprintf( ' style="%s"', $style );
 	}
@@ -55,32 +50,26 @@ function get_input( $name, $value, $style = '', $type = 'text', $readonly = fals
 	$input = sprintf( '<input type="%s" name="%s"%s%s%s />', $type, $name, $value, $style, $readonly );
 
 	return $input;
-
 }
 
 function get_rate_notice( $show_currency ) {
-
 	return '<p class="description">'
 		/* translators: %s: Store currency name, e.g. 'USD' */
 		. sprintf( __( 'Your store currency is: %s', 'wc-solana-pay' ), '<b>' . $show_currency . '</b>' )
 		. '</p><p class="description" style="padding-bottom:0.5rem">'
 		. __( 'It is currently not supported for automatic exchange rate lookup. Please enter your preferred exchange rates below.', 'wc-solana-pay' )
 		. '</p>';
-
 }
 
 function get_tokens_table_header( $show_currency, $rate_available ) {
-
 	return '<tr>'
 		. get_th( __( 'Enabled', 'wc-solana-pay' ), 'text-align:center;max-width:4rem' )
 		. get_th( __( 'Token', 'wc-solana-pay' ), 'min-width:10rem' )
 		. ( $rate_available ? '' : get_th( sprintf( '%s: 1.00 %s =', __( 'Exchange Rate', 'wc-solana-pay' ), $show_currency ), 'text-align:center' ) )
 		. '</tr>';
-
 }
 
 function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $rate_available ) {
-
 	$rows = '';
 
 	// Create Admin Settings table row for each supported token
@@ -99,7 +88,7 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 		// default settings
 		$table = array(
 			'rate'        => '1.00',
-			'enabled'     => !! $in_testmode, // enable testmode tokens by default
+			'enabled'     => (bool) $in_testmode, // enable testmode tokens by default
 		);
 
 		// merge saved settings into table
@@ -131,15 +120,13 @@ function get_tokens_table_rows( $tokens_table, $testmode_tokens, $live_tokens, $
 	}
 
 	return $rows;
-
 }
 
 function get_allowed_tags() {
-
 	$allowed_tags = wp_kses_allowed_html( 'post' );
 
 	// safe css attributes
-	add_filter( 'safe_style_css', function( $styles ) {
+	add_filter( 'safe_style_css', function ( $styles ) {
 		$styles[] = 'display';
 		$styles[] = 'text-decoration-line';
 		return $styles;
@@ -158,7 +145,6 @@ function get_allowed_tags() {
 	);
 
 	return $allowed_tags;
-
 }
 
 // show notice if exchange rate lookup is not available for the store base currency

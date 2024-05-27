@@ -16,14 +16,6 @@ if ( ! defined( 'WPINC' ) ) {
 class Solana_Tokens {
 
 	/**
-	 * Default scale precision for bc math functions.
-	 *
-	 * @var int
-	 */
-	private const BC_MATH_SCALE = 6;
-
-
-	/**
 	 * Suffix added to token key codes to make them unique in WC currencies list.
 	 *
 	 * @var string
@@ -64,13 +56,11 @@ class Solana_Tokens {
 
 
 	public function __construct() {
-
 		// load supported tokens
 		$this->load_supported_tokens();
 
 		// register hooks that will add supported tokens to the WC Currencies list
 		$this->register_hooks();
-
 	}
 
 
@@ -78,7 +68,6 @@ class Solana_Tokens {
 	 * Load supported tokens list.
 	 */
 	private function load_supported_tokens() {
-
 		$file_path = '/assets/json/supported_solana_tokens.json';
 		self::$supported_tokens = $this->load_tokens_json( $file_path );
 
@@ -88,7 +77,6 @@ class Solana_Tokens {
 		foreach ( self::$supported_tokens as $k => $v ) {
 			self::$testmode_tokens[ $k ]['mint'] = $v['mint_devnet'];
 		}
-
 	}
 
 
@@ -96,12 +84,10 @@ class Solana_Tokens {
 	 * Register filters for adding WC currencies
 	 */
 	private function register_hooks() {
-
 		// add filters for handling WC currencies
 		add_filter( 'woocommerce_currencies', array( $this, 'add_woocommerce_currencies' ) );
 		add_filter( 'woocommerce_currency_symbols', array( $this, 'add_woocommerce_currency_symbols' ) );
 		add_filter( 'woocommerce_currency_symbol', array( $this, 'get_woocommerce_currency_symbol' ), 10, 2 );
-
 	}
 
 
@@ -112,7 +98,6 @@ class Solana_Tokens {
 	 * @return array Tokens list
 	 */
 	private function load_tokens_json( $json_relpath ) {
-
 		$tokens = array();
 
 		$json = file_get_contents( PLUGIN_DIR . $json_relpath );
@@ -125,7 +110,6 @@ class Solana_Tokens {
 		}
 
 		return $tokens;
-
 	}
 
 
@@ -133,7 +117,6 @@ class Solana_Tokens {
 	 * Add supported Solana tokens to WC Currencies list.
 	 */
 	public function add_woocommerce_currencies( $currencies ) {
-
 		// add all supported tokens to the currencies list
 		foreach ( self::$supported_tokens as $k => $v ) {
 			$currencies[ $k ] = $v['name'];
@@ -143,7 +126,6 @@ class Solana_Tokens {
 		ksort( $currencies, SORT_NATURAL|SORT_FLAG_CASE );
 
 		return $currencies;
-
 	}
 
 
@@ -151,14 +133,12 @@ class Solana_Tokens {
 	 * Add symbols of supported Solana tokens to WC Currencies list.
 	 */
 	public function add_woocommerce_currency_symbols( $currencies ) {
-
 		// add all supported tokens to the currencies list
 		foreach ( self::$supported_tokens as $k => $v ) {
 			$currencies[ $k ] = $v['symbol'];
 		}
 
 		return $currencies;
-
 	}
 
 
@@ -166,13 +146,11 @@ class Solana_Tokens {
 	 * Provide symbols of supported Solana tokens when requested.
 	 */
 	public function get_woocommerce_currency_symbol( $symbol, $currency ) {
-
 		if ( array_key_exists( $currency, self::$supported_tokens ) ) {
 			$symbol = self::$supported_tokens[ $currency ]['symbol'];
 		}
 
 		return $symbol;
-
 	}
 
 
@@ -182,14 +160,12 @@ class Solana_Tokens {
 	 * @return array Tokens list
 	 */
 	public static function get_tokens_for_testmode() {
-
 		/**
 		 * Filters a list of Tokens supported for the Testmode.
 		 *
 		 * @since 1.0.0
 		 */
 		return apply_filters( 'solana_pay_for_wc_testmode_tokens', self::$testmode_tokens );
-
 	}
 
 
@@ -199,14 +175,12 @@ class Solana_Tokens {
 	 * @return array Tokens list
 	 */
 	public static function get_tokens_for_livemode() {
-
 		/**
 		 * Filters a list of Tokens supported for the Live mode.
 		 *
 		 * @since 1.0.0
 		 */
 		return apply_filters( 'solana_pay_for_wc_livemode_tokens', self::$livemode_tokens );
-
 	}
 
 
@@ -217,7 +191,6 @@ class Solana_Tokens {
 	 * @return string
 	 */
 	public static function get_store_currency( $context = 'view' ) {
-
 		$currency = get_woocommerce_currency();
 
 		// remove our suffix if context is view and the currency is one of our supported tokens
@@ -226,7 +199,6 @@ class Solana_Tokens {
 		}
 
 		return $currency;
-
 	}
 
 
@@ -236,9 +208,7 @@ class Solana_Tokens {
 	 * @return string
 	 */
 	public static function get_store_currency_key_suffix() {
-
 		return self::TOKEN_KEY_SUFFIX;
-
 	}
 
 
@@ -248,7 +218,6 @@ class Solana_Tokens {
 	 * @return bool
 	 */
 	public static function is_rate_conversion_supported() {
-
 		// list of currencies supported for rate lookup in the backend
 		$supported_currencies = array(
 			// Solana tokens supported
@@ -309,7 +278,6 @@ class Solana_Tokens {
 
 		$store_currency = self::get_store_currency();
 		return in_array( strtolower( $store_currency ), $supported_currencies );
-
 	}
 
 
@@ -319,12 +287,9 @@ class Solana_Tokens {
 	 * @return string
 	 */
 	public static function testmode_faucet_tip() {
-
 		$faucet_url = 'https://apps.aztemi.com/wc-solana-pay/faucet/';
 		$faucet_link = '<a href="' . $faucet_url . '" target="_blank" rel="noopener noreferrer"><b>' . esc_html__( 'Devnet Faucet', 'wc-solana-pay' ) . '</b></a>';
 		/* translators: %s: Devnet Faucet */
 		return '<p>' . sprintf( esc_html__( 'Get free tokens for testing from the %s.', 'wc-solana-pay' ), $faucet_link ) . '</p>';
-
 	}
-
 }

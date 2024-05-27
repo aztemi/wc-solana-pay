@@ -13,7 +13,7 @@
     "makepot": "composer run-script makepot",
     "lint": "composer run-script lint",
     "build": "npm run build --workspaces",
-    "nuke": "rm -rf vendor node_modules frontend/node_modules package-lock.json",
+    "nuke": "rm -rf vendor node_modules frontend/node_modules composer.lock package-lock.json",
     "package": "rm -f $npm_package_name-*.zip && cd .. && zip -r $npm_package_name/$npm_package_name-$npm_package_version.zip $npm_package_name -x **phpcs-report.txt **pbs-rules-set.xml **composer.lock **composer.json **package-lock.json **package.json **.md **.gitignore **.git/\\* **node_modules/\\* **vendor/\\* **frontend/\\* **.wordpress.org/\\* && cd $npm_package_name"
   },
   "repository": {
