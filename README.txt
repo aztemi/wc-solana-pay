@@ -1,7 +1,7 @@
 === WC Solana Pay ===
 Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay/donate/
-Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
+Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, bonk, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
 Tested up to: 6.5.3
 Stable tag: 2.7.0
@@ -26,6 +26,7 @@ Below is a live demo store. Get free tokens for testing from the [Devnet Faucet]
 = Supported Tokens for Payments =
 
 * Solana (SOL)
+* Bonk (BONK)
 * Tether USD Stablecoin (USDT)
 * Circle USD Stablecoin (USDC)
 * Circle EURO Stablecoin (EURC)
@@ -74,7 +75,7 @@ Solana Pay is a fast, decentralized, permissionless, and open source payment fra
 
 = Which Solana tokens can be accepted as payment? =
 
-We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for more tokens are planned to be added in future releases.
+We currently support payments in SOL, BONK, USDT, USDC, EURC and EUROe. Support for more tokens are planned to be added in future releases.
 
 = How much does it cost to use? =
 
