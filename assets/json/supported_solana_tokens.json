@@ -1,4 +1,14 @@
 {
+  "BONK": {
+    "symbol": "BONK",
+    "name": "Bonk",
+    "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "mint_devnet": "FX28VbekrNvgghgHHUqYyiEpQ98RN6yYBdWUJ6PUdER3",
+    "decimals": 5,
+    "decimals_view": 3,
+    "icon": "assets/img/tokens/bonk.jpg",
+    "coingecko": "bonk"
+  },
   "USDC": {
     "symbol": "USDC",
     "name": "Circle USD Coin",

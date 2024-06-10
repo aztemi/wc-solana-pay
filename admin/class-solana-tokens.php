@@ -225,6 +225,7 @@ class Solana_Tokens {
 			'usdt',
 			'eurc',
 			'euroe',
+			'bonk',
 			'sol',
 
 			// WC currencies supported on Coingecko since rate conversion uses Coingecko API
