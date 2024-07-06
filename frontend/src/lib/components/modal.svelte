@@ -27,6 +27,8 @@
   }
 
   async function openModal(/** @type {{ detail: any; }} */ e) {
+    if (showModal) return;
+
     eventResponse = e?.detail || {};
     notification.reset();
     order.reset();
