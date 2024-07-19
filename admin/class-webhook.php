@@ -57,6 +57,35 @@ class Webhook {
 
 
 	/**
+	 * Validate customer email address before processing order.
+	 *
+	 * If user is not logged in and registration is required, WC will attempt to create an account for the user.
+	 * This makes sure the user email address is not already registered. Otherwise, account creation will fail.
+	 */
+	private function validate_customer_email() {
+		if ( ! is_user_logged_in() && ! is_null( WC()->customer ) && ! is_null( WC()->checkout() ) ) {
+			$email = WC()->customer->get_billing_email();
+			$is_registration_required = filter_var( wc()->checkout()->is_registration_required(), FILTER_VALIDATE_BOOLEAN );
+
+			if ( $is_registration_required && ! empty( $email ) ) {
+				if ( ! is_email( $email ) ) {
+					wp_send_json_error(
+						esc_html__( 'Bad Request - Email address not valid', 'wc-solana-pay' ),
+						400
+					);
+				}
+				if ( email_exists( $email ) ) {
+					wp_send_json_error(
+						esc_html__( 'An account is already registered with your email address. Please log in and try again.', 'wc-solana-pay' ),
+						406
+					);
+				}
+			}
+		}
+	}
+
+
+	/**
 	 * Get payment-related details of specified order
 	 */
 	private function get_order_details( $order_id, &$data ) {
@@ -135,35 +164,11 @@ class Webhook {
 		// Add order or checkout cart details that are useful for payment in the frontend
 		if ( $order_id ) {
 			$this->get_order_details( $order_id, $data );
-
 		} elseif ( WC() && WC()->cart && ! empty( $cart_created ) ) {
 			$this->get_cart_details( $cart_created, $data );
-
-			// If user is not logged in and registration is required, WC will attempt to create an account for the user.
-			// Make sure the user email address is not already registered. Otherwise, account creation will fail.
-			if ( ! is_user_logged_in() && ! is_null( WC()->customer ) && ! is_null( WC()->checkout() ) ) {
-				$email = WC()->customer->get_billing_email();
-				$is_registration_required = filter_var( wc()->checkout()->is_registration_required(), FILTER_VALIDATE_BOOLEAN );
-
-				if ( $is_registration_required && ! empty( $email ) ) {
-					if ( ! is_email( $email ) ) {
-						wp_send_json_error(
-							esc_html__( 'Bad Request - Email address not valid', 'wc-solana-pay' ),
-							400
-						);
-					}
-					if ( email_exists( $email ) ) {
-						wp_send_json_error(
-							esc_html__( 'An account is already registered with your email address. Please log in and try again.', 'wc-solana-pay' ),
-							406
-						);
-					}
-				}
-			}
-
+			$this->validate_customer_email();
 		} else {
 			wp_send_json_error( 'Bad Request', 400 );
-
 		}
 
 		// validate amount

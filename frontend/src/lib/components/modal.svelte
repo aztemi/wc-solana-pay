@@ -2,7 +2,7 @@
   import { Keypair } from "@solana/web3.js";
   import { order } from "../store/order.js";
   import { Notification, notification, showSubmitOrderStatus, EXIT, STATE } from "./notification";
-  import { submitCheckoutForm, getCheckoutOrderDetails } from "../utils/backend_proxy.js";
+  import { submitCheckoutForm, getCheckoutOrderDetails, isCheckoutCartValid } from "../utils/backend_proxy.js";
   import { isLocalhost } from "../utils/helpers.js";
   import Header from "./header.svelte";
   import Loading from "./loading.svelte";
@@ -27,6 +27,8 @@
   }
 
   async function openModal(/** @type {{ detail: any; }} */ e) {
+    if (showModal) return;
+
     eventResponse = e?.detail || {};
     notification.reset();
     order.reset();
@@ -56,7 +58,7 @@
       msgId = notification.addNotice("Getting order details", STATE.LOADING);
 
       const ref = new Keypair().publicKey;
-      const jsonOrder = await getCheckoutOrderDetails(ref.toBase58());
+      const [jsonOrder] = await Promise.all([getCheckoutOrderDetails(ref.toBase58()), isCheckoutCartValid()]);
       order.setOrder(jsonOrder);
 
       notification.updateNotice(msgId, { status: STATE.OK, exit: EXIT.TIMEOUT });

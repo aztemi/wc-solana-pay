@@ -28,7 +28,7 @@ const requestToHandle = request => {
 module.exports = {
   ...defaultConfig,
   entry: {
-    payment_block: "/src/payment_block.js"
+    payment_block: "/src/payment_block.jsx"
   },
   output: {
     path: path.resolve(__dirname, "../assets/script/"),
