@@ -14,3 +14,10 @@ export function isMobile() {
 
   return false;
 }
+
+// safely decode HTML entities
+export function decodeEntities(encodedStr) {
+  const textArea = document.createElement("textarea");
+  textArea.innerHTML = encodedStr;
+  return textArea.value;
+}

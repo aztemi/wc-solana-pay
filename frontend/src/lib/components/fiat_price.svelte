@@ -1,4 +1,5 @@
 <script>
+  import { decodeEntities } from "../utils/helpers";
   import Icon from "./icons/icon.svelte";
 
   export let amount;
@@ -12,7 +13,7 @@
   <span>
     <bdi>
       <span><b>{amount}</b></span>
-      <span class="woocommerce-Price-currencySymbol"><b>{@html symbol}</b></span>
+      <span class="woocommerce-Price-currencySymbol"><b>{decodeEntities(symbol)}</b></span>
     </bdi>
   </span>
 </div>
