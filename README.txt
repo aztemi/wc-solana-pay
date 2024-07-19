@@ -3,11 +3,13 @@ Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay/donate/
 Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, eurc, euroe, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
-Tested up to: 6.5.3
-Stable tag: 2.7.0
+Tested up to: 6.6
+Stable tag: 2.8.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
+
+== Description ==
 
 WC Solana Pay - Fast payment gateway powered by Solana blockchain with support for **Block** and **Classic** themes.
 
@@ -91,6 +93,9 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 
 == Changelog ==
 
+= 2.8.0 :: 2024-07-19 =
+* Validate cart content before processing payment to prevent errors related to lack of stock.
+
 = 2.7.0 :: 2024-05-27 =
 * Offload payments validation logics to remote and log errors during payments processing
 
@@ -123,5 +128,5 @@ We currently support payments in SOL, USDT, USDC, EURC and EUROe. Support for mo
 
 == Upgrade Notice ==
 
-= 2.7.0 =
-Bug fixes and optimized payments processing logic. Upgrade is recommended.
+= 2.8.0 =
+Bug fixes and cart content validation before payment processing. Upgrade is recommended.
