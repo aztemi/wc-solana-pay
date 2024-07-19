@@ -253,6 +253,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$payload = array(
 			'id'       => PLUGIN_ID,
 			'baseurl'  => PLUGIN_URL,
+			'apiurl'   => esc_url( get_rest_url() ),
 			'pay_page' => $pay_page,
 			'order_id' => $order_id,
 		);

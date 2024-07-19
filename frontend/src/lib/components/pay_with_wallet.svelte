@@ -7,6 +7,7 @@
   import { ConnectionProvider, WalletProvider, workSpace } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
   import { startPolling } from "../utils/poll_for_transaction";
   import { postRequest } from "../utils/post_request";
+  import { isCheckoutCartValid } from "../utils/backend_proxy";
   import { notification, showSubmitOrderStatus, EXIT, STATE } from "./notification";
   import WalletSplitMultiButton from "./buttons/wallet_split_multi_button.svelte";
 
@@ -51,7 +52,10 @@
         msgId = notification.addNotice("Processing payment transaction", STATE.LOADING);
 
         // fetch the transaction
-        const { transaction } = await postRequest(link, { account: $walletStore.publicKey.toBase58() });
+        const [{ transaction }] = await Promise.all([
+          postRequest(link, { account: $walletStore.publicKey.toBase58() }),
+          isCheckoutCartValid()
+        ]);
 
         // extract payment transaction created in backend
         const txBuf = Buffer.from(transaction, "base64");
