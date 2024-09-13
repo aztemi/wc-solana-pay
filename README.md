@@ -26,7 +26,7 @@ Below are some of the major features of this plugin.
 - Solana Pay smart button integrated with the Checkout page for express checkout without redirect
 - Supports payments via QR Code scan and connection to browser wallets
 - Fast transactions handling and direct payments into the Solana wallet address that you configure
-- Supports payments in SOL, USDT, USDC, EURC and EUROe. More tokens can easily be added through configuration.
+- Supports payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. More tokens can easily be added through configuration.
 - Compatible with Gutenberg Block and Classic themes
 - Customizable settings under WooCommerce Payment page
 

@@ -19,6 +19,16 @@
     "icon": "assets/img/tokens/usdt.png",
     "coingecko": "tether"
   },
+  "PYUSD": {
+    "symbol": "PYUSD",
+    "name": "PayPal USD",
+    "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+    "mint_devnet": "Ftg4g7156m7UYnEFh9wEJEop8BeyomiN9sZUYmjQFVh9",
+    "decimals": 6,
+    "decimals_view": 4,
+    "icon": "assets/img/tokens/pyusd.png",
+    "coingecko": "paypal-usd"
+  },
   "EURC": {
     "symbol": "EURC",
     "name": "Circle EURO Coin",

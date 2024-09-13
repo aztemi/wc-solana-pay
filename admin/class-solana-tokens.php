@@ -223,6 +223,7 @@ class Solana_Tokens {
 			// Solana tokens supported
 			'usdc',
 			'usdt',
+			'pyusd',
 			'eurc',
 			'euroe',
 			'sol',
