@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WC Solana Pay 2.8.0\n"
+"Project-Id-Version: WC Solana Pay 2.9.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-solana-pay\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-07-19T12:40:33+00:00\n"
+"POT-Creation-Date: 2024-09-14T12:10:13+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: wc-solana-pay\n"
@@ -51,12 +51,12 @@ msgstr ""
 msgid "RPC remote call failed with code %d"
 msgstr ""
 
-#: admin/class-solana-tokens.php:291
+#: admin/class-solana-tokens.php:292
 msgid "Devnet Faucet"
 msgstr ""
 
 #. translators: %s: Devnet Faucet
-#: admin/class-solana-tokens.php:293
+#: admin/class-solana-tokens.php:294
 msgid "Get free tokens for testing from the %s."
 msgstr ""
 
