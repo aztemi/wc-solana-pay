@@ -1,6 +1,6 @@
 <script>
   import { order } from "../store/order.js";
-  import { baseurl, addTokenToCheckoutForm } from "../utils/backend_proxy.js";
+  import { pluginUrl, addTokenToCheckoutForm } from "../utils/backend_proxy.js";
   import IconButton from "./buttons/icon_button.svelte";
   import DropdownButton from "./buttons/dropdown_button.svelte";
   import MenuList from "./popup_menu/menu_list.svelte";
@@ -35,12 +35,12 @@
   <span class="tokens">
     {#if dropdownRequired}
       <DropdownButton bind:open={dropdownVisible}>
-        <img slot="start-icon" src={`${baseurl}/${icon}`} alt={name} />
+        <img slot="start-icon" src={`${pluginUrl}/${icon}`} alt={name} />
         <span class="token_symbol">{symbol}</span>
       </DropdownButton>
     {:else}
       <IconButton class="pwspfwc_nopointer">
-        <img slot="start-icon" src={`${baseurl}/${icon}`} alt={name} />
+        <img slot="start-icon" src={`${pluginUrl}/${icon}`} alt={name} />
         <span class="token_symbol">{symbol}</span>
       </IconButton>
     {/if}
@@ -48,7 +48,7 @@
       {#each Object.entries(tokens) as [key, token]}
         <MenuItem class={key === $order.activeToken ? "selected" : ""}>
           <IconButton on:click={() => setActiveToken(key)}>
-            <img slot="start-icon" src={`${baseurl}/${token.icon}`} alt={token.name} />
+            <img slot="start-icon" src={`${pluginUrl}/${token.icon}`} alt={token.name} />
             <span class="token_symbol">{token.symbol}</span>
           </IconButton>
         </MenuItem>

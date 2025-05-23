@@ -251,11 +251,12 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		$payload = array(
-			'id'       => PLUGIN_ID,
-			'baseurl'  => PLUGIN_URL,
-			'apiurl'   => esc_url( get_rest_url() ),
-			'pay_page' => $pay_page,
-			'order_id' => $order_id,
+			'id'        => PLUGIN_ID,
+			'pluginUrl' => PLUGIN_URL,
+			'apiUrl'    => $this->get_api_url(),
+			'baseUrl'   => esc_url( get_rest_url() ),
+			'payPage'   => $pay_page,
+			'orderId'   => $order_id,
 		);
 
 		$script = 'var WC_SOLANA_PAY = ' . wp_json_encode( $payload );
@@ -462,6 +463,16 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function get_accepted_solana_tokens_payment_options( $amount ) {
 		return $this->hSolanapay->get_available_payment_options( $amount );
+	}
+
+
+	/**
+	 * Get API endpoint URL
+	 *
+	 * @return string
+	 */
+	public function get_api_url() {
+		return esc_url( get_rest_url( null, PLUGIN_ID . '/v1/api' ) );
 	}
 
 

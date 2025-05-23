@@ -7,7 +7,9 @@
   let SolanaPayModal = null;
 
   onMount(async () => {
-    window.Buffer = Buffer;
+    if (typeof window !== "undefined" && window.Buffer === undefined) {
+      window.Buffer = Buffer;
+    }
     SolanaPayModal = (await import("./lib/components/modal.svelte")).default;
   });
 </script>

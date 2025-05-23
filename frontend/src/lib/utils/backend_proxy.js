@@ -6,10 +6,10 @@ import { decodeEntities } from "./helpers";
 const $$ = jQuery;
 
 // localized JS objects from PHP
-export const { id, baseurl, apiurl, pay_page, order_id } = WC_SOLANA_PAY;
+export const { id, pluginUrl, apiUrl, baseUrl, payPage, orderId } = WC_SOLANA_PAY;
 
 function getCheckoutForm() {
-  return $$(pay_page ? "form#order_review" : "form.checkout");
+  return $$(payPage ? "form#order_review" : "form.checkout");
 }
 
 /**
@@ -37,10 +37,10 @@ export function submitCheckoutForm() {
 
 // Check if the checkout cart handling in the backend has errors or not
 export async function isCheckoutCartValid() {
-  if (!pay_page) {
+  if (!payPage) {
     // checkout page
-    let apiUrl = new URL(apiurl);
-    const url = `${apiUrl.href}wc/store/v1/cart/`;
+    const baseurl = new URL(baseUrl);
+    const url = `${baseurl.href}wc/store/v1/cart/`;
     const cart = await fetch(url).then(r => r.json());
 
     if (cart && cart.errors?.length) throw new Error(decodeEntities(cart.errors[0].message));
