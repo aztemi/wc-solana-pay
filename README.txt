@@ -3,8 +3,8 @@ Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay/donate/
 Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, pyusd, eurc, euroe, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
-Tested up to: 6.6.2
-Stable tag: 2.9.0
+Tested up to: 6.8.1
+Stable tag: 2.10.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -94,6 +94,9 @@ We currently support payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. Support
 
 == Changelog ==
 
+= 2.10.0 :: 2025-04-30 =
+* Removed unstable dependency on PHP sessions, fixed theme incompatibility issues, and various bug fixes.
+
 = 2.9.0 :: 2024-09-14 =
 * Support for PayPal USD (PYUSD) for payments.
 
@@ -132,5 +135,5 @@ We currently support payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. Support
 
 == Upgrade Notice ==
 
-= 2.9.0 =
-Upgrade to enable PayPal USD (PYUSD) support for payments.
+= 2.10.0 =
+Dependency on PHP sessions removed. Upgrade for bug fixes and improved stability.
