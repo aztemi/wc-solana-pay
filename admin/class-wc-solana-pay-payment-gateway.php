@@ -69,14 +69,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Handle instance of the Session class for managing user data stored in WC session.
-	 *
-	 * @var Session
-	 */
-	protected $hSession;
-
-
-	/**
 	 * Handle instance of the Solana_Pay class for Solana payment verification.
 	 *
 	 * @var Solana_Pay
@@ -103,17 +95,13 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Load required dependencies for this class.
 	 */
 	private function load_dependencies() {
-		// Load session class and initialize session
-		require_once PLUGIN_DIR . '/admin/class-session.php';
-		$this->hSession = new Session();
-
 		// load Solana Pay class
 		require_once PLUGIN_DIR . '/admin/class-solana-pay.php';
-		$this->hSolanapay = new Solana_Pay( $this, $this->hSession );
+		$this->hSolanapay = new Solana_Pay( $this );
 
 		// load webhook class for handling incoming GET request
 		require_once PLUGIN_DIR . '/admin/class-webhook.php';
-		new Webhook( $this, $this->hSession );
+		new Webhook( $this );
 
 		// load public class
 		require_once PLUGIN_DIR . '/public/class-wc-solana-pay-public.php';

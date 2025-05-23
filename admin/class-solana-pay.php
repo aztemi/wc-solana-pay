@@ -63,17 +63,8 @@ class Solana_Pay {
 	protected $hGateway;
 
 
-	/**
-	 * Handle instance of a class wrapping user session plugin data.
-	 *
-	 * @var Session
-	 */
-	protected $hSession;
-
-
-	public function __construct( $gateway, $session ) {
+	public function __construct( $gateway ) {
 		$this->hGateway = $gateway;
-		$this->hSession = $session;
 	}
 
 
