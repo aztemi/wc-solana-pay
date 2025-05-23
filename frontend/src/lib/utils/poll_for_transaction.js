@@ -12,8 +12,8 @@ let pollingInterval = null;
 export function startPolling() {
   if (pollingInterval || isLocalhost()) return;
 
-  const { reference, poll } = get(order);
-  endpoint = `${poll}&ref=${reference.toBase58()}`;
+  const { poll } = get(order);
+  endpoint = poll;
   pollingInterval = setInterval(confirmPaymentTxn, POLLING_DELAY);
 }
 
@@ -26,7 +26,7 @@ export function stopPolling() {
 async function confirmPaymentTxn() {
   try {
     const json = await fetch(endpoint).then(r => r.json());
-    if (json?.signature) order.confirmPayment(json.signature);
+    if (json?.signature) order.setPaymentSignature(json.signature);
   } catch (error) {
     console.error(error.toString());
   }

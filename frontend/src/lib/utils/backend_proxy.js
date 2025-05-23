@@ -29,12 +29,6 @@ export function addTokenToCheckoutForm(key) {
   }
 }
 
-// submit checkout form
-export function submitCheckoutForm() {
-  const form = getCheckoutForm();
-  form?.trigger("submit");
-}
-
 // Check if the checkout cart handling in the backend has errors or not
 export async function isCheckoutCartValid() {
   if (!payPage) {
@@ -52,28 +46,20 @@ export async function isCheckoutCartValid() {
 /**
  * Get order details from backend
  *
- * @param {string} ref
+ * @param {string} orderId
  */
-export async function getCheckoutOrderDetails(ref) {
-  let url = `?wc-api=${id}&ref=${ref}&`;
+export async function getCheckoutOrderDetails(orderId) {
+  return await apiRequest({ action: "detail", queryParams: { orderId } });
+}
 
-  if (pay_page) {
-    // pay order page
-    url += `order_id=${order_id}`;
-  } else {
-    // checkout page
-    const cartCreated = sessionStorage.getItem("wc_cart_created");
-    url += `cart_created=${cartCreated}`;
-  }
-
-  const jsonOrder = await fetch(url).then(async res => {
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.data || json.error || "Unknown error");
-
-    return json;
-  });
-
-  return jsonOrder;
+/**
+ * Validate payment confirmation onchain via the backend
+ *
+ * @param {string} paymentId
+ * @param {string} orderId
+ */
+export async function confirmPayment(paymentId, orderId) {
+  return await apiRequest({ action: "confirm", queryParams: { id: paymentId, orderId } });
 }
 
 /**
@@ -103,4 +89,30 @@ export function blockElement(el, bgColor) {
   }
 
   return unblock;
+}
+
+/**
+ * Send API request to backend webhooks
+ */
+export async function apiRequest({ action, queryParams = {}, postData = null }) {
+  const url = new URL(apiUrl);
+  url.searchParams.set("action", action);
+
+  for (const [param, value] of Object.entries(queryParams)) {
+    url.searchParams.set(param, value);
+  }
+
+  return await fetch(url.toString(), {
+    method: postData ? "POST" : "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: postData ? JSON.stringify(postData) : undefined
+  }).then(async res => {
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.data || json.error || "Unknown error");
+
+    return json;
+  });
 }

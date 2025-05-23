@@ -344,6 +344,107 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$order = wc_get_order( $order_id );
 		$amount = $order->get_total();
 
+		if ( $amount > 0 ) {
+			// register order details
+			$status = $this->register_order_details( $order );
+
+			if ( 421 === $status ) {
+				// order already paid, confirm payment
+				return $this->confirm_payment( $order_id );
+			}
+
+			// Append redirect hash to trigger payment dialog
+			return array(
+				'result'   => 'success',
+				'redirect' => sprintf( '#%s-%s@%s', $this->id, $order_id, time() ),
+			);
+		} else {
+			// Remove cart
+			if ( isset( WC()->cart ) ) {
+				WC()->cart->empty_cart();
+			}
+
+			// Redirect to thank you page
+			return array(
+				'result'   => 'success',
+				'redirect' => $this->get_return_url( $order ),
+			);
+		}
+	}
+
+
+	/**
+	 * Register order details and update its metadata.
+	 *
+	 * @param  \WC_Order $order Order object.
+	 * @return int Status code
+	 */
+	private function register_order_details( $order ) {
+		$order_id = $order->get_id();
+		$amount   = (float) $order->get_total();
+		$currency = $order->get_currency();
+		$testmode = $this->get_testmode();
+
+		$order_details = array(
+			'local_id'  => $order_id,
+			'amount'    => $amount,
+			'currency'  => $currency,
+			'symbol'    => get_woocommerce_currency_symbol( $currency ),
+			'testmode'  => $testmode,
+			'recipient' => $this->get_merchant_wallet_address(),
+			'suffix'    => Solana_Tokens::get_store_currency_key_suffix(),
+			'label'     => esc_html( $this->get_brand_name() ),
+			'message'   => esc_html__( 'Thank you for your order', 'wc-solana-pay' ),
+			'home'      => $this->get_api_url(),
+			'poll'      => 'stat',
+			'link'      => 'txn',
+			'rpc'       => 'rpc',
+		);
+
+		// Add acceptable Solana tokens options for payment and their rates
+		$options = $this->get_accepted_solana_tokens_payment_options( $amount );
+		$order_details = array_merge( $order_details, $options );
+
+		// if order was previously registered, merge & update in remote otherwise register
+		$prev_details = $this->get_order_payment_meta( $order );
+		$res = array();
+
+		if ( isset( $prev_details['id'] ) ) {
+			// update order details in remote backend
+			$order_details = array_merge( $prev_details, $order_details );
+			$res = Solana_Pay::update_order_details( $order_details['id'], $order_details, $testmode );
+		} else {
+			// register order details with the remote backend
+			$res = Solana_Pay::register_order_details( $order_details, $testmode );
+		}
+
+		if ( isset( $res['id'] ) ) {
+			// store the details in order metadata for later use during payment processing
+			$order_details['id'] = $res['id'];
+			if ( count( $res['tokens'] ) ) {
+				$order_details['tokens'] = $res['tokens'];
+			}
+			$this->set_order_payment_meta( $order, $order_details );
+		} elseif ( 421 !== $res['status'] ) {
+			/* translators: %s: WordPress error message, e.g. 'Timeout error' */
+			throw new \Exception( sprintf( esc_html__( 'Checkout order registration failed: %s', 'wc-solana-pay' ), esc_attr( $res['error'] ) ) );
+		}
+
+		return $res['status'];
+	}
+
+
+	/**
+	 * Validate payment confirmation for an order and return the result.
+	 *
+	 * @param int $order_id Order ID.
+	 * @return array
+	 */
+	public function confirm_payment( $order_id ) {
+		// get order info and pending amount
+		$order = wc_get_order( $order_id );
+		$amount = $order->get_total();
+
 		// Confirm payment transaction on Solana chain, return if not found or if balance is less.
 		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount ) ) {
 			return array(
@@ -351,14 +452,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 				'redirect'     => wc_get_checkout_url(),
 				'errorMessage' => __( 'Payment failed. Please try again.', 'wc-solana-pay' ),
 			);
-		}
-
-		// Clear session
-		$this->hSession->clear();
-
-		// Remove cart
-		if ( isset( WC()->cart ) ) {
-			WC()->cart->empty_cart();
 		}
 
 		// Redirect to thank you page

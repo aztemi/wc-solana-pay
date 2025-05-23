@@ -1,8 +1,7 @@
 <script>
-  import { Keypair } from "@solana/web3.js";
   import { order } from "../store/order.js";
   import { Notification, notification, showSubmitOrderStatus, EXIT, STATE } from "./notification";
-  import { submitCheckoutForm, getCheckoutOrderDetails, isCheckoutCartValid } from "../utils/backend_proxy.js";
+  import { getCheckoutOrderDetails, isCheckoutCartValid, confirmPayment } from "../utils/backend_proxy.js";
   import { isLocalhost } from "../utils/helpers.js";
   import Header from "./header.svelte";
   import Loading from "./loading.svelte";
@@ -10,26 +9,31 @@
 
   const WAIT_DURATION = 2000;
   let showModal = false;
-  let eventResponse = {};
 
   // close modal when order times out
   $: if ($order.timedOut) closeModal();
 
-  // If payment transaction received, show notice for few seconds, submit form and close modal
+  // If successful payment transaction received, show notice for few seconds, close modal and redirect to 'Order Received' page
   $: {
     if ($order.paymentSignature) {
-      showSubmitOrderStatus();
-      setTimeout(() => {
-        submitCheckoutForm();
-        closeModal();
-      }, WAIT_DURATION);
+      confirmPayment($order.paymentId, $order.orderId)
+        .then(({ result, redirect }) => {
+          if (result === "success") {
+            showSubmitOrderStatus();
+
+            setTimeout(() => {
+              closeModal();
+              window.location.assign(redirect);
+            }, WAIT_DURATION);
+          }
+        })
+        .catch(e => console.error(e.toString()));
     }
   }
 
-  async function openModal(/** @type {{ detail: any; }} */ e) {
+  async function openModal() {
     if (showModal) return;
 
-    eventResponse = e?.detail || {};
     notification.reset();
     order.reset();
     showModal = true;
@@ -44,10 +48,13 @@
   }
 
   function closeModal() {
-    const { success, error } = eventResponse;
-    if (success && error) {
-      $order.paymentSignature ? success($order.activeToken) : error();
+    if (!$order.paymentSignature) {
+      // remove hash from the checkout page URL
+      const url = new URL(window.location.href);
+      url.hash = "";
+      window.location.replace(url);
     }
+
     showModal = false;
   }
 
@@ -57,8 +64,8 @@
     try {
       msgId = notification.addNotice("Getting order details", STATE.LOADING);
 
-      const ref = new Keypair().publicKey;
-      const [jsonOrder] = await Promise.all([getCheckoutOrderDetails(ref.toBase58()), isCheckoutCartValid()]);
+      const orderId = window.location.hash.split("@")[0].split("-").pop();
+      const [jsonOrder] = await Promise.all([getCheckoutOrderDetails(orderId), isCheckoutCartValid()]);
       order.setOrder(jsonOrder);
 
       notification.updateNotice(msgId, { status: STATE.OK, exit: EXIT.TIMEOUT });
