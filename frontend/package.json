@@ -9,7 +9,6 @@
     "dev": "vite",
     "build:block": "wp-scripts build --config block.webpack.config.cjs",
     "build:modal": "PACKAGE_NAME=modal vite build",
-    "build:button": "PACKAGE_NAME=button vite build",
     "build:table": "PACKAGE_NAME=table vite build",
     "build": "npm-run-all clean build:*"
   },
