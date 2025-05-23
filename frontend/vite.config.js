@@ -6,9 +6,6 @@ switch (process.env.PACKAGE_NAME) {
   case "modal":
     input = ["src/wc_solana_pay.js"];
     break;
-  case "button":
-    input = ["src/public_place_order_button.js"];
-    break;
   case "table":
     input = ["src/admin_tokens_table.js"];
     break;

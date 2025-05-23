@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { baseurl } from "../utils/backend_proxy";
+  import { pluginUrl } from "../utils/backend_proxy";
   import Icon from "./icons/icon.svelte";
   import CountdownTimer from "./countdown_timer.svelte";
 
@@ -8,7 +8,7 @@
 </script>
 
 <div>
-  <img src={`${baseurl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
+  <img src={`${pluginUrl}/assets/img/solana_pay_black.svg`} alt="Solana Pay" />
   <span>
     <CountdownTimer />
     <button class="pwspfwc_icon_button" on:click={() => dispatch("close")}>

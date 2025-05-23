@@ -2,7 +2,6 @@
  * Client side support for Gutenberg Blocks integration
  */
 
-import { useEffect } from "@wordpress/element";
 import { decodeEntities } from "@wordpress/html-entities";
 import { getSetting } from "@woocommerce/settings";
 import { registerPaymentMethod } from "@woocommerce/blocks-registry";
@@ -13,36 +12,7 @@ const label = decodeEntities(settings.title) || "";
 const description = decodeEntities(settings.description) || "";
 
 /** Content  component */
-function Content({ activePaymentMethod, eventRegistration, emitResponse }) {
-  const { onPaymentSetup } = eventRegistration;
-  const { responseTypes } = emitResponse;
-
-  useEffect(() => {
-    if (activePaymentMethod !== id) return;
-
-    const unsubscribe = onPaymentSetup(() => {
-      return new Promise(async resolve => {
-        const error = () => resolve({ type: responseTypes.ERROR });
-
-        const success = (key = "") =>
-          resolve({
-            type: responseTypes.SUCCESS,
-            meta: {
-              paymentMethodData: {
-                pwspfwc_payment_token: key
-              }
-            }
-          });
-
-        // show Solana payment modal
-        const event = new CustomEvent("openmodal", { detail: { success, error } });
-        dispatchEvent(event);
-      });
-    });
-
-    return unsubscribe;
-  }, [onPaymentSetup, activePaymentMethod, responseTypes]);
-
+function Content() {
   return <div>{description}</div>;
 }
 

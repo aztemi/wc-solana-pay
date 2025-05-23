@@ -7,7 +7,8 @@ import supportedTokens from "../../../../assets/json/supported_solana_tokens.jso
 const emptyOrder = {
   updated: false,
   timedOut: false,
-  reference: null,
+  paymentId: "",
+  orderId: "",
   amount: new BigNumber(0),
   currency: "",
   symbol: "",
@@ -33,18 +34,18 @@ function createOrderStore() {
 
     timeout: () => update(old => Object.assign({}, old, { timedOut: true })),
 
-    confirmPayment: paymentSignature => update(old => Object.assign({}, old, { paymentSignature })),
+    setPaymentSignature: paymentSignature => update(old => Object.assign({}, old, { paymentSignature })),
 
     setActiveToken: key => update(old => Object.assign({}, old, { activeToken: key })),
 
     setOrder: order =>
       update(old => {
-        let { id, reference, amount, tokens, suffix, rpc, home, link, poll, testmode } = order;
+        let { id, local_id, amount, tokens, suffix, rpc, home, link, poll, testmode } = order;
 
         let homeUrl = new URL(home);
         homeUrl.searchParams.set("id", id);
+        if (local_id) homeUrl.searchParams.set("orderId", local_id);
 
-        reference = new PublicKey(reference);
         amount = new BigNumber(amount);
 
         // Append 'devnet' to RPC endpoint in testmode.
@@ -67,7 +68,8 @@ function createOrderStore() {
 
         return Object.assign({}, old, order, {
           updated: true,
-          reference,
+          paymentId: id,
+          orderId: local_id,
           amount,
           activeToken,
           rpc: `${homeUrl.toString()}&action=${rpc}${devnetLink}`,

@@ -41,10 +41,6 @@ class WC_Solana_Pay_Public {
 
 		// add placeholder for the payment popup modal
 		add_action( 'wp_footer', array( $this, 'add_modal_placeholder' ), -10 );
-
-		// add custom 'Solana Pay' express checkout button in the place of 'Place Order' button
-		add_filter( 'woocommerce_order_button_html', array( $this, 'add_custom_place_order_button' ) );
-		add_filter( 'woocommerce_pay_order_button_html', array( $this, 'add_custom_place_order_button' ) );
 	}
 
 
@@ -88,27 +84,5 @@ class WC_Solana_Pay_Public {
 	 */
 	public function add_modal_placeholder() {
 		echo wp_kses_post( '<div id="wc_solana_pay_svelte_target"></div>' );
-	}
-
-
-	/**
-	 * Replace WC 'Place order' button with custom 'Solana Pay' button for express checkout
-	 */
-	public function add_custom_place_order_button( $button ) {
-		$buttonjs = get_script_path('/assets/script/public_place_order_button*.js');
-
-		if ( $buttonjs ) {
-			$script = get_partial_file_html( $buttonjs );
-			$button = get_partial_file_html(
-				'/public/partials/public-place-order-button.php',
-				array(
-					'id'     => PLUGIN_ID,
-					'button' => $button,
-					'script' => $script,
-				)
-			);
-		}
-
-		return $button;
 	}
 }

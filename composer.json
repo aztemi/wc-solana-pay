@@ -13,7 +13,7 @@
             "phpcs --standard=pbs-rules-set.xml --warning-severity=0 --report-source --report-full=phpcs-report.txt --extensions=php,html ."
         ],
         "makepot": [
-            "WP_CLI_PHP_ARGS=\"-d memory_limit=1G\" wp i18n make-pot . ./languages/wc-solana-pay.pot --domain=wc-solana-pay"
+            "WP_CLI_PHP_ARGS=\"-d memory_limit=2G\" wp i18n make-pot . ./languages/wc-solana-pay.pot --domain=wc-solana-pay"
         ]
     },
     "require-dev": {

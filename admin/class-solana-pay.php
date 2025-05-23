@@ -63,17 +63,8 @@ class Solana_Pay {
 	protected $hGateway;
 
 
-	/**
-	 * Handle instance of a class wrapping user session plugin data.
-	 *
-	 * @var Session
-	 */
-	protected $hSession;
-
-
-	public function __construct( $gateway, $session ) {
+	public function __construct( $gateway ) {
 		$this->hGateway = $gateway;
-		$this->hSession = $session;
 	}
 
 
@@ -101,12 +92,12 @@ class Solana_Pay {
 	public function confirm_payment_onchain( $order, $amount ) {
 		$order_id = $order->get_id();
 
-		// get checkout order details from current session
-		$data = $this->hSession->get_data();
-		$id = $data['id'];
+		// get checkout order details
+		$order_details = $this->hGateway->get_order_payment_meta( $order );
+		$id = $order_details['id'];
 
 		// fetch payment status details for the order from remote
-		$res = self::get_payment_details( $id, $this->hGateway->get_testmode() );
+		$res = self::get_payment_details( $id, $order_details['testmode'] );
 
 		// return false if checkout reference id does not match
 		$received_id = $res['body']['id'];
@@ -131,7 +122,7 @@ class Solana_Pay {
 
 		// validate recipient. Return false if recipient does not match
 		$receiver = $res['body']['receiver'];
-		$expected_receiver = $data['recipient'];
+		$expected_receiver = $order_details['recipient'];
 		if ( $receiver !== $expected_receiver ) {
 			logger( "Process payment failed. Order: $order_id, checkout id: $id. Recipient wallet mismatch - expected: $expected_receiver, receiver: $receiver." );
 			return false;
@@ -142,16 +133,16 @@ class Solana_Pay {
 		$tokens = $this->hGateway->get_accepted_solana_tokens();
 		$symbol = $tokens[ $token_id ]['symbol'];
 		$meta = array(
-			'id'          => $id,
+			'confirmed'   => true,  // ToDo: is it needed?
 			'transaction' => $txn_id,
-			'reference'   => $data['reference'],
 			'receiver'    => $receiver,
 			'payer'       => $res['body']['payer'],
 			'received'    => rtrim( $res['body']['received'], '0' ) . ' ' . $symbol,
 			'paid'        => rtrim( $res['body']['paid'], '0' ) . ' ' . $symbol,
 			'url'         => $this->get_explorer_url( $txn_id ),
 		);
-		$this->hGateway->set_order_payment_meta( $order, $meta );
+		$order_details = array_merge( $order_details, $meta );
+		$this->hGateway->set_order_payment_meta( $order, $order_details );
 
 		// Complete payment and return true
 		$order->add_order_note( __( 'Solana Pay payment completed', 'wc-solana-pay' ) );
@@ -239,7 +230,29 @@ class Solana_Pay {
 	 * @return array  Remote server response, containing the reference ID of the order.
 	 */
 	public static function register_order_details( $data, $testmode ) {
-		$url = self::endpoint_url( '', 'order', $testmode );
+		$url = self::endpoint_url( '', 'checkout', $testmode );
+		$response = remote_request( $url, 'POST', wp_json_encode( $data ) );
+		if ( 200 === $response['status'] ) {
+			$body = $response['body'];
+			$response['id'] = array_key_exists( 'id', $body ) ? $body['id'] : '';
+			$response['tokens'] = array_key_exists( 'tokens', $body ) ? $body['tokens'] : array();
+		}
+
+		return $response;
+	}
+
+
+	/**
+	 * Update checkout order details in remote server.
+	 *
+	 * @param  string $ref_id   Unique payment session ID.
+	 * @param  string $data     Payment order details.
+	 * @param  bool   $testmode Testmode status flag; true if in Testmode, false otherwise.
+	 * @return array  Remote server response, containing the reference ID of the order.
+	 */
+	public static function update_order_details( $ref_id, $data, $testmode ) {
+		// ToDo: Implement me
+		$url = self::endpoint_url( $ref_id, 'checkout', $testmode );
 		$response = remote_request( $url, 'POST', wp_json_encode( $data ) );
 		if ( 200 === $response['status'] ) {
 			$body = $response['body'];

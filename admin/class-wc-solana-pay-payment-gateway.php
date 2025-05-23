@@ -69,14 +69,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Handle instance of the Session class for managing user data stored in WC session.
-	 *
-	 * @var Session
-	 */
-	protected $hSession;
-
-
-	/**
 	 * Handle instance of the Solana_Pay class for Solana payment verification.
 	 *
 	 * @var Solana_Pay
@@ -103,17 +95,13 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * Load required dependencies for this class.
 	 */
 	private function load_dependencies() {
-		// Load session class and initialize session
-		require_once PLUGIN_DIR . '/admin/class-session.php';
-		$this->hSession = new Session();
-
 		// load Solana Pay class
 		require_once PLUGIN_DIR . '/admin/class-solana-pay.php';
-		$this->hSolanapay = new Solana_Pay( $this, $this->hSession );
+		$this->hSolanapay = new Solana_Pay( $this );
 
 		// load webhook class for handling incoming GET request
 		require_once PLUGIN_DIR . '/admin/class-webhook.php';
-		new Webhook( $this, $this->hSession );
+		new Webhook( $this );
 
 		// load public class
 		require_once PLUGIN_DIR . '/public/class-wc-solana-pay-public.php';
@@ -251,11 +239,12 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		$payload = array(
-			'id'       => PLUGIN_ID,
-			'baseurl'  => PLUGIN_URL,
-			'apiurl'   => esc_url( get_rest_url() ),
-			'pay_page' => $pay_page,
-			'order_id' => $order_id,
+			'id'        => PLUGIN_ID,
+			'pluginUrl' => PLUGIN_URL,
+			'apiUrl'    => $this->get_api_url(),
+			'baseUrl'   => esc_url( get_rest_url() ),
+			'payPage'   => $pay_page,
+			'orderId'   => $order_id,
 		);
 
 		$script = 'var WC_SOLANA_PAY = ' . wp_json_encode( $payload );
@@ -343,6 +332,107 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		$order = wc_get_order( $order_id );
 		$amount = $order->get_total();
 
+		if ( $amount > 0 ) {
+			// register order details
+			$status = $this->register_order_details( $order );
+
+			if ( 421 === $status ) {
+				// order already paid, confirm payment
+				return $this->confirm_payment( $order_id );
+			}
+
+			// Append redirect hash to trigger payment dialog
+			return array(
+				'result'   => 'success',
+				'redirect' => sprintf( '#%s-%s@%s', $this->id, $order_id, time() ),
+			);
+		} else {
+			// Remove cart
+			if ( isset( WC()->cart ) ) {
+				WC()->cart->empty_cart();
+			}
+
+			// Redirect to thank you page
+			return array(
+				'result'   => 'success',
+				'redirect' => $this->get_return_url( $order ),
+			);
+		}
+	}
+
+
+	/**
+	 * Register order details and update its metadata.
+	 *
+	 * @param  \WC_Order $order Order object.
+	 * @return int Status code
+	 */
+	private function register_order_details( $order ) {
+		$order_id = $order->get_id();
+		$amount   = (float) $order->get_total();
+		$currency = $order->get_currency();
+		$testmode = $this->get_testmode();
+
+		$order_details = array(
+			'local_id'  => $order_id,
+			'amount'    => $amount,
+			'currency'  => $currency,
+			'symbol'    => get_woocommerce_currency_symbol( $currency ),
+			'testmode'  => $testmode,
+			'recipient' => $this->get_merchant_wallet_address(),
+			'suffix'    => Solana_Tokens::get_store_currency_key_suffix(),
+			'label'     => esc_html( $this->get_brand_name() ),
+			'message'   => esc_html__( 'Thank you for your order', 'wc-solana-pay' ),
+			'home'      => $this->get_api_url(),
+			'poll'      => 'stat',
+			'link'      => 'txn',
+			'rpc'       => 'rpc',
+		);
+
+		// Add acceptable Solana tokens options for payment and their rates
+		$options = $this->get_accepted_solana_tokens_payment_options( $amount );
+		$order_details = array_merge( $order_details, $options );
+
+		// if order was previously registered, merge & update in remote otherwise register
+		$prev_details = $this->get_order_payment_meta( $order );
+		$res = array();
+
+		if ( isset( $prev_details['id'] ) ) {
+			// update order details in remote backend
+			$order_details = array_merge( $prev_details, $order_details );
+			$res = Solana_Pay::update_order_details( $order_details['id'], $order_details, $testmode );
+		} else {
+			// register order details with the remote backend
+			$res = Solana_Pay::register_order_details( $order_details, $testmode );
+		}
+
+		if ( isset( $res['id'] ) ) {
+			// store the details in order metadata for later use during payment processing
+			$order_details['id'] = $res['id'];
+			if ( count( $res['tokens'] ) ) {
+				$order_details['tokens'] = $res['tokens'];
+			}
+			$this->set_order_payment_meta( $order, $order_details );
+		} elseif ( 421 !== $res['status'] ) {
+			/* translators: %s: WordPress error message, e.g. 'Timeout error' */
+			throw new \Exception( sprintf( esc_html__( 'Checkout order registration failed: %s', 'wc-solana-pay' ), esc_attr( $res['error'] ) ) );
+		}
+
+		return $res['status'];
+	}
+
+
+	/**
+	 * Validate payment confirmation for an order and return the result.
+	 *
+	 * @param int $order_id Order ID.
+	 * @return array
+	 */
+	public function confirm_payment( $order_id ) {
+		// get order info and pending amount
+		$order = wc_get_order( $order_id );
+		$amount = $order->get_total();
+
 		// Confirm payment transaction on Solana chain, return if not found or if balance is less.
 		if ( ( $amount > 0 ) && ! $this->hSolanapay->confirm_payment_onchain( $order, $amount ) ) {
 			return array(
@@ -350,14 +440,6 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 				'redirect'     => wc_get_checkout_url(),
 				'errorMessage' => __( 'Payment failed. Please try again.', 'wc-solana-pay' ),
 			);
-		}
-
-		// Clear session
-		$this->hSession->clear();
-
-		// Remove cart
-		if ( isset( WC()->cart ) ) {
-			WC()->cart->empty_cart();
 		}
 
 		// Redirect to thank you page
@@ -462,6 +544,16 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function get_accepted_solana_tokens_payment_options( $amount ) {
 		return $this->hSolanapay->get_available_payment_options( $amount );
+	}
+
+
+	/**
+	 * Get API endpoint URL
+	 *
+	 * @return string
+	 */
+	public function get_api_url() {
+		return esc_url( get_rest_url( null, PLUGIN_ID . '/v1/api' ) );
 	}
 
 

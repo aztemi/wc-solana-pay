@@ -23,17 +23,8 @@ class Webhook {
 	protected $hGateway;
 
 
-	/**
-	 * Handle instance of a class wrapping user session plugin data.
-	 *
-	 * @var Session
-	 */
-	protected $hSession;
-
-
-	public function __construct( $gateway, $session ) {
+	public function __construct( $gateway ) {
 		$this->hGateway = $gateway;
-		$this->hSession = $session;
 		$this->register_hooks();
 	}
 
@@ -43,7 +34,7 @@ class Webhook {
 	 */
 	private function register_hooks() {
 		// webhook GET endpoint for frontend to get order details
-		add_action( 'woocommerce_api_' . PLUGIN_ID, array( $this, 'handle_order_request' ) );
+		add_action( PLUGIN_ID . '_detail', array( $this, 'handle_get_order_details' ) );
 
 		// webhook GET & POST endpoints for receiving payment transactions according to Solana Pay Spec
 		add_action( PLUGIN_ID . '_txn', array( $this, 'handle_transaction_request' ) );
@@ -51,156 +42,38 @@ class Webhook {
 		// webhook GET & POST endpoints for checking and setting (by RPC backend) transaction confirmation status
 		add_action( PLUGIN_ID . '_stat', array( $this, 'handle_status_request' ) );
 
+		// webhook GET endpoint for frontend to validate payment confirmation
+		add_action( PLUGIN_ID . '_confirm', array( $this, 'handle_confirm_payment' ) );
+
 		// webhook POST endpoint for sending signed transactions to the remote RPC node
 		add_action( PLUGIN_ID . '_rpc', array( $this, 'send_rpc_request' ) );
 	}
 
 
 	/**
-	 * Validate customer email address before processing order.
-	 *
-	 * If user is not logged in and registration is required, WC will attempt to create an account for the user.
-	 * This makes sure the user email address is not already registered. Otherwise, account creation will fail.
-	 */
-	private function validate_customer_email() {
-		if ( ! is_user_logged_in() && ! is_null( WC()->customer ) && ! is_null( WC()->checkout() ) ) {
-			$email = WC()->customer->get_billing_email();
-			$is_registration_required = filter_var( wc()->checkout()->is_registration_required(), FILTER_VALIDATE_BOOLEAN );
-
-			if ( $is_registration_required && ! empty( $email ) ) {
-				if ( ! is_email( $email ) ) {
-					wp_send_json_error(
-						esc_html__( 'Bad Request - Email address not valid', 'wc-solana-pay' ),
-						400
-					);
-				}
-				if ( email_exists( $email ) ) {
-					wp_send_json_error(
-						esc_html__( 'An account is already registered with your email address. Please log in and try again.', 'wc-solana-pay' ),
-						406
-					);
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Get payment-related details of specified order
-	 */
-	private function get_order_details( $order_id, &$data ) {
-		$order = wc_get_order( $order_id );
-		if ( ! $order ) {
-			return;
-		}
-
-		$prev_data = $this->hSession->get_data();
-		if ( isset( $prev_data['order_id'] ) && ( $order_id === $prev_data['order_id'] ) ) {
-			$data['reference'] = $prev_data['reference'];
-		}
-
-		$data['memo'] = "Order#{$order_id}";
-		$data['amount'] = (float) $order->get_total();
-		$data['currency'] = $order->get_currency();
-		$data['symbol'] = get_woocommerce_currency_symbol( $data['currency'] );
-		$data['order_id'] = $order_id;
-	}
-
-
-	/**
-	 * Get payment-related details of checkout cart
-	 */
-	private function get_cart_details( $cart_created, &$data ) {
-		$cart_hash = WC()->cart->get_cart_hash();
-		if ( ! $cart_hash ) {
-			return;
-		}
-
-		$prev_data = $this->hSession->get_data();
-		if (
-			isset( $prev_data['cart_hash'] ) && ( $cart_hash === $prev_data['cart_hash'] ) &&
-			isset( $prev_data['cart_created'] ) && ( $cart_created === $prev_data['cart_created'] )
-			) {
-				$data['reference'] = $prev_data['reference'];
-		}
-
-		$data['memo'] = "Cart@{$cart_created}";
-		$data['amount'] = (float) WC()->cart->get_total('edit');
-		$data['currency'] = Solana_Tokens::get_store_currency('edit');
-		$data['symbol'] = get_woocommerce_currency_symbol( $data['currency'] );
-		$data['cart_hash'] = $cart_hash;
-		$data['cart_created'] = $cart_created;
-	}
-
-
-	/**
 	 * Handle incoming webhook GET order request.
 	 */
-	public function handle_order_request() {
+	public function handle_get_order_details() {
 		// validate incoming params
-		$ref = isset( $_GET['ref'] ) ? trim( wc_clean( wp_unslash( $_GET['ref'] ) ) ) : '';
-		$order_id = isset( $_GET['order_id'] ) ? absint( wp_unslash( $_GET['order_id'] ) ) : false;
-		$cart_created = isset( $_GET['cart_created'] ) ? trim( wc_clean( wp_unslash( $_GET['cart_created'] ) ) ) : '';
+		$order_id = isset( $_GET['orderId'] ) ? absint( wp_unslash( $_GET['orderId'] ) ) : false;
 
-		if ( empty( $ref ) ) {
+		if ( ! $order_id ) {
 			wp_send_json_error( 'Bad Request', 400 );
 		}
 
-		// default return data
-		$data = array(
-			'amount'    => 0,
-			'reference' => $ref,
-			'home'      => esc_url( get_rest_url( null, PLUGIN_ID . '/v1/api' ) ),
-			'link'      => 'txn',
-			'poll'      => 'stat',
-			'rpc'       => 'rpc',
-			'testmode'  => $this->hGateway->get_testmode(),
-			'recipient' => $this->hGateway->get_merchant_wallet_address(),
-			'suffix'    => Solana_Tokens::get_store_currency_key_suffix(),
-			'label'     => esc_html( $this->hGateway->get_brand_name() ),
-			'message'   => esc_html__( 'Thank you for your order', 'wc-solana-pay' ),
-		);
-
-		// Add order or checkout cart details that are useful for payment in the frontend
-		if ( $order_id ) {
-			$this->get_order_details( $order_id, $data );
-		} elseif ( WC() && WC()->cart && ! empty( $cart_created ) ) {
-			$this->get_cart_details( $cart_created, $data );
-			$this->validate_customer_email();
-		} else {
-			wp_send_json_error( 'Bad Request', 400 );
-		}
-
-		// validate amount
-		$amount = $data['amount'];
-		if ( $amount <= 0 ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
 			wp_send_json_error( 'Not Found', 404 );
 		}
 
-		// Add acceptable Solana tokens options for payment and their rates
-		$options = $this->hGateway->get_accepted_solana_tokens_payment_options( $amount );
-		$data = array_merge( $data, $options );
-
-		// register order details with the remote backend
-		$testmode = $this->hGateway->get_testmode();
-		$res = Solana_Pay::register_order_details( $data, $testmode );
-		if ( ! isset( $res['id'] ) ) {
-			wp_send_json_error( $res['error'], $res['status'] );
-		}
-
-		// store the data in user session for later use during payment processing
-		if ( count( $res['tokens'] ) ) {
-			$data['tokens'] = $res['tokens'];
-		}
-		$data['id'] = $res['id'];
-		$this->hSession->set_data( $data );
+		$details = $this->hGateway->get_order_payment_meta( $order );
 
 		// remove unused info; share only necessary data with the frontend
-		unset( $data['recipient'] );
-		unset( $data['callback_url'] );
+		unset( $details['recipient'] );
+		unset( $details['callback_url'] );
 
 		// send response
-		wp_send_json( $data, 200 );
+		wp_send_json( $details, 200 );
 	}
 
 
@@ -283,9 +156,8 @@ class Webhook {
 	public function handle_status_request( $request ) {
 		// validate incoming params
 		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
-		$ref = isset( $_GET['ref'] ) ? trim( wc_clean( wp_unslash( $_GET['ref'] ) ) ) : '';
 
-		if ( empty( $id ) || empty( $ref ) ) {
+		if ( empty( $id ) ) {
 			wp_send_json_error( 'Bad Request', 400 );
 		}
 
@@ -347,6 +219,28 @@ class Webhook {
 			wp_send_json_success();
 
 		}
+	}
+
+
+	/**
+	 * Handle payment confirmation request from the frontend.
+	 */
+	public function handle_confirm_payment( $request ) {
+		// validate incoming params
+		$id = isset( $_GET['id'] ) ? trim( wc_clean( wp_unslash( $_GET['id'] ) ) ) : '';
+		$order_id = isset( $_GET['orderId'] ) ? absint( wp_unslash( $_GET['orderId'] ) ) : false;
+
+		if ( empty( $id ) ) {
+			wp_send_json_error( 'Bad Request', 400 );
+		}
+
+		if ( ! $order_id ) {
+			wp_send_json_error( 'Bad Request', 400 );
+		}
+
+		// confirm payment
+		$res = $this->hGateway->confirm_payment( $order_id );
+		wp_send_json( $res, 200 );
 	}
 
 
