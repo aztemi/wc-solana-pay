@@ -180,9 +180,13 @@ class Solana_Pay {
 				$amount_in_token = rtrim( bcdiv( $rate, $power, $decimals ), '0' );
 
 				$options['tokens'][ $k ] = array(
+					'token'  => $k,
 					'amount' => $amount_in_token,
-					'mint' => $tokens[ $k ]['mint'],
-					'dp' => $tokens[ $k ]['decimals_view'],
+					'mint'   => $tokens[ $k ]['mint'],
+					'dp'     => $tokens[ $k ]['decimals_view'],
+					'name'   => $tokens[ $k ]['name'],
+					'symbol' => $tokens[ $k ]['symbol'],
+					'icon'   => PLUGIN_URL . '/' . $tokens[ $k ]['icon'],
 				);
 			}
 		}
