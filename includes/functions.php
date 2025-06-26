@@ -34,6 +34,15 @@ function is_bcmath_installed() {
 
 
 /**
+ * Detect if Checkout Block is used on the current page or not.
+ *
+ * @return bool true if page has checkout block, otherwise false.
+ */
+function is_checkout_block() {
+	return \Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils::is_checkout_block_default();
+}
+
+/**
  * Display an error notice message on the admin screen.
  *
  * @param string $notice Error message to display.

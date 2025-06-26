@@ -164,8 +164,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		add_filter( 'woocommerce_admin_order_data_after_order_details', array( $this, 'add_payment_details_to_admin_order_page' ) );
 		add_filter( 'woocommerce_order_details_after_order_table', array( $this, 'add_payment_details_to_public_order_page' ) );
 
-		// export global JS variables
-		add_action( 'wp_head', array( $this, 'export_global_js_variables' ) );
+		if ( is_checkout() || is_checkout_pay_page() || is_checkout_block() ) {
+			// export global JS variables
+			add_action( 'wp_head', array( $this, 'export_global_js_variables' ) );
+		}
 	}
 
 

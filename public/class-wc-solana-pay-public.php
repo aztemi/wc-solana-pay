@@ -24,7 +24,9 @@ class WC_Solana_Pay_Public {
 
 
 	public function __construct() {
-		$this->register_hooks();
+		if ( is_checkout() || is_checkout_pay_page() || is_checkout_block() ) {
+			$this->register_hooks();
+		}
 	}
 
 
