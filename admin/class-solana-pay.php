@@ -133,7 +133,7 @@ class Solana_Pay {
 		$tokens = $this->hGateway->get_accepted_solana_tokens();
 		$symbol = $tokens[ $token_id ]['symbol'];
 		$meta = array(
-			'confirmed'   => true,  // ToDo: is it needed?
+			'confirmed'   => true,
 			'transaction' => $txn_id,
 			'receiver'    => $receiver,
 			'payer'       => $res['body']['payer'],

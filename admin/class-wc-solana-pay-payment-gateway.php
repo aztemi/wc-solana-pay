@@ -447,8 +447,8 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		if ( $should_refresh ) {
 			try {
 				$this->register_order_details( $order );
-			} catch ( \Exception $e ) {
-				// Error in background refresh call, do nothing & return silently
+			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch -- This is a background refresh call & can be ignored.
+				// ignore & return silently
 			}
 		}
 	}
@@ -538,7 +538,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function add_payment_details_to_admin_order_page( $order ) {
 		$meta = $this->get_order_payment_meta( $order );
-		if ( count( $meta ) ) {
+		if ( is_array( $meta ) && ( true === $meta['confirmed'] ) ) {
 			echo wp_kses_post( get_partial_file_html( '/admin/partials/admin-payment-details.php', $meta ) );
 		}
 	}
@@ -552,7 +552,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function add_payment_details_to_public_order_page( $order ) {
 		$meta = $this->get_order_payment_meta( $order );
-		if ( count( $meta ) ) {
+		if ( is_array( $meta ) && ( true === $meta['confirmed'] ) ) {
 			echo wp_kses_post( get_partial_file_html( '/public/partials/public-payment-details.php', $meta ) );
 		}
 	}
