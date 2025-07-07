@@ -29,6 +29,14 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
+	 * Default price refresh interval in seconds.
+	 *
+	 * @var int
+	 */
+	private const PRICE_REFRESH_INTERVAL = 5 * MINUTE_IN_SECONDS;
+
+
+	/**
 	 * Testmode flag; true if Testmode is enabled, false otherwise.
 	 *
 	 * @var bool
@@ -247,6 +255,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 			'baseUrl'   => esc_url( get_rest_url() ),
 			'payPage'   => $pay_page,
 			'orderId'   => $order_id,
+			'priceUpdateFreq' => self::PRICE_REFRESH_INTERVAL,
 		);
 
 		$script = 'var WC_SOLANA_PAY = ' . wp_json_encode( $payload );
@@ -411,6 +420,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		if ( isset( $res['id'] ) ) {
 			// store the details in order metadata for later use during payment processing
 			$order_details['id'] = $res['id'];
+			$order_details['timestamp'] = time();
 			if ( count( $res['tokens'] ) ) {
 				$order_details['tokens'] = $res['tokens'];
 			}
@@ -421,6 +431,25 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		return $res['status'];
+	}
+
+
+	/**
+	 * Refresh order price details if price already outdated.
+	 *
+	 * @param  \WC_Order $order Order object.
+	 */
+	public function refresh_order_details( $order ) {
+		$order_details = $this->get_order_payment_meta( $order );
+		$should_refresh = ( time() - ( $order_details['timestamp'] ?? 0 ) ) >= self::PRICE_REFRESH_INTERVAL;
+
+		if ( $should_refresh ) {
+			try {
+				$this->register_order_details( $order );
+			} catch ( \Exception $e ) {
+				// Error in background refresh call, do nothing & return silently
+			}
+		}
 	}
 
 
