@@ -6,7 +6,7 @@ import { decodeEntities } from "./helpers";
 const $$ = jQuery;
 
 // localized JS objects from PHP
-export const { id, pluginUrl, apiUrl, baseUrl, payPage, orderId } = WC_SOLANA_PAY;
+export const { id, icon, pluginUrl, apiUrl, baseUrl, payPage, orderId } = WC_SOLANA_PAY;
 
 function getCheckoutForm() {
   return $$(payPage ? "form#order_review" : "form.checkout");

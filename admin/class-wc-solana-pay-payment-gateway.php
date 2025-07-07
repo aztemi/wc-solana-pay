@@ -122,7 +122,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	private function setup_properties() {
 		$this->id                 = PLUGIN_ID;
-		$this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black_gradient.svg';
+		$this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black.svg';
 		$this->has_fields         = false;
 		$this->supports           = array( 'products' );
 		$this->method_title       = __( 'WC Solana Pay', 'wc-solana-pay' );
@@ -250,6 +250,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		$payload = array(
 			'id'        => PLUGIN_ID,
+			'icon'      => $this->icon,
 			'pluginUrl' => PLUGIN_URL,
 			'apiUrl'    => $this->get_api_url(),
 			'baseUrl'   => esc_url( get_rest_url() ),
