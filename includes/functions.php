@@ -34,12 +34,12 @@ function is_bcmath_installed() {
 
 
 /**
- * Detect if Checkout Block is used on the current page or not.
+ * Detect if current page is the Checkout, Pay or Thanks page.
  *
- * @return bool true if page has checkout block, otherwise false.
+ * @return bool true if page is checkout page, otherwise false.
  */
-function is_checkout_block() {
-	return \Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils::is_checkout_block_default();
+function is_checkout_page() {
+	return is_page( wc_get_page_id( 'checkout' ) );
 }
 
 /**

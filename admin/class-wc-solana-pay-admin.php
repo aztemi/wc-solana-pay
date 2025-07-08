@@ -90,8 +90,7 @@ class WC_Solana_Pay_Admin {
 	 */
 	public function register_block_support_class() {
 		// check if block is in use for the Checkout page
-		$checkout_page_id = wc_get_page_id( 'checkout' );
-		$has_block_checkout = $checkout_page_id && has_block( 'woocommerce/checkout', $checkout_page_id );
+		$has_block_checkout = \Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils::is_checkout_block_default();
 
 		// load block if in Admin page or Checkout has block
 		$load_block = is_admin() || $has_block_checkout;

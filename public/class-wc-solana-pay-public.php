@@ -24,16 +24,25 @@ class WC_Solana_Pay_Public {
 
 
 	public function __construct() {
-		if ( is_checkout() || is_checkout_pay_page() || is_checkout_block() ) {
-			$this->register_hooks();
-		}
+		add_action( 'template_redirect', array( $this, 'register_hooks' ) );
+		$this->register_hooks();
 	}
 
 
 	/**
 	 * Register actions and filters for the payment gateway
 	 */
-	private function register_hooks() {
+	public function register_hooks() {
+		// return if not on a checkout page
+		if ( ! is_checkout_page() ) {
+			return;
+		}
+
+		// return if already enquequed
+		if ( $this->handle_js && wp_script_is( $this->handle_js, 'enqueued' ) ) {
+			return;
+		}
+
 		// enqueue css and js
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
