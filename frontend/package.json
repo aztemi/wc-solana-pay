@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "@types/big.js": "^6.2.2",
     "@types/jquery": "^3.5.30",
     "@woocommerce/dependency-extraction-webpack-plugin": "^3.0.1",
     "@wordpress/scripts": "^27.9.0",
@@ -30,7 +31,7 @@
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.91.8",
-    "bignumber.js": "^9.1.2",
+    "big.js": "^7.0.1",
     "buffer": "^6.0.3"
   },
   "overrides": {
