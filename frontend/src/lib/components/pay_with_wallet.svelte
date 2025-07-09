@@ -26,10 +26,7 @@
       SolflareWalletAdapter,
       CoinbaseWalletAdapter,
       LedgerWalletAdapter,
-      SafePalWalletAdapter,
-      TrustWalletAdapter,
-      MathWalletAdapter,
-      TorusWalletAdapter
+      TrustWalletAdapter
     } = await import("@solana/wallet-adapter-wallets");
 
     wallets = [
@@ -37,10 +34,7 @@
       new SolflareWalletAdapter({ network }),
       new CoinbaseWalletAdapter(),
       new LedgerWalletAdapter(),
-      new SafePalWalletAdapter(),
-      new TrustWalletAdapter(),
-      new MathWalletAdapter(),
-      new TorusWalletAdapter()
+      new TrustWalletAdapter()
     ];
   });
 

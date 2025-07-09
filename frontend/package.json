@@ -29,7 +29,7 @@
     "@aztemi/svelte-on-solana-wallet-adapter-ui": "^1.1.5",
     "@solana/pay": "^0.2.5",
     "@solana/wallet-adapter-base": "^0.9.23",
-    "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@solana/wallet-adapter-wallets": "^0.19.37",
     "@solana/web3.js": "^1.91.8",
     "big.js": "^7.0.1",
     "buffer": "^6.0.3"
