@@ -59,10 +59,8 @@ class WC_Solana_Pay_Public {
 	 * Register stylesheets for the public-facing frontend.
 	 */
 	public function enqueue_styles() {
-		$css = get_script_path( '/assets/script/pay_widget.css', PLUGIN_URL );
-		if ( $css ) {
-			wp_enqueue_style( PLUGIN_ID . '_css', $css );
-		}
+		// Enqueue DashIcons
+		wp_enqueue_style( 'dashicons' );
 	}
 
 
@@ -70,14 +68,6 @@ class WC_Solana_Pay_Public {
 	 * Register JavaScripts for the public-facing frontend.
 	 */
 	public function enqueue_scripts() {
-		// Enqueue payment modal script
-		$modaljs = get_script_path( '/assets/script/pay_widget.js', PLUGIN_URL );
-		$modalphp = get_script_path( '/assets/script/pay_widget*.php', PLUGIN_DIR );
-		if ( $modaljs && $modalphp ) {
-			$dependency = require $modalphp ;
-			wp_enqueue_script( PLUGIN_ID . '_paywidgetjs', $modaljs, $dependency['dependencies'], $dependency['version'], true );
-		}
-
 		// Enqueue Solana Pay overlay modal script
 		$modaljs = get_script_path( '/assets/script/wc_solana_pay*.js', PLUGIN_URL );
 		if ( $modaljs ) {
@@ -102,9 +92,9 @@ class WC_Solana_Pay_Public {
 
 	/**
 	 * Add a placeholder element where the payment popup modal will be mounted.
-	 * React will inject our custom payment modal in it.
+	 * Svelte will inject our custom payment modal in it.
 	 */
 	public function add_modal_placeholder() {
-		echo wp_kses_post( '<div id="azt_paywidget_target"></div>' );
+		echo wp_kses_post( '<div id="wc_solana_pay_svelte_target"></div>' );
 	}
 }
