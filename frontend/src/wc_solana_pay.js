@@ -1,8 +1,13 @@
 // @ts-nocheck
+import { Buffer } from "buffer";
 import { id } from "./lib/utils/backend_proxy.js";
 import WC_Solana_Pay from "./wc_solana_pay.svelte";
 
-if (typeof window !== "undefined" && window.process === undefined) {
+if (typeof window !== "undefined" && !window.Buffer) {
+  window.Buffer = Buffer;
+}
+
+if (typeof window !== "undefined" && !window.process) {
   window.process = { browser: true, env: { ENVIRONMENT: "BROWSER" } };
 }
 
