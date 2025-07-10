@@ -68,7 +68,7 @@
         class="paybtn wallet-adapter-button wallet-adapter-button-trigger {loading ? 'loading' : ''}"
         disabled={loading}
       >
-        <img slot="start-icon" src={wallet.icon} alt={`${wallet.name} icon`} />
+        <img slot="start-icon" src={wallet.adapter.icon} alt={`${wallet.adapter.name} icon`} />
         Pay Now
       </IconButton>
     {/if}
