@@ -33,11 +33,5 @@
     "@solana/web3.js": "^1.98.2",
     "big.js": "^7.0.1",
     "buffer": "^6.0.3"
-  },
-  "overrides": {
-    "@ledgerhq/devices": "6.27.1",
-    "@ledgerhq/errors": "6.16.3",
-    "@ledgerhq/hw-transport": "6.27.1",
-    "@ledgerhq/hw-transport-webhid": "6.27.1"
   }
 }
