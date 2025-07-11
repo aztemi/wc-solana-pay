@@ -96,6 +96,7 @@
         ul
           background-color var(--modal_back_color)
           transform translateX(-1rem) translateY(-0.2rem)
+          position fixed
 
         li
           &:hover, &.selected

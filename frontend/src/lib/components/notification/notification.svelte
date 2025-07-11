@@ -51,6 +51,7 @@
   p
     margin 0
     padding 0
+    font-size medium
     &.error
       font-size 0.8rem
       overflow-x hidden

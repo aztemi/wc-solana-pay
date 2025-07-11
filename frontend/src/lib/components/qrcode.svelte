@@ -5,7 +5,7 @@
   export let link;
   export let label;
   export let message;
-  export let size = 256;
+  export let size = 224;
 
   let canvas;
 

@@ -54,7 +54,7 @@
 
 {#if !wallet}
   <IconButton class="wallet-adapter-button wallet-adapter-button-trigger" on:click={openModal}>
-    Select Wallet
+    Connect Wallet
   </IconButton>
 {:else if connecting}
   <WalletConnectButton />
@@ -99,6 +99,9 @@
 {/if}
 
 <style lang="stylus">
+  span
+    font-size medium
+
   :global
     .wallet-adapter-split-dropdown
       position relative

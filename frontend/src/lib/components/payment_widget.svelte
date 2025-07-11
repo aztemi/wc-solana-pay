@@ -38,10 +38,12 @@
 
 <style lang="stylus">
   section
-    padding 0 2rem
+    padding 0 1rem
+    @media screen and (min-width: 640px)
+      padding 0 2rem
 
   .paywith
-    padding-top 1rem
+    padding-top 1.5rem
     display flex
     flex-direction column
     align-items center

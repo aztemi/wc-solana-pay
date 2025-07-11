@@ -63,7 +63,7 @@
 
         notification.updateNotice(msgId, { status: STATE.OK, exit: EXIT.TIMEOUT });
       } catch (error) {
-        notification.updateNotice(msgId, { status: STATE.ERROR, error: error.message, exit: EXIT.MANUAL });
+        notification.updateNotice(msgId, { status: STATE.ERROR, error: error.message, exit: EXIT.TIMEOUT });
         console.error(error.toString());
       } finally {
         loading = false;
@@ -75,7 +75,7 @@
 <ConnectionProvider endpoint={clusterApiUrl(network)} config="confirmed" />
 <WalletProvider {localStorageKey} {wallets} {autoConnect} />
 
-<span>Pay with Browser Wallet</span>
+<span>Pay with a browser wallet</span>
 <div>
   {#key link}
     <WalletSplitMultiButton {loading} on:payclick={payWithConnectedWallet} />
@@ -83,6 +83,10 @@
 </div>
 
 <style lang="stylus">
+  span
+    font-size medium
+    font-weight bold
+
   div
     padding-top 0.5rem
     text-align center
