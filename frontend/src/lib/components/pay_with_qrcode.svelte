@@ -1,7 +1,5 @@
 <script>
-  import { onMount } from "svelte";
   import { order } from "../store/order.js";
-  import { isMobile } from "../utils/helpers.js";
   import { startPolling } from "../utils/poll_for_transaction.js";
   import Icon from "./icons/icon.svelte";
   import QrCode from "./qrcode.svelte";
@@ -9,7 +7,7 @@
 
   export let link;
 
-  let qrCodeVisible = true;
+  let qrCodeVisible = false;
   const { label, message } = $order;
 
   /**
@@ -19,11 +17,6 @@
     qrCodeVisible = show;
     if (qrCodeVisible) startPolling();
   }
-
-  onMount(() => {
-    // first hide QR code on mobile
-    showQrCode(!isMobile());
-  });
 </script>
 
 {#if qrCodeVisible}
