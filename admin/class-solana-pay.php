@@ -133,7 +133,7 @@ class Solana_Pay {
 		$tokens = $this->hGateway->get_accepted_solana_tokens();
 		$symbol = $tokens[ $token_id ]['symbol'];
 		$meta = array(
-			'confirmed'   => true,  // ToDo: is it needed?
+			'confirmed'   => true,
 			'transaction' => $txn_id,
 			'receiver'    => $receiver,
 			'payer'       => $res['body']['payer'],
@@ -180,9 +180,13 @@ class Solana_Pay {
 				$amount_in_token = rtrim( bcdiv( $rate, $power, $decimals ), '0' );
 
 				$options['tokens'][ $k ] = array(
+					'token'  => $k,
 					'amount' => $amount_in_token,
-					'mint' => $tokens[ $k ]['mint'],
-					'dp' => $tokens[ $k ]['decimals_view'],
+					'mint'   => $tokens[ $k ]['mint'],
+					'dp'     => $tokens[ $k ]['decimals_view'],
+					'name'   => $tokens[ $k ]['name'],
+					'symbol' => $tokens[ $k ]['symbol'],
+					'icon'   => PLUGIN_URL . '/' . $tokens[ $k ]['icon'],
 				);
 			}
 		}

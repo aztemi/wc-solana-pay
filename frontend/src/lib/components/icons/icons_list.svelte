@@ -23,24 +23,6 @@
     />
   </symbol>
 
-  <symbol id="icon_loading" viewBox="0 0 24 24">
-    <style>
-      .spinner_aj0A {
-        transform-origin: center;
-        animation: spinner_KYSC 0.75s infinite linear;
-      }
-      @keyframes spinner_KYSC {
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-    <path
-      class="spinner_aj0A"
-      d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z"
-    />
-  </symbol>
-
   <symbol id="icon_warn" viewBox="0 -960 960 960">
     <path
       d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"

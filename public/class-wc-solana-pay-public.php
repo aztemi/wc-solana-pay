@@ -24,6 +24,7 @@ class WC_Solana_Pay_Public {
 
 
 	public function __construct() {
+		add_action( 'template_redirect', array( $this, 'register_hooks' ) );
 		$this->register_hooks();
 	}
 
@@ -31,7 +32,17 @@ class WC_Solana_Pay_Public {
 	/**
 	 * Register actions and filters for the payment gateway
 	 */
-	private function register_hooks() {
+	public function register_hooks() {
+		// return if not on a checkout page
+		if ( ! is_checkout_page() ) {
+			return;
+		}
+
+		// return if already enquequed
+		if ( $this->handle_js && wp_script_is( $this->handle_js, 'enqueued' ) ) {
+			return;
+		}
+
 		// enqueue css and js
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -77,6 +88,7 @@ class WC_Solana_Pay_Public {
 
 		return $tag;
 	}
+
 
 	/**
 	 * Add a placeholder element where the payment popup modal will be mounted.

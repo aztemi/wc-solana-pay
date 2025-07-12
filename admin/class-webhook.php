@@ -66,6 +66,7 @@ class Webhook {
 			wp_send_json_error( 'Not Found', 404 );
 		}
 
+		$this->hGateway->refresh_order_details( $order );
 		$details = $this->hGateway->get_order_payment_meta( $order );
 
 		// remove unused info; share only necessary data with the frontend

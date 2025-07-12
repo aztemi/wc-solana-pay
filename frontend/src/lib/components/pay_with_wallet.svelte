@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { Buffer } from "buffer";
-  import { Transaction } from "@solana/web3.js";
+  import { Transaction, clusterApiUrl } from "@solana/web3.js";
   import { WalletReadyState } from "@solana/wallet-adapter-base";
   import { walletStore } from "@aztemi/svelte-on-solana-wallet-adapter-core";
   import { ConnectionProvider, WalletProvider, workSpace } from "@aztemi/svelte-on-solana-wallet-adapter-ui";
@@ -12,7 +12,6 @@
   import WalletSplitMultiButton from "./buttons/wallet_split_multi_button.svelte";
 
   export let link;
-  export let endpoint;
   export let network;
 
   let wallets = [];
@@ -26,10 +25,7 @@
       SolflareWalletAdapter,
       CoinbaseWalletAdapter,
       LedgerWalletAdapter,
-      SafePalWalletAdapter,
-      TrustWalletAdapter,
-      MathWalletAdapter,
-      TorusWalletAdapter
+      TrustWalletAdapter
     } = await import("@solana/wallet-adapter-wallets");
 
     wallets = [
@@ -37,10 +33,7 @@
       new SolflareWalletAdapter({ network }),
       new CoinbaseWalletAdapter(),
       new LedgerWalletAdapter(),
-      new SafePalWalletAdapter(),
-      new TrustWalletAdapter(),
-      new MathWalletAdapter(),
-      new TorusWalletAdapter()
+      new TrustWalletAdapter()
     ];
   });
 
@@ -52,13 +45,13 @@
         msgId = notification.addNotice("Processing payment transaction", STATE.LOADING);
 
         // fetch the transaction
-        const [{ transaction }] = await Promise.all([
+        const [{ transaction: serializedTx }] = await Promise.all([
           postRequest(link, { account: $walletStore.publicKey.toBase58() }),
           isCheckoutCartValid()
         ]);
 
         // extract payment transaction created in backend
-        const txBuf = Buffer.from(transaction, "base64");
+        const txBuf = Buffer.from(serializedTx, "base64");
         let tx = Transaction.from(txBuf);
 
         // sign and send the transaction
@@ -70,7 +63,7 @@
 
         notification.updateNotice(msgId, { status: STATE.OK, exit: EXIT.TIMEOUT });
       } catch (error) {
-        notification.updateNotice(msgId, { status: STATE.ERROR, error: error.message, exit: EXIT.MANUAL });
+        notification.updateNotice(msgId, { status: STATE.ERROR, error: error.message, exit: EXIT.TIMEOUT });
         console.error(error.toString());
       } finally {
         loading = false;
@@ -79,10 +72,10 @@
   }
 </script>
 
-<ConnectionProvider network={endpoint} config="confirmed" />
+<ConnectionProvider endpoint={clusterApiUrl(network)} config="confirmed" />
 <WalletProvider {localStorageKey} {wallets} {autoConnect} />
 
-<span>Pay with Browser Wallet</span>
+<span>Pay with a browser wallet</span>
 <div>
   {#key link}
     <WalletSplitMultiButton {loading} on:payclick={payWithConnectedWallet} />
@@ -90,6 +83,10 @@
 </div>
 
 <style lang="stylus">
+  span
+    font-size medium
+    font-weight bold
+
   div
     padding-top 0.5rem
     text-align center

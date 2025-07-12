@@ -2,6 +2,7 @@
   import { slide } from "svelte/transition";
   import { notification, STATE, EXIT } from "./store";
   import Icon from "../icons/icon.svelte";
+  import Spinner from "../icons/spinner.svelte";
 </script>
 
 {#if $notification.notices.length}
@@ -12,7 +13,7 @@
           <span class="msgspan">
             <p>{message}</p>
             {#if status === STATE.LOADING}
-              <span class="icon"><Icon name="loading" title="" /></span>
+              <span class="icon"><Spinner /></span>
             {/if}
             {#if status === STATE.ERROR}
               <span class="icon error"><Icon name="warn" title="Failed" /></span>
@@ -50,6 +51,7 @@
   p
     margin 0
     padding 0
+    font-size medium
     &.error
       font-size 0.8rem
       overflow-x hidden

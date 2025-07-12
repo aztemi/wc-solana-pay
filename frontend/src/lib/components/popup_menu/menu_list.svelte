@@ -22,14 +22,12 @@
     list-style none
     z-index var(--layer_dropdown_list)
     position absolute
-    top 100%
-    right 0
     margin 0
     padding 0
     display grid
     grid-template-rows 1fr
     grid-row-gap 0.5rem
     border-radius 0.5rem
-    transform translateY(0.2rem);
+    transform translateY(0.2rem)
 
 </style>

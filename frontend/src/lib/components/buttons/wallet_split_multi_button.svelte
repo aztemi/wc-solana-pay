@@ -54,7 +54,7 @@
 
 {#if !wallet}
   <IconButton class="wallet-adapter-button wallet-adapter-button-trigger" on:click={openModal}>
-    Select Wallet
+    Connect Wallet
   </IconButton>
 {:else if connecting}
   <WalletConnectButton />
@@ -68,7 +68,7 @@
         class="paybtn wallet-adapter-button wallet-adapter-button-trigger {loading ? 'loading' : ''}"
         disabled={loading}
       >
-        <img slot="start-icon" src={wallet.icon} alt={`${wallet.name} icon`} />
+        <img slot="start-icon" src={wallet.adapter.icon} alt={`${wallet.adapter.name} icon`} />
         Pay Now
       </IconButton>
     {/if}
@@ -99,6 +99,9 @@
 {/if}
 
 <style lang="stylus">
+  span
+    font-size medium
+
   :global
     .wallet-adapter-split-dropdown
       position relative

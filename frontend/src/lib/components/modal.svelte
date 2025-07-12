@@ -40,7 +40,7 @@
     await getCheckoutOrder();
     if (isLocalhost())
       notification.addNotice(
-        "Transactions validation not possible",
+        "Transactions validation not available",
         STATE.ERROR,
         EXIT.MANUAL,
         "WordPress is on localhost. Webhook callback not available."
@@ -70,7 +70,7 @@
 
       notification.updateNotice(msgId, { status: STATE.OK, exit: EXIT.TIMEOUT });
     } catch (error) {
-      notification.updateNotice(msgId, { status: STATE.ERROR, error: error.message, exit: EXIT.MANUAL });
+      notification.updateNotice(msgId, { status: STATE.ERROR, error: error.message, exit: EXIT.TIMEOUT });
       console.error(error.toString());
     }
   }
@@ -109,12 +109,14 @@
       position relative
       display block
       overflow-y auto
-      max-width 90vw
-      max-height 95%
       border-radius 0.5rem
       border 1px solid var(--modal_border_color)
       background-color var(--modal_back_color)
-      @media screen and (min-width: 640px)
-        max-width 30rem
+      max-height 95%
+      width 100%
+      // Hack instead of `max-width min(95vw, 30rem)` due to bugs in Stylus & Svelte-preprocess (https://github.com/stylus/stylus/issues/2584)
+      max-width 95vw
+      @media screen and (min-width: 500px)
+        max-width 480px
 
 </style>

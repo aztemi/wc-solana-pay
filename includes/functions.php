@@ -34,6 +34,15 @@ function is_bcmath_installed() {
 
 
 /**
+ * Detect if current page is the Checkout, Pay or Thanks page.
+ *
+ * @return bool true if page is checkout page, otherwise false.
+ */
+function is_checkout_page() {
+	return is_page( wc_get_page_id( 'checkout' ) );
+}
+
+/**
  * Display an error notice message on the admin screen.
  *
  * @param string $notice Error message to display.

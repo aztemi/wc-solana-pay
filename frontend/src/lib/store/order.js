@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import Big from "big.js";
 import { writable } from "svelte/store";
 import { PublicKey } from "@solana/web3.js";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
@@ -9,7 +9,7 @@ const emptyOrder = {
   timedOut: false,
   paymentId: "",
   orderId: "",
-  amount: new BigNumber(0),
+  amount: new Big(0),
   currency: "",
   symbol: "",
   rpc: "", // RPC endpoint
@@ -46,7 +46,7 @@ function createOrderStore() {
         homeUrl.searchParams.set("id", id);
         if (local_id) homeUrl.searchParams.set("orderId", local_id);
 
-        amount = new BigNumber(amount);
+        amount = new Big(amount);
 
         // Append 'devnet' to RPC endpoint in testmode.
         // A hack to make the 'getChainForEndpoint()', used in WalletProvider, detect the correct network
@@ -60,7 +60,7 @@ function createOrderStore() {
           const token = key.replace(suffix, "");
           if (token in supportedTokens) {
             paymentTokens[key] = supportedTokens[token];
-            paymentTokens[key]["amount"] = new BigNumber(value.amount).decimalPlaces(value.dp, BigNumber.ROUND_CEIL);
+            paymentTokens[key]["amount"] = new Big(value.amount).round(value.dp, Big.roundUp);
             if (value.mint) paymentTokens[key]["mint"] = new PublicKey(value.mint);
             if (!activeToken) activeToken = key;
           }
