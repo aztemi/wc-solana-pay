@@ -1,10 +1,10 @@
 === WC Solana Pay ===
 Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay/donate/
-Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, pyusd, eurc, euroe, block, blockchain, cryptocurrency, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
+Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, pyusd, eurc, euroe, block, blockchain, cryptocurrency, stablecoin, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
 Requires at least: 5.2
 Tested up to: 6.8.1
-Stable tag: 2.10.0
+Stable tag: 2.11.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -15,7 +15,7 @@ WC Solana Pay - Fast payment gateway powered by Solana blockchain with support f
 
 Accept crypto payments in **SOL**, **USDT**, **USDC**, **EURC** and more via **QR Code** and through all major Solana wallets, including Phantom, Solflare and Backpack.
 
-This is a quick and easy way to add crypto payments to your WooCommerce store and WordPress website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
+This is a quick and easy way to add crypto and stablecoin payments to your WooCommerce store and WordPress website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
 
 [youtube https://www.youtube.com/watch?v=ArqS84jGjE0]
 
@@ -94,6 +94,10 @@ We currently support payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. Support
 
 == Changelog ==
 
+= 2.11.0 :: 2025-07-10 =
+* Fixed "dapp not trusted" warnings in some wallets by upgrading Wallet Adapter dependencies
+* Enhanced modal UI and optimize script loading
+
 = 2.10.0 :: 2025-04-30 =
 * Removed unstable dependency on PHP sessions, fixed theme incompatibility issues, and various bug fixes.
 
@@ -135,5 +139,5 @@ We currently support payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. Support
 
 == Upgrade Notice ==
 
-= 2.10.0 =
-Dependency on PHP sessions removed. Upgrade for bug fixes and improved stability.
+= 2.11.0 =
+Latest Solana Wallet Adapter support. Upgrade for bug fixes and improved stability.

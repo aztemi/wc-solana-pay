@@ -7,7 +7,7 @@ Solana Pay powered payment gateway for WordPress and WooCommerce.
 This is a decentralized, permissionless, and fast payment gateway powered by Solana blockchain.
 It supports payments in SOL, USDT, USDC, EURC and more via QR Code and through all major Solana wallets, including Phantom, Solflare and Backpack.
 
-It is a quick and easy way to add crypto payments to your WooCommerce store and WordPress website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
+It is a quick and easy way to add crypto and stablecoin payments to your WooCommerce store and WordPress website. Give your customers a fast, seamless crypto checkout experience and increase your conversion rate.
 
 ## How to use on a WordPress site
 
