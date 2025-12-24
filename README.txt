@@ -1,13 +1,15 @@
 === WC Solana Pay ===
 Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay/donate/
-Tags: solana pay, solana, payment, web3, crypto, sol, usdt, usdc, pyusd, eurc, euroe, block, blockchain, cryptocurrency, stablecoin, woocommerce, wc, wc solana pay, wc-solana-pay, solanapay
+Tags: solana pay, stablecoin, payment, blockchain, crypto
 Requires at least: 5.2
-Tested up to: 6.8.1
-Stable tag: 2.11.0
+Tested up to: 6.9
+Stable tag: 2.11.1
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
+
+Crypto payment gateway for WooCommerce powered by Solana Pay.
 
 == Description ==
 
@@ -94,6 +96,9 @@ We currently support payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. Support
 
 == Changelog ==
 
+= 2.11.1 :: 2025-12-23 =
+* Upgrade package dependencies and verify support for WordPress 6.9
+
 = 2.11.0 :: 2025-07-10 =
 * Fixed "dapp not trusted" warnings in some wallets by upgrading Wallet Adapter dependencies
 * Enhanced modal UI and optimize script loading
@@ -139,5 +144,5 @@ We currently support payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. Support
 
 == Upgrade Notice ==
 
-= 2.11.0 =
-Latest Solana Wallet Adapter support. Upgrade for bug fixes and improved stability.
+= 2.11.1 =
+Package dependencies updated. Upgrade for latest WordPress support.
