@@ -34,9 +34,9 @@ return array(
 		'default'     => Solana_Pay::NETWORK_MAINNET_BETA,
 		'description' => __('The Solana network cluster for processing transactions.<br /><b>"Devnet" is only for testing and has no monetary value. Select "Mainnet-Beta" to go live for real cryptocurrencies.</b>', 'wc-solana-pay'),
 		'options'     => array(
-											Solana_Pay::NETWORK_DEVNET => __( 'Devnet (Test Mode)', 'wc-solana-pay' ),
-											Solana_Pay::NETWORK_MAINNET_BETA  => __( 'Mainnet-Beta (Production Mode)', 'wc-solana-pay' ),
-										 ),
+			Solana_Pay::NETWORK_DEVNET => __( 'Devnet (Test Mode)', 'wc-solana-pay' ),
+			Solana_Pay::NETWORK_MAINNET_BETA  => __( 'Mainnet-Beta (Production Mode)', 'wc-solana-pay' ),
+		),
 	),
 	'tokens_table'  => array(
 		'title'       => __( 'Accepted Payment Tokens', 'wc-solana-pay' ),
@@ -53,12 +53,12 @@ return array(
 		'title'       => __( 'Plugin Name', 'wc-solana-pay' ),
 		'type'        => 'text',
 		'default'     => __( 'WC Solana Pay', 'wc-solana-pay' ),
-		'description' => __( 'The name of the payment gateway that customers will see on the checkout page.', 'wc-solana-pay' ),
+		'description' => __( 'Payment method name displayed on the checkout page.', 'wc-solana-pay' ),
 	),
 	'description'   => array(
 		'title'       => __( 'Description', 'wc-solana-pay' ),
 		'type'        => 'textarea',
 		'default'     => __( 'Complete your payment with Solana Pay.', 'wc-solana-pay' ),
-		'description' => __( 'Payment method description that customers will see on the checkout page.', 'wc-solana-pay' ),
+		'description' => __( 'Payment method description displayed on the checkout page.', 'wc-solana-pay' ),
 	),
 );

@@ -37,6 +37,14 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
+	 * Backend response status code indicating the order was already registered and paid.
+	 *
+	 * @var int
+	 */
+	private const BACKEND_STATUS_ALREADY_PAID = 421;
+
+
+	/**
 	 * Testmode flag; true if Testmode is enabled, false otherwise.
 	 *
 	 * @var bool
@@ -107,7 +115,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		require_once PLUGIN_DIR . '/admin/class-solana-pay.php';
 		$this->hSolanapay = new Solana_Pay( $this );
 
-		// load webhook class for handling incoming GET request
+		// load webhook class for handling incoming REST request
 		require_once PLUGIN_DIR . '/admin/class-webhook.php';
 		new Webhook( $this );
 
@@ -351,7 +359,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 			// register order details
 			$status = $this->register_order_details( $order );
 
-			if ( 421 === $status ) {
+			if ( self::BACKEND_STATUS_ALREADY_PAID === $status ) {
 				// order already paid, confirm payment
 				return $this->confirm_payment( $order_id );
 			}
@@ -429,7 +437,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 				$order_details['tokens'] = $res['tokens'];
 			}
 			$this->set_order_payment_meta( $order, $order_details );
-		} elseif ( 421 !== $res['status'] ) {
+		} elseif ( self::BACKEND_STATUS_ALREADY_PAID !== $res['status'] ) {
 			/* translators: %s: WordPress error message, e.g. 'Timeout error' */
 			throw new \Exception( sprintf( esc_html__( 'Checkout order registration failed: %s', 'wc-solana-pay' ), esc_attr( $res['error'] ) ) );
 		}
@@ -509,6 +517,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @param array     $meta  Metadata to store.
 	 */
 	public function set_order_payment_meta( $order, $meta ) {
+		if ( ! $order ) {
+			return;
+		}
+
 		$order->update_meta_data( self::ORDER_META_KEY, $meta );
 		$order->save_meta_data();
 	}
@@ -521,7 +533,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function get_order_payment_meta( $order ) {
-		if ( $this->id === $order->get_payment_method() ) {
+		if ( (bool) $order && $this->id === $order->get_payment_method() ) {
 			$meta = $order->get_meta( self::ORDER_META_KEY );
 		}
 

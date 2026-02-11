@@ -204,7 +204,7 @@ class Solana_Pay {
 	 * @param  int    $limit   Number of prepend & postpend characters to keep.
 	 * @return string
 	 */
-	public static function shorten_hash_address( $address, $limit = 6 ) {
+	public static function shorten_hash_address( $address, $limit = 10 ) {
 		return substr( $address, 0, $limit ) . '...' . substr( $address, -$limit );
 	}
 

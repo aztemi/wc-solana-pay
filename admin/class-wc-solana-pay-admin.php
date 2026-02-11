@@ -40,12 +40,12 @@ class WC_Solana_Pay_Admin {
 	 */
 	public function add_action_links( $links ) {
 		if ( current_user_can( 'manage_woocommerce' ) ) {
-			$settings_link = sprintf(
-													'<a href="%1$s">%2$s</a>',
-													admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . PLUGIN_ID ),
-													__( 'Settings', 'wc-solana-pay' )
-											 );
-
+			$settings_link =
+				sprintf(
+					'<a href="%1$s">%2$s</a>',
+					admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . PLUGIN_ID ),
+					__( 'Settings', 'wc-solana-pay' )
+				);
 			array_unshift( $links, $settings_link );
 		}
 
