@@ -37,9 +37,8 @@ define( __NAMESPACE__ . '\PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 // load plugin core class and start it
 function load_plugin_class() {
 	require_once PLUGIN_DIR . '/includes/class-wc-solana-pay.php';
-
-	$plugin = new WC_Solana_Pay();
-	$plugin->run();
+	new WC_Solana_Pay();
 }
 
-load_plugin_class();
+// initialize plugin on plugins_loaded
+add_action( 'plugins_loaded', __NAMESPACE__ . '\load_plugin_class' );

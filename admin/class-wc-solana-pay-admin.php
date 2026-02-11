@@ -7,8 +7,6 @@
 
 namespace AZTemi\WC_Solana_Pay;
 
-use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
-
 // die if accessed directly
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -18,18 +16,7 @@ if ( ! defined( 'WPINC' ) ) {
 class WC_Solana_Pay_Admin {
 
 	public function __construct() {
-		$this->load_dependencies();
 		$this->register_hooks();
-	}
-
-
-	/**
-	 * Load required dependencies for this class.
-	 */
-	private function load_dependencies() {
-		// load Solana tokens class for Store cryptocurrency handling
-		require_once PLUGIN_DIR . '/admin/class-solana-tokens.php';
-		new Solana_Tokens();
 	}
 
 
@@ -37,73 +24,11 @@ class WC_Solana_Pay_Admin {
 	 * Register all actions and filters needed to start the plugin
 	 */
 	private function register_hooks() {
-		// declare compatibility for HPOS
-		add_action( 'before_woocommerce_init', array( $this, 'declare_compatibility' ) );
-
-		// register Solana Pay payment gateway class
-		add_action( 'plugins_loaded', array( $this, 'load_payment_gateway_class' ) );
-		add_filter( 'woocommerce_payment_gateways', array( $this, 'register_payment_gateway_class' ) );
-
-		// register WooCommerce Blocks integration class
-		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_block_support_class' ) );
-
 		// Add 'Settings' link to the Installed Plugins page after plugin activation
 		add_filter( 'plugin_action_links_' . PLUGIN_BASENAME, array( $this, 'add_action_links' ) );
 
 		// register an endpoint for handling REST calls
 		add_action( 'rest_api_init', array( $this, 'register_rest_endpoint' ) );
-	}
-
-
-	/**
-	 * Declare compatibility for Woo High-Performance Order Storage (HPOS)
-	 */
-	public function declare_compatibility() {
-		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', PLUGIN_FILE, true );
-		}
-	}
-
-
-	/**
-	 * Load payment gateway class
-	 */
-	public function load_payment_gateway_class() {
-		require_once PLUGIN_DIR . '/admin/class-wc-solana-pay-payment-gateway.php';
-	}
-
-
-	/**
-	 * Register payment gateway class
-	 *
-	 * @param  array $gateways List of gateways currently registered
-	 * @return array Extended gateways list
-	 */
-	public function register_payment_gateway_class( $gateways = array() ) {
-		$gateways[] = __NAMESPACE__ . '\WC_Solana_Pay_Payment_Gateway';
-		return $gateways;
-	}
-
-
-	/**
-	 * Register WooCommerce Blocks integration class
-	 */
-	public function register_block_support_class() {
-		// check if block is in use for the Checkout page
-		$has_block_checkout = \Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils::is_checkout_block_default();
-
-		// load block if in Admin page or Checkout has block
-		$load_block = is_admin() || $has_block_checkout;
-
-		if ( $load_block && class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
-			require_once PLUGIN_DIR . '/admin/class-wc-solana-pay-payment-block.php';
-			add_action(
-				'woocommerce_blocks_payment_method_type_registration',
-				function ( PaymentMethodRegistry $payment_method_registry ) {
-					$payment_method_registry->register( new WC_Solana_Pay_Payment_Block() );
-				}
-			);
-		}
 	}
 
 
