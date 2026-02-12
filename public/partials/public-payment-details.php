@@ -14,6 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 
 $short_txn = esc_html( Solana_Pay::shorten_hash_address( $transaction, 15 ) );
+$network = $testmode ? __( 'Solana Devnet (Test Mode)', 'wc-solana-pay' ) : __( 'Solana Mainnet-Beta', 'wc-solana-pay' );
 
 function echo_tr( $key, $value, $url = '' ) {
 	$tr = '<tr><th>' . esc_html( $key ) . ':</th><td>';
@@ -32,6 +33,7 @@ function echo_tr( $key, $value, $url = '' ) {
 	<tbody>
 <?php
 	echo_tr( __( 'Transaction ID', 'wc-solana-pay' ), $short_txn, $url );
+	echo_tr( __( 'Network', 'wc-solana-pay' ), $network );
 	echo_tr( __( 'Wallet Address', 'wc-solana-pay' ), $payer );
 	echo_tr( __( 'Amount', 'wc-solana-pay' ), $paid );
 ?>
