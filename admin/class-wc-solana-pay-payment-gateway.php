@@ -130,7 +130,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	private function setup_properties() {
 		$this->id                 = PLUGIN_ID;
-		$this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black.svg';
+		$this->default_icon       = PLUGIN_URL . '/assets/img/solana_pay_black.svg';
 		$this->has_fields         = false;
 		$this->supports           = array( 'products' );
 		$this->method_title       = __( 'WC Solana Pay', 'wc-solana-pay' );
@@ -149,6 +149,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		// update configurations
 		$this->title           = $this->get_option( 'title', $this->title );
+		$this->icon            = $this->get_option( 'plugin_icon', $this->default_icon );
 		$this->enabled         = $this->get_option( 'enabled' );
 		$this->brand_name      = $this->get_option( 'brand_name' );
 		$this->description     = $this->get_option( 'description' );
@@ -174,7 +175,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	private function register_hooks() {
 		// Save Admin page settings
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_tokens_table' ) );
+		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_custom_options' ) );
 
 		// Add Solana Pay payment details on Order page
 		add_filter( 'woocommerce_admin_order_data_after_order_details', array( $this, 'add_payment_details_to_admin_order_page' ) );
@@ -312,12 +313,56 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Save tokens table admin settings
+	 * Generate html for plugin icon.
+	 * This is called from WC to generate the upload icon html on the Admin Settings page.
+	 *
+	 * @param  string $key  Field key.
+	 * @param  array  $data Field data.
+	 * @return string
 	 */
-	public function save_tokens_table() {
+	public function generate_plugin_icon_html( $key, $data ) {
+		$html = '';
+		$iconjs = get_script_path('/assets/script/admin_plugin_icon*.js');
+
+		if ( $iconjs ) {
+			$script = get_partial_file_html(
+				$iconjs,
+				array(
+					'button_text'  => __( 'Use this image', 'wc-solana-pay' ),
+					'select_title' => __( 'Select or Upload an Icon', 'wc-solana-pay' ),
+				)
+			);
+
+			$html = get_partial_file_html(
+				'/admin/partials/admin-plugin-icon.php',
+				array(
+					'tip'          => $data['desc_tip'],
+					'title'        => $data['title'],
+					'script'       => $script,
+					'icon'         => $this->icon,
+					'default_icon' => $this->default_icon,
+				)
+			);
+		}
+
+		return $html;
+	}
+
+
+	/**
+	 * Save plugin's custom options from the admin settings
+	 */
+	public function save_custom_options() {
 		$tokens = array();
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verification already handled in WC_Admin_Settings::save()
+		// Save plugin icon option
+		if ( isset( $_POST['pwspfwc_plugin_icon'] ) ) {
+			$this->icon = wc_clean( wp_unslash( $_POST['pwspfwc_plugin_icon'] ) );
+			$this->update_option( 'plugin_icon', $this->icon );
+		}
+
+		// Save tokens table options
 		if (
 			isset( $_POST['pwspfwc_id'] ) &&
 			isset( $_POST['pwspfwc_rate'] )

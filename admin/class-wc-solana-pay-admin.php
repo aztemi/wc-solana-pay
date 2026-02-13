@@ -29,6 +29,9 @@ class WC_Solana_Pay_Admin {
 
 		// register an endpoint for handling REST calls
 		add_action( 'rest_api_init', array( $this, 'register_rest_endpoint' ) );
+
+		// enqueue scripts
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_wp_media_library' ) );
 	}
 
 
@@ -50,6 +53,17 @@ class WC_Solana_Pay_Admin {
 		}
 
 		return $links;
+	}
+
+
+	/**
+	 * Enqueue WP media library scripts, its styles and jQuery
+	 */
+	public function enqueue_wp_media_library( $hook_suffix ) {
+		if ( 'woocommerce_page_wc-settings' === $hook_suffix ) {
+			wp_enqueue_media();
+			wp_enqueue_script('jquery');
+		}
 	}
 
 

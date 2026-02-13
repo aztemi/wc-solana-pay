@@ -55,6 +55,11 @@ return array(
 		'default'     => __( 'WC Solana Pay', 'wc-solana-pay' ),
 		'description' => __( 'Payment method name displayed on the checkout page.', 'wc-solana-pay' ),
 	),
+	'plugin_icon'   => array(
+		'title'       => __( 'Plugin Icon', 'wc-solana-pay' ),
+		'type'        => 'plugin_icon',
+		'desc_tip'    => __( 'Customize the plugin icon image. Recommended icon size is 48 x 32 pixels.', 'wc-solana-pay' ),
+	),
 	'description'   => array(
 		'title'       => __( 'Description', 'wc-solana-pay' ),
 		'type'        => 'textarea',

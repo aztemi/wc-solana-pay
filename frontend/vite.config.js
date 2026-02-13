@@ -9,6 +9,9 @@ switch (process.env.PACKAGE_NAME) {
   case "table":
     input = ["src/admin_tokens_table.js"];
     break;
+  case "icon":
+    input = ["src/admin_plugin_icon.js"];
+    break;
   default:
     throw new Error("PACKAGE_NAME is not defined or is not valid");
 }
