@@ -181,6 +181,9 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		add_filter( 'woocommerce_admin_order_data_after_order_details', array( $this, 'add_payment_details_to_admin_order_page' ) );
 		add_filter( 'woocommerce_order_details_after_order_table', array( $this, 'add_payment_details_to_public_order_page' ) );
 
+		// Add style to plugin icon when shown
+		add_filter( 'woocommerce_gateway_icon', array( $this, 'get_icon_with_style' ), 10, 2 );
+
 		// export global JS variables
 		add_action( 'wp_head', array( $this, 'export_global_js_variables' ) );
 	}
@@ -615,6 +618,22 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		if ( is_array( $meta ) && ( true === $meta['confirmed'] ) ) {
 			echo wp_kses_post( get_partial_file_html( '/public/partials/public-payment-details.php', $meta ) );
 		}
+	}
+
+
+	/**
+	 * Add style to plugin icon img element html
+	 *
+	 * @param string $icon Gateway icon.
+	 * @param string $id   Gateway ID.
+	 * @return string
+	 */
+	public function get_icon_with_style( $icon, $id ) {
+		if ( (bool) $this->icon && $this->id === $id ) {
+			$icon = '<img src="' . esc_url( $this->icon ) . '" alt="' . esc_attr( $this->get_title() ) . '" style="vertical-align:middle;max-height:2.5rem;"' . '" />';
+		}
+
+		return $icon;
 	}
 
 

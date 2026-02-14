@@ -8,7 +8,7 @@
 </script>
 
 <div>
-  <img src={icon} alt="Solana Pay icon" />
+  <img src={icon} alt="Plugin icon" />
   <span>
     <CountdownTimer />
     <button class="pwspfwc_icon_button" on:click={() => dispatch("close")}>
@@ -23,6 +23,9 @@
     display flex
     align-items center
     justify-content space-between
+
+    img
+      max-height 2.5rem
 
     span
       display flex

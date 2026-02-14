@@ -8,6 +8,7 @@ import { registerPaymentMethod } from "@woocommerce/blocks-registry";
 
 const id = "wc-solana-pay";
 const settings = getSetting(`${id}_data`, {});
+const icon = decodeEntities(settings.icon) || "";
 const label = decodeEntities(settings.title) || "";
 const description = decodeEntities(settings.description) || "";
 
@@ -18,17 +19,21 @@ function Content() {
 
 /** Icon component from the icon svg url */
 function Icon() {
+  if (!icon) return;
   return (
-    <svg width="86" height="32" style={{ marginRight: "1rem" }}>
-      <image xlinkHref={settings.icon} width="86" height="32" />
-    </svg>
+    <img src={icon} alt={`${label} icon`} style={{ verticalAlign: "middle", marginRight: "1rem", maxHeight: "2.5rem" }} />
   );
 }
 
 /** Label component */
 function Label({ components }) {
   const { PaymentMethodLabel } = components;
-  return <PaymentMethodLabel text={label} icon={<Icon />} />;
+  return (
+    <div>
+      <Icon />
+      <PaymentMethodLabel text={label} />
+    </div>
+  );
 }
 
 const paymentMethod = {
