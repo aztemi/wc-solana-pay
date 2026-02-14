@@ -184,6 +184,9 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		// Add style to plugin icon when shown
 		add_filter( 'woocommerce_gateway_icon', array( $this, 'get_icon_with_style' ), 10, 2 );
 
+		// Condense transaction hash displayed on the order details page
+		add_filter( 'woocommerce_order_get_transaction_id', array( $this, 'shorten_transaction_id' ), 10, 2 );
+
 		// export global JS variables
 		add_action( 'wp_head', array( $this, 'export_global_js_variables' ) );
 	}
@@ -634,6 +637,22 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		}
 
 		return $icon;
+	}
+
+
+	/**
+	 * Shorten the Solana transaction ID hash string displayed on the order details page
+	 *
+	 * @param string    $txn_id Transaction ID.
+	 * @param \WC_Order $order  Order object.
+	 * @return string
+	 */
+	public function shorten_transaction_id( $txn_id, $order ) {
+		if ( $this->id === $order->get_payment_method() ) {
+			$txn_id = esc_attr( Solana_Pay::shorten_hash_address( $txn_id ) );
+		}
+
+		return $txn_id;
 	}
 
 
