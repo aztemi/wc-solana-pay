@@ -1,9 +1,10 @@
 /**
- * <script> tag logic for handling plugin icon field on the WC Payments Admin Settings page
+ * Admin script for handling Plugin Icon settings.
  *
- * This script is loaded from the PHP code side.
+ * - Live preview when icon URL changes
+ * - Reset to default icon
+ * - Upload/select icon via WordPress media library
  */
-
 jQuery(function ($) {
   let mediaUploader = null;
   const buttonText = "<?php echo esc_attr( $button_text ) ?>";

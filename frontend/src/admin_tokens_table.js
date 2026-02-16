@@ -1,9 +1,10 @@
 /**
- * <script> tag logic on the WC Payments Admin Settings page
+ * Admin script for handling Network/Testmode UI visibility.
  *
- * This script is loaded from the PHP code side.
+ * - Shows or hides settings rows depending on the selected network.
+ * - If "devnet" is selected → test mode fields are shown.
+ * - Otherwise → live-only fields are shown.
  */
-
 jQuery(function ($) {
   // Testmode Dropdown Select handling
   function handleTestmodeDropdown() {

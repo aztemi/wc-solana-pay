@@ -1,5 +1,9 @@
 /**
- * Client side support for Gutenberg Blocks integration
+ * Payment Method Registration
+ *
+ * - Dynamically loads gateway title, description, icon, and supported features
+ * - Provides custom Label, Icon, and Content components
+ * - Ensures compatibility with WooCommerce Blocks checkout experience
  */
 
 import { decodeEntities } from "@wordpress/html-entities";

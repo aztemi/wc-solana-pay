@@ -1,7 +1,9 @@
 /**
- * <script> tag logic to copy text to clipboard
+ * Handles copy-to-clipboard functionality for buttons with the `.pwspfwc_copy_button` class.
  *
- * This script is loaded from the PHP code side.
+ * - Copies the value from the button's `data-text` attribute
+ * - Toggles icon visibility to indicate success
+ * - Restores original state after 2 seconds
  */
 
 import "./lib/styles/global.styl";
