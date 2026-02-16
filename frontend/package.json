@@ -11,6 +11,7 @@
     "build:modal": "PACKAGE_NAME=modal vite build",
     "build:table": "PACKAGE_NAME=table vite build",
     "build:icon": "PACKAGE_NAME=icon vite build",
+    "build:copy": "PACKAGE_NAME=copy vite build",
     "build": "npm-run-all clean build:*"
   },
   "devDependencies": {

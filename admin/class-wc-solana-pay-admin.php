@@ -31,7 +31,7 @@ class WC_Solana_Pay_Admin {
 		add_action( 'rest_api_init', array( $this, 'register_rest_endpoint' ) );
 
 		// enqueue scripts
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_wp_media_library' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 	}
 
 
@@ -57,12 +57,26 @@ class WC_Solana_Pay_Admin {
 
 
 	/**
-	 * Enqueue WP media library scripts, its styles and jQuery
+	 * Enqueue custom scripts on the WooCommerce Admin Orders and Settings pages
 	 */
-	public function enqueue_wp_media_library( $hook_suffix ) {
-		if ( 'woocommerce_page_wc-settings' === $hook_suffix ) {
+	public function enqueue_admin_scripts( $hook_suffix ) {
+		if ( in_array( $hook_suffix, array( 'woocommerce_page_wc-settings', 'woocommerce_page_wc-orders' ) ) ) {
+			wp_enqueue_style( 'dashicons' );
 			wp_enqueue_media();
-			wp_enqueue_script('jquery');
+
+			// enqueue css files
+			$css = '/assets/script/style*.css';
+			$css_url = get_script_path( $css, PLUGIN_URL );
+			$css_path = get_script_path( $css );
+			$handle  = PLUGIN_ID . '_admin_copycss';
+			wp_enqueue_style( $handle, $css_url, array(), filemtime( $css_path ) );
+
+			// enqueue js files
+			$js  = '/assets/script/copy_to_clipboard*.js';
+			$js_url = get_script_path( $js, PLUGIN_URL );
+			$js_path = get_script_path( $js );
+			$handle = PLUGIN_ID . '_admin_copyjs';
+			wp_enqueue_script( $handle, $js_url, array('jquery'), filemtime( $js_path ), true );
 		}
 	}
 

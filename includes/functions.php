@@ -44,6 +44,16 @@ function is_checkout_page() {
 
 
 /**
+ * Detect if current page is the View Order page.
+ *
+ * @return bool true if page is order view page, otherwise false.
+ */
+function is_view_order_page() {
+	return is_wc_endpoint_url( 'view-order' );
+}
+
+
+/**
  * Display an error notice message on the admin screen.
  *
  * @param string $notice Error message to display.
@@ -68,6 +78,23 @@ function logger( $message, $level = 'warning' ) {
 	if ( $logger ) {
 		$logger->log( $level, wc_print_r( $message, true ), array( 'source' => PLUGIN_ID ) );
 	}
+}
+
+
+/**
+ * Get html partial to render a "Copy to Clipboard" button.
+ *
+ * @param string $text The text string to be copied when the button is clicked.
+ */
+function get_copy_button_html( $text ) {
+    return sprintf(
+        '<button class="button button-link pwspfwc_copy_button" title="%s" data-text="%s" type="button" style="margin-left:0.7rem;text-decoration:none;">
+            <span class="dashicons dashicons-admin-page" style="vertical-align:middle;"></span>
+            <span class="dashicons dashicons-saved pwspfwc_hidden" style="vertical-align:middle;"></span>
+        </button>',
+        esc_attr__( 'Copy', 'wc-solana-pay' ),
+        esc_attr( $text )
+    );
 }
 
 

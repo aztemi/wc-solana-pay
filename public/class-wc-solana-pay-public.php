@@ -33,8 +33,8 @@ class WC_Solana_Pay_Public {
 	 * Register actions and filters for the payment gateway
 	 */
 	public function register_hooks() {
-		// return if not on a checkout page
-		if ( ! is_checkout_page() ) {
+		// return if not on a view-order or checkout page
+		if ( ! is_view_order_page() && ! is_checkout_page() ) {
 			return;
 		}
 
@@ -47,11 +47,14 @@ class WC_Solana_Pay_Public {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		// load scripts as modules
-		add_filter( 'script_loader_tag', array( $this, 'load_enqueued_scripts_as_modules' ), 10, 2 );
+		// only for checkout page
+		if ( is_checkout_page() ) {
+			// load scripts as modules
+			add_filter( 'script_loader_tag', array( $this, 'load_enqueued_scripts_as_modules' ), 10, 2 );
 
-		// add placeholder for the payment popup modal
-		add_action( 'wp_footer', array( $this, 'add_modal_placeholder' ), -10 );
+			// add placeholder for the payment popup modal
+			add_action( 'wp_footer', array( $this, 'add_modal_placeholder' ), -10 );
+		}
 	}
 
 
@@ -61,6 +64,13 @@ class WC_Solana_Pay_Public {
 	public function enqueue_styles() {
 		// Enqueue DashIcons
 		wp_enqueue_style( 'dashicons' );
+
+		// enqueue css files
+		$css = '/assets/script/style*.css';
+		$css_url = get_script_path( $css, PLUGIN_URL );
+		$css_path = get_script_path( $css );
+		$handle  = PLUGIN_ID . '_copycss';
+		wp_enqueue_style( $handle, $css_url, array(), filemtime( $css_path ) );
 	}
 
 
@@ -68,6 +78,13 @@ class WC_Solana_Pay_Public {
 	 * Register JavaScripts for the public-facing frontend.
 	 */
 	public function enqueue_scripts() {
+		// enqueue js files
+		$js  = '/assets/script/copy_to_clipboard*.js';
+		$js_url = get_script_path( $js, PLUGIN_URL );
+		$js_path = get_script_path( $js );
+		$handle = PLUGIN_ID . '_copyjs';
+		wp_enqueue_script( $handle, $js_url, array('jquery'), filemtime( $js_path ), true );
+
 		// Enqueue Solana Pay overlay modal script
 		$modaljs = get_script_path( '/assets/script/wc_solana_pay*.js', PLUGIN_URL );
 		if ( $modaljs ) {
