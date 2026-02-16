@@ -32,7 +32,10 @@ export default defineConfig({
     rollupOptions: {
       input,
       output: {
-        format: "iife"
+        format: "iife",
+        entryFileNames: "[name].js",
+        chunkFileNames: "[name].js",
+        assetFileNames: "[name][extname]"
       }
     }
   },

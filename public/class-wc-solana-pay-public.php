@@ -86,11 +86,11 @@ class WC_Solana_Pay_Public {
 		wp_enqueue_script( $handle, $js_url, array('jquery'), filemtime( $js_path ), true );
 
 		// Enqueue Solana Pay overlay modal script
-		$modaljs = get_script_path( '/assets/script/wc_solana_pay*.js', PLUGIN_URL );
-		if ( $modaljs ) {
-			$this->handle_js = PLUGIN_ID . '_modaljs';
-			wp_enqueue_script( $this->handle_js, $modaljs, array( 'jquery' ), null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Filename already has version added by the JS bundler.
-		}
+		$js  = '/assets/script/wc_solana_pay*.js';
+		$js_url = get_script_path( $js, PLUGIN_URL );
+		$js_path = get_script_path( $js );
+		$this->handle_js = PLUGIN_ID . '_modaljs';
+		wp_enqueue_script( $this->handle_js, $js_url, array('jquery'), filemtime( $js_path ), true );
 	}
 
 
