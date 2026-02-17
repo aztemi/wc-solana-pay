@@ -23,7 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
       <div class="alignleft" style="display:flex;gap:1rem;align-items:center;">
         <img id="pwspfwc_img_icon" src="<?php echo esc_url( $icon ); ?>" alt="<?php echo esc_attr( $title ); ?>" style="max-height:5rem;" />
         <input type="button" id="pwspfwc_btn_upload" class="button" value="<?php esc_attr_e( 'Select or Upload an Icon', 'wc-solana-pay' ); ?>" />
-        <input type="button" id="pwspfwc_btn_reset" class="button" value="<?php esc_attr_e( 'Revert to default Icon', 'wc-solana-pay' ); ?>" data-defaulticon="<?php echo esc_attr( $default_icon ); ?>" />
+        <input type="button" id="pwspfwc_btn_reset" class="button" value="<?php esc_attr_e( 'Restore default Icon', 'wc-solana-pay' ); ?>" data-defaulticon="<?php echo esc_attr( $default_icon ); ?>" />
         <input class="input-text regular-input " type="hidden" name="pwspfwc_plugin_icon" id="pwspfwc_plugin_icon" value="<?php echo esc_attr( $icon ); ?>" />
       </div>
     </fieldset>
