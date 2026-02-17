@@ -68,7 +68,7 @@ class WC_Solana_Pay_Public {
 		// enqueue css files
 		$css = '/assets/script/style*.css';
 		$css_url = get_script_path( $css, PLUGIN_URL );
-		$css_path = get_script_path( $css );
+		$css_path = get_script_path( $css, PLUGIN_DIR );
 		$handle  = PLUGIN_ID . '_copycss';
 		wp_enqueue_style( $handle, $css_url, array(), filemtime( $css_path ) );
 	}
@@ -81,14 +81,14 @@ class WC_Solana_Pay_Public {
 		// enqueue js files
 		$js  = '/assets/script/copy_to_clipboard*.js';
 		$js_url = get_script_path( $js, PLUGIN_URL );
-		$js_path = get_script_path( $js );
+		$js_path = get_script_path( $js, PLUGIN_DIR );
 		$handle = PLUGIN_ID . '_copyjs';
 		wp_enqueue_script( $handle, $js_url, array('jquery'), filemtime( $js_path ), true );
 
 		// Enqueue Solana Pay overlay modal script
 		$js  = '/assets/script/wc_solana_pay*.js';
 		$js_url = get_script_path( $js, PLUGIN_URL );
-		$js_path = get_script_path( $js );
+		$js_path = get_script_path( $js, PLUGIN_DIR );
 		$this->handle_js = PLUGIN_ID . '_modaljs';
 		wp_enqueue_script( $this->handle_js, $js_url, array('jquery'), filemtime( $js_path ), true );
 	}

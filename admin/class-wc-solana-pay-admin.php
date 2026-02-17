@@ -67,14 +67,14 @@ class WC_Solana_Pay_Admin {
 			// enqueue css files
 			$css = '/assets/script/style*.css';
 			$css_url = get_script_path( $css, PLUGIN_URL );
-			$css_path = get_script_path( $css );
+			$css_path = get_script_path( $css, PLUGIN_DIR );
 			$handle  = PLUGIN_ID . '_admin_copycss';
 			wp_enqueue_style( $handle, $css_url, array(), filemtime( $css_path ) );
 
 			// enqueue js files
 			$js  = '/assets/script/copy_to_clipboard*.js';
 			$js_url = get_script_path( $js, PLUGIN_URL );
-			$js_path = get_script_path( $js );
+			$js_path = get_script_path( $js, PLUGIN_DIR );
 			$handle = PLUGIN_ID . '_admin_copyjs';
 			wp_enqueue_script( $handle, $js_url, array('jquery'), filemtime( $js_path ), true );
 		}

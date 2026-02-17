@@ -68,6 +68,14 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
+	 * Default gateway icon path.
+	 *
+	 * @var string
+	 */
+	protected $default_icon;
+
+
+	/**
 	 * Merchant Solana wallet address where all payments will be sent.
 	 *
 	 * @var string
@@ -695,7 +703,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function add_payment_details_to_admin_order_page( $order ) {
 		$meta = $this->get_order_payment_meta( $order );
-		if ( is_array( $meta ) && ( true === $meta['confirmed'] ) ) {
+		if ( ! empty( $meta ) && ! empty( $meta['confirmed'] ) ) {
 			echo wp_kses_post( get_partial_file_html( '/admin/partials/admin-payment-details.php', $meta ) );
 		}
 	}
@@ -709,7 +717,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function add_payment_details_to_public_order_page( $order ) {
 		$meta = $this->get_order_payment_meta( $order );
-		if ( is_array( $meta ) && ( true === $meta['confirmed'] ) ) {
+		if ( ! empty( $meta ) && ! empty( $meta['confirmed'] ) ) {
 			echo wp_kses_post( get_partial_file_html( '/public/partials/public-payment-details.php', $meta ) );
 		}
 	}
