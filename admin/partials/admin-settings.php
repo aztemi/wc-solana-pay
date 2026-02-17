@@ -66,4 +66,14 @@ return array(
 		'default'     => __( 'Complete your payment with Solana Pay.', 'wc-solana-pay' ),
 		'description' => __( 'Payment method description displayed on the checkout page.', 'wc-solana-pay' ),
 	),
+	'modal_location' => array(
+		'title'       => __( 'When to show payment popup', 'wc-solana-pay' ),
+		'type'        => 'select',
+		'default'     => WC_Solana_Pay_Payment_Gateway::MODAL_LOCATION_CHECKOUT,
+		'description' => __( 'Choose when the payment popup appears to the customer.<br /><b>On Checkout page</b>: Opens immediately after clicking "Place order". <b>On Order received page</b>: Opens on the order confirmation page.', 'wc-solana-pay' ),
+		'options' => array(
+			WC_Solana_Pay_Payment_Gateway::MODAL_LOCATION_CHECKOUT      => __( 'On Checkout page', 'wc-solana-pay' ),
+			WC_Solana_Pay_Payment_Gateway::MODAL_LOCATION_ORDER_RECEIPT => __( 'On Order received page', 'wc-solana-pay' ),
+		),
+	),
 );
