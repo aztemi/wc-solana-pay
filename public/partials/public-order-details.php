@@ -36,7 +36,7 @@ $show_customer_details = $wc_order->get_user_id() === get_current_user_id();
 				<td>
 					<?php
 					$wp_button_class = wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '';
-					$class = 'woocommerce-button' . $wp_button_class . ' button pay order-actions-button';
+					$class = 'woocommerce-button' . $wp_button_class . ' button pay order-actions-button pwspfwc_nowrap';
 					$label = __( 'Pay Now', 'wc-solana-pay' );
 
 					echo '<a href="' . esc_url( $url ) . '" class="' . esc_attr( $class ) . '" aria-label="' . esc_attr( $label ) . '">' . esc_html( $label ) . '</a>';
