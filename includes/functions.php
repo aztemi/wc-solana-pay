@@ -87,14 +87,14 @@ function logger( $message, $level = 'warning' ) {
  * @param string $text The text string to be copied when the button is clicked.
  */
 function get_copy_button_html( $text ) {
-    return sprintf(
-        '<button class="button button-link pwspfwc_copy_button" title="%s" data-text="%s" type="button" style="margin-left:0.7rem;text-decoration:none;">
-            <span class="dashicons dashicons-admin-page" style="vertical-align:middle;"></span>
-            <span class="dashicons dashicons-saved pwspfwc_hidden" style="vertical-align:middle;"></span>
-        </button>',
-        esc_attr__( 'Copy', 'wc-solana-pay' ),
-        esc_attr( $text )
-    );
+	return sprintf(
+		'<button class="button button-link pwspfwc_copy_button" title="%s" data-text="%s" type="button" style="margin-left:0.7rem;text-decoration:none;">
+			<span class="dashicons dashicons-admin-page" style="vertical-align:middle;"></span>
+			<span class="dashicons dashicons-saved pwspfwc_hidden" style="vertical-align:middle;"></span>
+		</button>',
+		esc_attr__( 'Copy', 'wc-solana-pay' ),
+		esc_attr( $text )
+	);
 }
 
 

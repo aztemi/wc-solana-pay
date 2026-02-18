@@ -76,7 +76,7 @@ class WC_Solana_Pay_Admin {
 			$js_url = get_script_path( $js, PLUGIN_URL );
 			$js_path = get_script_path( $js, PLUGIN_DIR );
 			$handle = PLUGIN_ID . '_admin_copyjs';
-			wp_enqueue_script( $handle, $js_url, array('jquery'), filemtime( $js_path ), true );
+			wp_enqueue_script( $handle, $js_url, array( 'jquery' ), filemtime( $js_path ), true );
 		}
 	}
 

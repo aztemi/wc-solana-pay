@@ -13,17 +13,17 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 
-$order = wc_get_order( $order_id );
+$wc_order = wc_get_order( $order_id );
 
-if ( ! $order ) {
+if ( ! $wc_order ) {
 	return;
 }
 
-$order_items        = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) );
-$show_purchase_note = $order->has_status( apply_filters( 'woocommerce_purchase_note_order_statuses', array( 'completed', 'processing' ) ) );
+$order_items        = $wc_order->get_items( 'line_item' );
+$show_purchase_note = $wc_order->has_status( array( 'completed', 'processing' ) );
 
 // We make sure the order belongs to the user. This will also be true if the user is a guest, and the order belongs to a guest (userID === 0).
-$show_customer_details = $order->get_user_id() === get_current_user_id();
+$show_customer_details = $wc_order->get_user_id() === get_current_user_id();
 ?>
 
 <section class="woocommerce-order-details">
@@ -48,8 +48,6 @@ $show_customer_details = $order->get_user_id() === get_current_user_id();
 </section>
 
 <section class="woocommerce-order-details">
-	<?php do_action( 'woocommerce_order_details_before_order_table', $order ); ?>
-
 	<h2 class="woocommerce-order-details__title"><?php esc_html_e( 'Order details', 'woocommerce' ); ?></h2>
 
 	<table class="woocommerce-table woocommerce-table--order-details shop_table order_details">
@@ -63,15 +61,13 @@ $show_customer_details = $order->get_user_id() === get_current_user_id();
 
 		<tbody>
 			<?php
-			do_action( 'woocommerce_order_details_before_order_table_items', $order );
-
 			foreach ( $order_items as $item_id => $item ) {
 				$product = $item->get_product();
 
 				wc_get_template(
 					'order/order-details-item.php',
 					array(
-						'order'              => $order,
+						'order'              => $wc_order,
 						'item_id'            => $item_id,
 						'item'               => $item,
 						'show_purchase_note' => $show_purchase_note,
@@ -80,26 +76,16 @@ $show_customer_details = $order->get_user_id() === get_current_user_id();
 					)
 				);
 			}
-
-			do_action( 'woocommerce_order_details_after_order_table_items', $order );
 			?>
 		</tbody>
 
 		<tfoot>
-			<?php
-			foreach ( $order->get_order_item_totals() as $key => $total ) {
-			?>
+			<?php foreach ( $wc_order->get_order_item_totals() as $key => $total ) { ?>
 				<tr>
 					<th scope="row"><?php echo esc_html( $total['label'] ); ?></th>
 					<td><?php echo wp_kses_post( $total['value'] ); ?></td>
 				</tr>
-			<?php
-			}
-			?>
+			<?php } ?>
 		</tfoot>
 	</table>
-
-	<?php do_action( 'woocommerce_order_details_after_order_table', $order ); ?>
 </section>
-
-<?php do_action( 'woocommerce_after_order_details', $order ); ?>

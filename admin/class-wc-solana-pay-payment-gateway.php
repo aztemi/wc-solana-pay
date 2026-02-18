@@ -732,7 +732,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function get_icon_with_style( $icon, $id ) {
 		if ( (bool) $this->icon && $this->id === $id ) {
-			$icon = '<img src="' . esc_url( $this->icon ) . '" alt="' . esc_attr( $this->get_title() ) . '" style="vertical-align:middle;max-height:2.5rem;"' . '" />';
+			$icon = '<img src="' . esc_url( $this->icon ) . '" alt="' . esc_attr( $this->get_title() ) . '" style="vertical-align:middle;max-height:2.5rem;" />';
 		}
 
 		return $icon;
