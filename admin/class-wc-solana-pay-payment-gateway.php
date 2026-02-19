@@ -427,7 +427,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	/**
 	 * Generate a checkout URL for the given order with a unique fragment to trigger the payment modal in frontend.
 	 *
-	 * @param \WC_Order $order
+	 * @param \WC_Order $order Order object
 	 * @return string
 	 */
 	protected function get_payment_modal_url( $order ) {
@@ -435,8 +435,12 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 			return wc_get_checkout_url();
 		}
 
-		// Base URL: checkout page or order-pay page
-		$base_url = $this->is_checkoutpage ? wc_get_checkout_url() : $order->get_checkout_payment_url( true );
+		// Determine base URL
+		if ( $this->is_checkoutpage ) {
+			$base_url = is_checkout_pay_page() ? $order->get_checkout_payment_url( false ) : wc_get_checkout_url();
+		} else {
+			$base_url = $order->get_checkout_payment_url( true );
+		}
 
 		// Append unique fragment to trigger the modal
 		$fragment = sprintf( '#%s-%d@%d', $this->id, $order->get_id(), time() );
