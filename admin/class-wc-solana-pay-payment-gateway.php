@@ -37,11 +37,42 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
+	 * Backend response status code indicating the order was already registered and paid.
+	 *
+	 * @var int
+	 */
+	private const BACKEND_STATUS_ALREADY_PAID = 421;
+
+
+	/**
 	 * Testmode flag; true if Testmode is enabled, false otherwise.
 	 *
 	 * @var bool
 	 */
 	protected $is_testmode;
+
+
+	/**
+	 * Available payment modal display locations.
+	 */
+	public const MODAL_LOCATION_CHECKOUT      = 'checkout';
+	public const MODAL_LOCATION_ORDER_RECEIPT = 'order_receipt';
+
+
+	/**
+	 * True if the payment popup modal appears on the checkout page, false otherwise.
+	 *
+	 * @var bool
+	 */
+	protected $is_checkoutpage;
+
+
+	/**
+	 * Default gateway icon path.
+	 *
+	 * @var string
+	 */
+	protected $default_icon;
 
 
 	/**
@@ -107,7 +138,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 		require_once PLUGIN_DIR . '/admin/class-solana-pay.php';
 		$this->hSolanapay = new Solana_Pay( $this );
 
-		// load webhook class for handling incoming GET request
+		// load webhook class for handling incoming REST request
 		require_once PLUGIN_DIR . '/admin/class-webhook.php';
 		new Webhook( $this );
 
@@ -122,7 +153,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	private function setup_properties() {
 		$this->id                 = PLUGIN_ID;
-		$this->icon               = PLUGIN_URL . '/assets/img/solana_pay_black.svg';
+		$this->default_icon       = PLUGIN_URL . '/assets/img/solana_pay_black.svg';
 		$this->has_fields         = false;
 		$this->supports           = array( 'products' );
 		$this->method_title       = __( 'WC Solana Pay', 'wc-solana-pay' );
@@ -141,6 +172,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		// update configurations
 		$this->title           = $this->get_option( 'title', $this->title );
+		$this->icon            = $this->get_option( 'plugin_icon', $this->default_icon );
 		$this->enabled         = $this->get_option( 'enabled' );
 		$this->brand_name      = $this->get_option( 'brand_name' );
 		$this->description     = $this->get_option( 'description' );
@@ -157,6 +189,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 		// Get saved settings for the supported Solana tokens table
 		$this->tokens_table = get_option( Solana_Tokens::TOKENS_OPTION_KEY, array() );
+
+		// get payment modal placement setting
+		$modal_location = $this->get_option( 'modal_location', self::MODAL_LOCATION_ORDER_RECEIPT );
+		$this->is_checkoutpage = self::MODAL_LOCATION_CHECKOUT === $modal_location;
 	}
 
 
@@ -166,11 +202,20 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	private function register_hooks() {
 		// Save Admin page settings
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_tokens_table' ) );
+		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'save_custom_options' ) );
+
+		// Handle payment on the pay order page
+		add_action( 'woocommerce_receipt_' . $this->id, array( $this, 'process_payment_on_pay_order_page' ) );
 
 		// Add Solana Pay payment details on Order page
 		add_filter( 'woocommerce_admin_order_data_after_order_details', array( $this, 'add_payment_details_to_admin_order_page' ) );
 		add_filter( 'woocommerce_order_details_after_order_table', array( $this, 'add_payment_details_to_public_order_page' ) );
+
+		// Add style to plugin icon when shown
+		add_filter( 'woocommerce_gateway_icon', array( $this, 'get_icon_with_style' ), 10, 2 );
+
+		// Condense transaction hash displayed on the order details page
+		add_filter( 'woocommerce_order_get_transaction_id', array( $this, 'shorten_transaction_id' ), 10, 2 );
 
 		// export global JS variables
 		add_action( 'wp_head', array( $this, 'export_global_js_variables' ) );
@@ -304,12 +349,56 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
-	 * Save tokens table admin settings
+	 * Generate html for plugin icon.
+	 * This is called from WC to generate the upload icon html on the Admin Settings page.
+	 *
+	 * @param  string $key  Field key.
+	 * @param  array  $data Field data.
+	 * @return string
 	 */
-	public function save_tokens_table() {
+	public function generate_plugin_icon_html( $key, $data ) {
+		$html = '';
+		$iconjs = get_script_path('/assets/script/admin_plugin_icon*.js');
+
+		if ( $iconjs ) {
+			$script = get_partial_file_html(
+				$iconjs,
+				array(
+					'button_text'  => __( 'Use this image', 'wc-solana-pay' ),
+					'select_title' => __( 'Select or Upload an Icon', 'wc-solana-pay' ),
+				)
+			);
+
+			$html = get_partial_file_html(
+				'/admin/partials/admin-plugin-icon.php',
+				array(
+					'tip'          => $data['desc_tip'],
+					'title'        => $data['title'],
+					'script'       => $script,
+					'icon'         => $this->icon,
+					'default_icon' => $this->default_icon,
+				)
+			);
+		}
+
+		return $html;
+	}
+
+
+	/**
+	 * Save plugin's custom options from the admin settings
+	 */
+	public function save_custom_options() {
 		$tokens = array();
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verification already handled in WC_Admin_Settings::save()
+		// Save plugin icon option
+		if ( isset( $_POST['pwspfwc_plugin_icon'] ) ) {
+			$this->icon = wc_clean( wp_unslash( $_POST['pwspfwc_plugin_icon'] ) );
+			$this->update_option( 'plugin_icon', $this->icon );
+		}
+
+		// Save tokens table options
 		if (
 			isset( $_POST['pwspfwc_id'] ) &&
 			isset( $_POST['pwspfwc_rate'] )
@@ -336,6 +425,31 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 
 
 	/**
+	 * Generate a checkout URL for the given order with a unique fragment to trigger the payment modal in frontend.
+	 *
+	 * @param \WC_Order $order Order object
+	 * @return string
+	 */
+	protected function get_payment_modal_url( $order ) {
+		if ( ! $order ) {
+			return wc_get_checkout_url();
+		}
+
+		// Determine base URL
+		if ( $this->is_checkoutpage ) {
+			$base_url = is_checkout_pay_page() ? $order->get_checkout_payment_url( false ) : wc_get_checkout_url();
+		} else {
+			$base_url = $order->get_checkout_payment_url( true );
+		}
+
+		// Append unique fragment to trigger the modal
+		$fragment = sprintf( '#%s-%d@%d', $this->id, $order->get_id(), time() );
+
+		return $base_url . $fragment;
+	}
+
+
+	/**
 	 * Process payment and return the result.
 	 * This is called from WC to confirm payment for an order.
 	 *
@@ -343,35 +457,83 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-		// get order info and pending amount
+		try {
+			// get order info
+			$order = wc_get_order( $order_id );
+
+			// Determine whether order is already paid
+			$is_paid = ( $order->is_paid() || ( 0 >= $order->get_total() ) );
+
+			// if order not paid yet, register its details with the backend
+			if ( ! $is_paid ) {
+				$status = $this->register_order_details( $order );
+
+				if ( self::BACKEND_STATUS_ALREADY_PAID === $status ) {
+					// order seems paid, confirm payment onchain
+					$res = $this->confirm_payment( $order_id );
+					$is_paid = ( 'success' === $res['result'] );
+				}
+			}
+
+			// if order is paid, cleanup and redirect
+			if ( $is_paid ) {
+				// Remove cart
+				if ( isset( WC()->cart ) && WC()->cart ) {
+					WC()->cart->empty_cart();
+				}
+
+				// Redirect to thank you page
+				return array(
+					'result'   => 'success',
+					'redirect' => $this->get_return_url( $order ),
+				);
+			}
+
+			// Redirect customer to payment workflow
+			return array(
+				'result'   => 'success',
+				'redirect' => $this->get_payment_modal_url( $order ),
+			);
+		} catch ( \Throwable $e ) {
+			logger(
+				sprintf(
+					'Process payment failed with exception. Order: %s, error:%s, file: %s:%d',
+					$order_id, $e->getMessage(), $e->getFile(), $e->getLine()
+				)
+			);
+			return array(
+				'result'       => 'failure',
+				'redirect'     => wc_get_checkout_url(),
+				'errorMessage' => __( 'Payment failed. Please try again.', 'wc-solana-pay' ),
+			);
+		}
+	}
+
+
+	/**
+	 * Handles payment processing on the "Pay for Order" page.
+	 *
+	 * If the order is already paid, redirect the customer to the return URL.
+	 * Otherwise, display the order details table so the customer can proceed with payment.
+	 *
+	 * @param int $order_id The ID of the order being processed.
+	 */
+	public function process_payment_on_pay_order_page( $order_id ) {
 		$order = wc_get_order( $order_id );
-		$amount = $order->get_total();
 
-		if ( $amount > 0 ) {
-			// register order details
-			$status = $this->register_order_details( $order );
+		if ( ! $order ) {
+			return;
+		}
 
-			if ( 421 === $status ) {
-				// order already paid, confirm payment
-				return $this->confirm_payment( $order_id );
-			}
-
-			// Append redirect hash to trigger payment dialog
-			return array(
-				'result'   => 'success',
-				'redirect' => sprintf( '#%s-%s@%s', $this->id, $order_id, time() ),
-			);
+		if ( $order->is_paid() ) {
+			wp_safe_redirect( $this->get_return_url( $order ) );
+			exit;
 		} else {
-			// Remove cart
-			if ( isset( WC()->cart ) ) {
-				WC()->cart->empty_cart();
-			}
-
-			// Redirect to thank you page
-			return array(
-				'result'   => 'success',
-				'redirect' => $this->get_return_url( $order ),
+			$args = array(
+				'order_id' => $order_id,
+				'url'      => $this->get_payment_modal_url( $order ),
 			);
+			echo wp_kses_post( get_partial_file_html( '/public/partials/public-order-details.php', $args ) );
 		}
 	}
 
@@ -429,7 +591,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 				$order_details['tokens'] = $res['tokens'];
 			}
 			$this->set_order_payment_meta( $order, $order_details );
-		} elseif ( 421 !== $res['status'] ) {
+		} elseif ( self::BACKEND_STATUS_ALREADY_PAID !== $res['status'] ) {
 			/* translators: %s: WordPress error message, e.g. 'Timeout error' */
 			throw new \Exception( sprintf( esc_html__( 'Checkout order registration failed: %s', 'wc-solana-pay' ), esc_attr( $res['error'] ) ) );
 		}
@@ -509,6 +671,10 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @param array     $meta  Metadata to store.
 	 */
 	public function set_order_payment_meta( $order, $meta ) {
+		if ( ! $order ) {
+			return;
+		}
+
 		$order->update_meta_data( self::ORDER_META_KEY, $meta );
 		$order->save_meta_data();
 	}
@@ -521,7 +687,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function get_order_payment_meta( $order ) {
-		if ( $this->id === $order->get_payment_method() ) {
+		if ( (bool) $order && $this->id === $order->get_payment_method() ) {
 			$meta = $order->get_meta( self::ORDER_META_KEY );
 		}
 
@@ -541,7 +707,7 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function add_payment_details_to_admin_order_page( $order ) {
 		$meta = $this->get_order_payment_meta( $order );
-		if ( is_array( $meta ) && ( true === $meta['confirmed'] ) ) {
+		if ( ! empty( $meta ) && ! empty( $meta['confirmed'] ) ) {
 			echo wp_kses_post( get_partial_file_html( '/admin/partials/admin-payment-details.php', $meta ) );
 		}
 	}
@@ -555,9 +721,41 @@ class WC_Solana_Pay_Payment_Gateway extends \WC_Payment_Gateway {
 	 */
 	public function add_payment_details_to_public_order_page( $order ) {
 		$meta = $this->get_order_payment_meta( $order );
-		if ( is_array( $meta ) && ( true === $meta['confirmed'] ) ) {
+		if ( ! empty( $meta ) && ! empty( $meta['confirmed'] ) ) {
 			echo wp_kses_post( get_partial_file_html( '/public/partials/public-payment-details.php', $meta ) );
 		}
+	}
+
+
+	/**
+	 * Add style to plugin icon img element html
+	 *
+	 * @param string $icon Gateway icon.
+	 * @param string $id   Gateway ID.
+	 * @return string
+	 */
+	public function get_icon_with_style( $icon, $id ) {
+		if ( (bool) $this->icon && $this->id === $id ) {
+			$icon = '<img src="' . esc_url( $this->icon ) . '" alt="' . esc_attr( $this->get_title() ) . '" style="vertical-align:middle;max-height:2.5rem;" />';
+		}
+
+		return $icon;
+	}
+
+
+	/**
+	 * Shorten the Solana transaction ID hash string displayed on the order details page
+	 *
+	 * @param string    $txn_id Transaction ID.
+	 * @param \WC_Order $order  Order object.
+	 * @return string
+	 */
+	public function shorten_transaction_id( $txn_id, $order ) {
+		if ( $this->id === $order->get_payment_method() ) {
+			$txn_id = esc_attr( Solana_Pay::shorten_hash_address( $txn_id ) );
+		}
+
+		return $txn_id;
 	}
 
 

@@ -1,4 +1,12 @@
 // @ts-nocheck
+/**
+ * Initializes the Solana Pay frontend experience within WooCommerce.
+ *
+ * - Provides browser polyfills for `Buffer` and `process`
+ * - Mounts the Svelte application (`WC_Solana_Pay`)
+ * - Handles modal auto-opening via URL hash detection
+ * - Mitigates modal race conditions with repeated dispatch attempts
+ */
 import { Buffer } from "buffer";
 import { id } from "./lib/utils/backend_proxy.js";
 import WC_Solana_Pay from "./wc_solana_pay.svelte";
