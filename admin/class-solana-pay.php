@@ -205,7 +205,7 @@ class Solana_Pay {
 	 * @return string
 	 */
 	public static function shorten_hash_address( $address, $limit = 10 ) {
-		return substr( $address, 0, $limit ) . '...' . substr( $address, -$limit );
+		return strlen( (string) $address ) > ( 2 * $limit ) ? substr( $address, 0, $limit ) . '...' . substr( $address, -$limit ) : $address;
 	}
 
 
