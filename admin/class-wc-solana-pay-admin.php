@@ -60,7 +60,7 @@ class WC_Solana_Pay_Admin {
 	 * Enqueue custom scripts on the WooCommerce Admin Orders and Settings pages
 	 */
 	public function enqueue_admin_scripts( $hook_suffix ) {
-		if ( in_array( $hook_suffix, array( 'woocommerce_page_wc-settings', 'woocommerce_page_wc-orders' ) ) ) {
+		if ( in_array( $hook_suffix, array( 'woocommerce_page_wc-settings', 'woocommerce_page_wc-orders', 'post.php' ) ) ) {
 			wp_enqueue_style( 'dashicons' );
 			wp_enqueue_media();
 
