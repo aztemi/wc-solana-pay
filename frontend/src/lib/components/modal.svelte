@@ -42,7 +42,7 @@
       notification.addNotice(
         "Transactions validation not available",
         STATE.ERROR,
-        EXIT.MANUAL,
+        EXIT.TIMEOUT,
         "WordPress is on localhost. Webhook callback not available."
       );
   }
