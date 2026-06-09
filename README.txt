@@ -3,8 +3,8 @@ Contributors: aztemi, t4top
 Donate link: https://apps.aztemi.com/wc-solana-pay/donate/
 Tags: solana pay, stablecoin, payment, blockchain, crypto
 Requires at least: 5.2
-Tested up to: 6.9.1
-Stable tag: 2.12.0
+Tested up to: 7.0
+Stable tag: 2.13.0
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -96,6 +96,10 @@ We currently support payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. Support
 
 == Changelog ==
 
+= 2.13.0 :: 2026-06-08 =
+* Monitor payment transaction using WebSocket for improved payment processing performance
+* Verify support for WordPress 7.0
+
 = 2.12.0 :: 2026-02-18 =
 * Added support for displaying the payment modal on both Checkout and Order Received pages
 * Added copy-to-clipboard and custom plugin icon support
@@ -149,5 +153,5 @@ We currently support payments in SOL, USDT, USDC, PYUSD, EURC and EUROe. Support
 
 == Upgrade Notice ==
 
-= 2.12.0 =
-Improved payment modal flexibility, enhanced admin UI and stability improvements. Upgrade recommended.
+= 2.13.0 =
+Improved payment processing speed by additional transaction detection through WebSocket. Upgrade recommended.
